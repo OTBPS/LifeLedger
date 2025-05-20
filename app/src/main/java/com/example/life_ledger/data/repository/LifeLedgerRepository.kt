@@ -1,0 +1,340 @@
+package com.example.life_ledger.data.repository
+
+import com.example.life_ledger.data.dao.*
+import com.example.life_ledger.data.model.*
+import kotlinx.coroutines.flow.Flow
+
+/**
+ * LifeLedger应用统一数据仓库
+ * 整合所有实体的数据访问功能
+ */
+class LifeLedgerRepository(
+    private val transactionDao: TransactionDao,
+    private val todoDao: TodoDao,
+    private val categoryDao: CategoryDao,
+    private val budgetDao: BudgetDao,
+    private val userSettingsDao: UserSettingsDao
+) {
+    
+    // ==================== Transaction相关操作 ====================
+    
+    // 基础CRUD
+    suspend fun insertTransaction(transaction: Transaction) = transactionDao.insert(transaction)
+    suspend fun updateTransaction(transaction: Transaction) = transactionDao.update(transaction)
+    suspend fun deleteTransaction(transaction: Transaction) = transactionDao.delete(transaction)
+    suspend fun getTransactionById(id: String) = transactionDao.getById(id)
+    fun getAllTransactions() = transactionDao.getAllFlow()
+    
+    // 统计查询
+    suspend fun getTotalIncome() = transactionDao.getTotalIncome()
+    suspend fun getTotalExpense() = transactionDao.getTotalExpense()
+    fun getIncomeTransactions() = transactionDao.getIncomeFlow()
+    fun getExpenseTransactions() = transactionDao.getExpenseFlow()
+    fun getTransactionsByCategory(categoryId: String) = transactionDao.getByCategoryFlow(categoryId)
+    fun getTransactionsByDateRange(startDate: Long, endDate: Long) = transactionDao.getByDateRangeFlow(startDate, endDate)
+    suspend fun getMonthlyStats() = transactionDao.getMonthlyStats()
+    
+    // 搜索
+    fun searchTransactions(query: String) = transactionDao.searchTransactionsFlow(query)
+    
+    // ==================== TodoItem相关操作 ====================
+    
+    // 基础CRUD
+    suspend fun insertTodo(todo: TodoItem) = todoDao.insert(todo)
+    suspend fun updateTodo(todo: TodoItem) = todoDao.update(todo)
+    suspend fun deleteTodo(todo: TodoItem) = todoDao.delete(todo)
+    suspend fun getTodoById(id: String) = todoDao.getById(id)
+    fun getAllTodos() = todoDao.getAllFlow()
+    
+    // 状态查询
+    fun getPendingTodos() = todoDao.getPendingFlow()
+    fun getCompletedTodos() = todoDao.getCompletedFlow()
+    fun getHighPriorityTodos() = todoDao.getHighPriorityFlow()
+    fun getTodosByCategory(categoryId: String) = todoDao.getByCategoryFlow(categoryId)
+    
+    // 时间相关
+    fun getTodayDueTodos(): Flow<List<TodoItem>> {
+        val calendar = java.util.Calendar.getInstance()
+        val startOfDay = calendar.apply {
+            set(java.util.Calendar.HOUR_OF_DAY, 0)
+            set(java.util.Calendar.MINUTE, 0)
+            set(java.util.Calendar.SECOND, 0)
+            set(java.util.Calendar.MILLISECOND, 0)
+        }.timeInMillis
+        val endOfDay = startOfDay + 24 * 60 * 60 * 1000 - 1
+        return todoDao.getTodayDueFlow(startOfDay, endOfDay)
+    }
+    
+    fun getOverdueTodos() = todoDao.getOverdueFlow(System.currentTimeMillis())
+    
+    // 统计
+    suspend fun getTodoStats(): TodoStats {
+        val total = todoDao.getTotalCount()
+        val pending = todoDao.getPendingCount()
+        val completed = todoDao.getCompletedCount()
+        val overdue = todoDao.getOverdueCount(System.currentTimeMillis())
+        
+        return TodoStats(
+            totalCount = total,
+            pendingCount = pending,
+            completedCount = completed,
+            overdueCount = overdue,
+            completionRate = if (total > 0) (completed.toDouble() / total * 100) else 0.0
+        )
+    }
+    
+    // 批量操作
+    suspend fun markTodosAsCompleted(ids: List<String>) {
+        val currentTime = System.currentTimeMillis()
+        todoDao.markAsCompleted(ids, currentTime, currentTime)
+    }
+    
+    // 搜索
+    fun searchTodos(query: String) = todoDao.searchTodosFlow(query)
+    
+    // ==================== Category相关操作 ====================
+    
+    // 基础CRUD
+    suspend fun insertCategory(category: Category) = categoryDao.insert(category)
+    suspend fun updateCategory(category: Category) = categoryDao.update(category)
+    suspend fun deleteCategory(category: Category) = categoryDao.delete(category)
+    suspend fun getCategoryById(id: String) = categoryDao.getById(id)
+    fun getAllCategories() = categoryDao.getAllFlow()
+    
+    // 按类型查询
+    fun getFinancialCategories() = categoryDao.getFinancialCategoriesFlow()
+    fun getTodoCategories() = categoryDao.getTodoCategoriesFlow()
+    fun getIncomeCategories() = categoryDao.getIncomeCategoriesFlow()
+    fun getExpenseCategories() = categoryDao.getExpenseCategoriesFlow()
+    
+    // 默认分类
+    suspend fun getDefaultFinancialCategory(subType: String) = categoryDao.getDefaultFinancialCategory(subType)
+    suspend fun getDefaultTodoCategory() = categoryDao.getDefaultTodoCategory()
+    
+    // 使用统计
+    suspend fun incrementCategoryUsage(categoryId: String) {
+        val currentTime = System.currentTimeMillis()
+        categoryDao.incrementUsage(categoryId, currentTime, currentTime)
+    }
+    
+    // 搜索
+    fun searchCategories(query: String) = categoryDao.searchCategoriesFlow(query)
+    
+    // ==================== Budget相关操作 ====================
+    
+    // 基础CRUD
+    suspend fun insertBudget(budget: Budget) = budgetDao.insert(budget)
+    suspend fun updateBudget(budget: Budget) = budgetDao.update(budget)
+    suspend fun deleteBudget(budget: Budget) = budgetDao.delete(budget)
+    suspend fun getBudgetById(id: String) = budgetDao.getById(id)
+    fun getAllBudgets() = budgetDao.getAllFlow()
+    
+    // 当前预算
+    fun getCurrentBudgets() = budgetDao.getCurrentBudgetsFlow(System.currentTimeMillis())
+    suspend fun getCurrentBudgetByCategory(categoryId: String) = 
+        budgetDao.getCurrentBudgetByCategory(categoryId, System.currentTimeMillis())
+    
+    // 预算状态
+    fun getOverspentBudgets() = budgetDao.getOverspentBudgetsFlow()
+    fun getNearLimitBudgets() = budgetDao.getNearLimitBudgetsFlow()
+    
+    // 预算更新
+    suspend fun updateBudgetSpent(budgetId: String, amount: Double) {
+        budgetDao.updateSpent(budgetId, amount, System.currentTimeMillis())
+    }
+    
+    suspend fun addBudgetSpent(budgetId: String, amount: Double) {
+        budgetDao.addSpent(budgetId, amount, System.currentTimeMillis())
+    }
+    
+    // 统计
+    suspend fun getBudgetOverview() = budgetDao.getCurrentBudgetOverview(System.currentTimeMillis())
+    
+    // 搜索
+    fun searchBudgets(query: String) = budgetDao.searchBudgetsFlow(query)
+    
+    // ==================== UserSettings相关操作 ====================
+    
+    // 基础CRUD
+    suspend fun insertUserSettings(settings: UserSettings) = userSettingsDao.insert(settings)
+    suspend fun updateUserSettings(settings: UserSettings) = userSettingsDao.update(settings)
+    suspend fun getUserSettings(userId: String) = userSettingsDao.getByUserId(userId)
+    fun getUserSettingsFlow(userId: String) = userSettingsDao.getByUserIdFlow(userId)
+    suspend fun getDefaultSettings() = userSettingsDao.getDefaultSettings()
+    
+    // 特定设置更新
+    suspend fun updateTheme(userId: String, theme: UserSettings.AppTheme) {
+        userSettingsDao.updateTheme(userId, theme, System.currentTimeMillis())
+    }
+    
+    suspend fun updateCurrency(userId: String, currency: String, currencySymbol: String) {
+        userSettingsDao.updateCurrency(userId, currency, currencySymbol, System.currentTimeMillis())
+    }
+    
+    suspend fun updateNotificationEnabled(userId: String, enabled: Boolean) {
+        userSettingsDao.updateNotificationEnabled(userId, enabled, System.currentTimeMillis())
+    }
+    
+    suspend fun updateBiometric(userId: String, enabled: Boolean) {
+        userSettingsDao.updateBiometric(userId, enabled, System.currentTimeMillis())
+    }
+    
+    // ==================== 跨表查询和业务逻辑 ====================
+    
+    /**
+     * 获取首页仪表板数据
+     */
+    suspend fun getDashboardData(): DashboardData {
+        val todayStats = getTodayFinancialStats()
+        val todoStats = getTodoStats()
+        val budgetOverview = getBudgetOverview()
+        val recentTransactions = transactionDao.getRecentTransactions(5)
+        val todayTodos = todoDao.getTodayDueCount(getTodayStartEnd().first, getTodayStartEnd().second)
+        val overdueTodos = todoDao.getOverdueCount(System.currentTimeMillis())
+        
+        return DashboardData(
+            todayIncome = todayStats.income,
+            todayExpense = todayStats.expense,
+            todayBalance = todayStats.balance,
+            totalBudget = budgetOverview.totalAmount,
+            totalSpent = budgetOverview.totalSpent,
+            budgetUsageRate = budgetOverview.totalUsageRate,
+            pendingTodos = todoStats.pendingCount,
+            todayDueTodos = todayTodos,
+            overdueTodos = overdueTodos,
+            recentTransactions = recentTransactions
+        )
+    }
+    
+    /**
+     * 获取今日财务统计
+     */
+    private suspend fun getTodayFinancialStats(): DailyFinancialStats {
+        val (startOfDay, endOfDay) = getTodayStartEnd()
+        val income = transactionDao.getIncomeByDateRange(startOfDay, endOfDay)
+        val expense = transactionDao.getExpenseByDateRange(startOfDay, endOfDay)
+        
+        return DailyFinancialStats(
+            income = income,
+            expense = expense,
+            balance = income - expense
+        )
+    }
+    
+    /**
+     * 获取今日开始和结束时间戳
+     */
+    private fun getTodayStartEnd(): Pair<Long, Long> {
+        val calendar = java.util.Calendar.getInstance()
+        val startOfDay = calendar.apply {
+            set(java.util.Calendar.HOUR_OF_DAY, 0)
+            set(java.util.Calendar.MINUTE, 0)
+            set(java.util.Calendar.SECOND, 0)
+            set(java.util.Calendar.MILLISECOND, 0)
+        }.timeInMillis
+        val endOfDay = startOfDay + 24 * 60 * 60 * 1000 - 1
+        return Pair(startOfDay, endOfDay)
+    }
+    
+    /**
+     * 添加交易记录并更新相关预算
+     */
+    suspend fun addTransactionWithBudgetUpdate(transaction: Transaction): Long {
+        // 插入交易记录
+        val transactionId = transactionDao.insert(transaction)
+        
+        // 如果是支出，更新相关预算
+        if (transaction.type == Transaction.TransactionType.EXPENSE && transaction.categoryId != null) {
+            val budget = budgetDao.getCurrentBudgetByCategory(
+                transaction.categoryId, 
+                System.currentTimeMillis()
+            )
+            budget?.let {
+                budgetDao.addSpent(it.id, transaction.amount, System.currentTimeMillis())
+            }
+        }
+        
+        // 更新分类使用次数
+        transaction.categoryId?.let { categoryId ->
+            categoryDao.incrementUsage(categoryId, System.currentTimeMillis(), System.currentTimeMillis())
+        }
+        
+        return transactionId
+    }
+    
+    /**
+     * 初始化默认数据
+     */
+    suspend fun initializeDefaultData() {
+        // 检查是否已有数据
+        if (categoryDao.getCount() == 0) {
+            // 插入默认分类
+            val financialCategories = Category.createDefaultFinancialCategories()
+            categoryDao.insertAll(financialCategories)
+            
+            val todoCategories = Category.createDefaultTodoCategories()
+            categoryDao.insertAll(todoCategories)
+        }
+        
+        // 检查用户设置
+        if (!userSettingsDao.hasAnySettings()) {
+            val defaultSettings = UserSettings()
+            userSettingsDao.insert(defaultSettings)
+        }
+    }
+    
+    /**
+     * 清理过期数据
+     */
+    suspend fun cleanupExpiredData() {
+        val thirtyDaysAgo = System.currentTimeMillis() - (30 * 24 * 60 * 60 * 1000L)
+        val ninetyDaysAgo = System.currentTimeMillis() - (90 * 24 * 60 * 60 * 1000L)
+        
+        // 归档过期预算
+        budgetDao.archiveExpiredBudgets(System.currentTimeMillis(), System.currentTimeMillis())
+        
+        // 删除旧的预算（保留90天）
+        budgetDao.deleteOldBudgets(ninetyDaysAgo)
+        
+        // 删除已完成的旧待办事项（保留30天）
+        // 注意：这里需要自定义SQL，暂时跳过
+    }
+}
+
+// ==================== 数据类定义 ====================
+
+/**
+ * 待办事项统计数据
+ */
+data class TodoStats(
+    val totalCount: Int,
+    val pendingCount: Int,
+    val completedCount: Int,
+    val overdueCount: Int,
+    val completionRate: Double
+)
+
+/**
+ * 日财务统计数据
+ */
+data class DailyFinancialStats(
+    val income: Double,
+    val expense: Double,
+    val balance: Double
+)
+
+/**
+ * 仪表板数据
+ */
+data class DashboardData(
+    val todayIncome: Double,
+    val todayExpense: Double,
+    val todayBalance: Double,
+    val totalBudget: Double,
+    val totalSpent: Double,
+    val budgetUsageRate: Double,
+    val pendingTodos: Int,
+    val todayDueTodos: Int,
+    val overdueTodos: Int,
+    val recentTransactions: List<Transaction>
+) 

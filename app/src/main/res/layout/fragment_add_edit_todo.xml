@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <!-- 数据绑定变量，待TodoViewModel创建后再添加 -->
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.todo.AddEditTodoFragment">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorSurface"
+                app:title="添加任务"
+                app:navigationIcon="@drawable/ic_arrow_back"
+                app:titleTextColor="?attr/colorOnSurface" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- 任务标题 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:text="任务标题"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="请输入任务标题"
+                            app:startIconDrawable="@drawable/ic_assignment">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/editTitle"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="text"
+                                android:maxLines="2" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 任务描述 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:text="任务描述"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="添加详细描述（可选）"
+                            app:startIconDrawable="@drawable/ic_description">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/editDescription"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textMultiLine"
+                                android:lines="3"
+                                android:maxLines="5" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 分类和优先级 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp"
+                            android:text="分类和优先级"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <!-- 分类选择 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="16dp">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginEnd="12dp"
+                                android:src="@drawable/ic_category"
+                                app:tint="?attr/colorOnSurfaceVariant" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="16dp"
+                                android:text="分类"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                                android:textColor="?attr/colorOnSurface" />
+
+                            <Spinner
+                                android:id="@+id/spinnerCategory"
+                                android:layout_width="0dp"
+                                android:layout_height="48dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/spinner_background"
+                                android:padding="12dp" />
+
+                        </LinearLayout>
+
+                        <!-- 优先级选择 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginEnd="12dp"
+                                android:src="@drawable/ic_priority"
+                                app:tint="?attr/colorOnSurfaceVariant" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="16dp"
+                                android:text="优先级"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                                android:textColor="?attr/colorOnSurface" />
+
+                            <com.google.android.material.chip.ChipGroup
+                                android:id="@+id/chipGroupPriority"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                app:singleLine="true"
+                                app:singleSelection="true">
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/chipLow"
+                                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="低" />
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/chipMedium"
+                                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:checked="true"
+                                    android:text="中" />
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/chipHigh"
+                                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="高" />
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/chipUrgent"
+                                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="紧急" />
+
+                            </com.google.android.material.chip.ChipGroup>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 时间设置 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp"
+                            android:text="时间设置"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <!-- 截止时间 -->
+                        <LinearLayout
+                            android:id="@+id/layoutDueDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="12dp"
+                            android:layout_marginBottom="8dp">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginEnd="12dp"
+                                android:src="@drawable/ic_calendar"
+                                app:tint="?attr/colorOnSurfaceVariant" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="16dp"
+                                android:text="截止时间"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                                android:textColor="?attr/colorOnSurface" />
+
+                            <TextView
+                                android:id="@+id/tvDueDate"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="未设置"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:gravity="end" />
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginStart="8dp"
+                                android:src="@drawable/ic_chevron_right"
+                                app:tint="?attr/colorOnSurfaceVariant" />
+
+                        </LinearLayout>
+
+                        <!-- 提醒设置 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="12dp">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginEnd="12dp"
+                                android:src="@drawable/ic_notifications"
+                                app:tint="?attr/colorOnSurfaceVariant" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="提醒"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                                android:textColor="?attr/colorOnSurface" />
+
+                            <com.google.android.material.switchmaterial.SwitchMaterial
+                                android:id="@+id/switchReminder"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+
+                        </LinearLayout>
+
+                        <!-- 提醒时间 -->
+                        <LinearLayout
+                            android:id="@+id/layoutReminderTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="12dp"
+                            android:layout_marginStart="36dp"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="16dp"
+                                android:text="提醒时间"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                                android:textColor="?attr/colorOnSurface" />
+
+                            <TextView
+                                android:id="@+id/tvReminderTime"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="截止前1小时"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:gravity="end" />
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginStart="8dp"
+                                android:src="@drawable/ic_chevron_right"
+                                app:tint="?attr/colorOnSurfaceVariant" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 标签 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:text="标签"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="用逗号分隔多个标签，如：重要,紧急"
+                            app:startIconDrawable="@drawable/ic_tag">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/editTags"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="text" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 进度设置 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardProgress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    android:visibility="visible"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp"
+                            android:text="任务进度"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <com.google.android.material.slider.Slider
+                                android:id="@+id/sliderProgress"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:valueFrom="0"
+                                android:valueTo="100"
+                                android:stepSize="5" />
+
+                            <TextView
+                                android:id="@+id/tvProgressPercent"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:text="0%"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                                android:textColor="?attr/colorOnSurface"
+                                android:minWidth="48dp"
+                                android:gravity="center" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 操作按钮 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <!-- 删除按钮（编辑模式才显示） -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonDelete"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:text="删除"
+                        android:textColor="@color/md_theme_error"
+                        android:visibility="gone"
+                        app:icon="@drawable/ic_delete"
+                        app:iconTint="@color/md_theme_error"
+                        app:strokeColor="@color/md_theme_error"
+                        tools:visibility="visible" />
+
+                    <!-- 保存按钮 -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonSave"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:text="保存"
+                        app:icon="@drawable/ic_save" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout> 

@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+    </data>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- 标题栏 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="AI智能分析"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface" />
+
+                    <Button
+                        android:id="@+id/buttonUserProfile"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="用户设置"
+                        app:icon="@drawable/ic_person" />
+
+                </LinearLayout>
+
+                <!-- 进度条 -->
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
+
+                <!-- 操作按钮 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <Button
+                        android:id="@+id/buttonFullAnalysis"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="一键智能分析"
+                        android:textSize="16sp"
+                        app:icon="@drawable/ic_analytics"
+                        android:layout_marginBottom="8dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/buttonAnalyzeExpenses"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="支出分析"
+                            app:icon="@drawable/ic_analytics"
+                            android:layout_marginEnd="4dp" />
+
+                        <Button
+                            android:id="@+id/buttonMonthlyReport"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="月度报告"
+                            app:icon="@drawable/ic_report"
+                            android:layout_marginStart="4dp"
+                            android:layout_marginEnd="4dp" />
+
+                        <Button
+                            android:id="@+id/buttonPersonalizedAdvice"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="个性建议"
+                            app:icon="@drawable/ic_lightbulb"
+                            android:layout_marginStart="4dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- 支出分析结果 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/layoutExpenseAnalysis"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="gone"
+                    app:cardElevation="4dp"
+                    app:cardCornerRadius="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="💡 智能支出分析"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorPrimary"
+                            android:layout_marginBottom="12dp" />
+
+                        <TextView
+                            android:id="@+id/textExpenseAnalysisSummary"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:lineSpacingExtra="4dp"
+                            android:layout_marginBottom="8dp"
+                            tools:text="分析总结..." />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="?attr/colorOutlineVariant"
+                            android:layout_marginVertical="8dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="📊 支出结构分析"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:id="@+id/textStructureAnalysis"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:layout_marginBottom="8dp"
+                            tools:text="结构分析..." />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="🎯 消费习惯评估"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:id="@+id/textHabitAssessment"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:layout_marginBottom="8dp"
+                            tools:text="习惯评估..." />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="⚠️ 潜在问题识别"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:id="@+id/textProblemIdentification"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:layout_marginBottom="8dp"
+                            tools:text="问题识别..." />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="💡 优化建议"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:id="@+id/textOptimizationSuggestions"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:layout_marginBottom="8dp"
+                            tools:text="优化建议..." />
+
+                        <TextView
+                            android:id="@+id/textAnalysisTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="12sp"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:gravity="end"
+                            tools:text="分析时间：2024-01-01 12:00" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 月度报告 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/layoutMonthlyReport"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="gone"
+                    app:cardElevation="4dp"
+                    app:cardCornerRadius="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:id="@+id/textReportTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="📊 月度财务报告"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorPrimary"
+                            android:layout_marginBottom="12dp"
+                            tools:text="2024年1月财务报告" />
+
+                        <TextView
+                            android:id="@+id/textReportSummary"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="8dp"
+                            tools:text="报告摘要..." />
+
+                        <TextView
+                            android:id="@+id/textReportContent"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:lineSpacingExtra="4dp"
+                            android:layout_marginBottom="8dp"
+                            tools:text="详细报告内容..." />
+
+                        <TextView
+                            android:id="@+id/textReportTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="12sp"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:gravity="end"
+                            tools:text="生成时间：2024-01-01 12:00" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 个性化建议 -->
+                <LinearLayout
+                    android:id="@+id/layoutAdvice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="🎯 个性化消费建议"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorPrimary"
+                        android:layout_marginBottom="12dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerViewAdvice"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        tools:listitem="@layout/item_consumption_advice" />
+
+                </LinearLayout>
+
+                <!-- 占位符 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="32dp"
+                    android:visibility="visible">
+
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:src="@drawable/ic_analytics"
+                        android:alpha="0.6"
+                        android:layout_marginBottom="16dp"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="点击上方按钮开始AI智能分析"
+                        android:textSize="16sp"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:gravity="center" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="基于您的财务数据，AI将为您提供专业的分析和建议"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:gravity="center"
+                        android:layout_marginTop="8dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+</layout> 

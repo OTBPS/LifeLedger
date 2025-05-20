@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardAdvice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:cardElevation="2dp"
+        app:cardCornerRadius="8dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/colorOutlineVariant">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- 标题和优先级 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/textAdviceTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorOnSurface"
+                    tools:text="控制娱乐支出" />
+
+                <TextView
+                    android:id="@+id/textAdvicePriority"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:background="@drawable/bg_rounded_corner"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    tools:text="优先级：1" />
+
+            </LinearLayout>
+
+            <!-- 描述 -->
+            <TextView
+                android:id="@+id/textAdviceDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:lineSpacingExtra="2dp"
+                android:layout_marginBottom="8dp"
+                tools:text="建议减少每月在娱乐方面的支出，可以选择更经济的娱乐方式，如在家看电影、户外运动等。" />
+
+            <!-- 预期效果 -->
+            <TextView
+                android:id="@+id/textAdviceEffect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="?attr/colorPrimary"
+                android:layout_marginBottom="4dp"
+                android:drawablePadding="4dp"
+                app:drawableStartCompat="@drawable/ic_target"
+                app:drawableTint="?attr/colorPrimary"
+                tools:text="预期效果：每月可节省500-800元" />
+
+            <!-- 难度 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_difficulty"
+                    app:tint="?attr/colorOnSurfaceVariant"
+                    android:layout_marginEnd="4dp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="执行难度："
+                    android:textSize="12sp"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+
+                <TextView
+                    android:id="@+id/textAdviceDifficulty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_rounded_corner"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    tools:text="中等" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout> 

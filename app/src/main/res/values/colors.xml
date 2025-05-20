@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Legacy colors (keep for compatibility) -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Material Design 3 Light Theme Colors -->
+    <color name="md_theme_primary">#006D3B</color>
+    <color name="md_theme_on_primary">#FFFFFF</color>
+    <color name="md_theme_primary_container">#94F7B4</color>
+    <color name="md_theme_on_primary_container">#00210E</color>
+    
+    <color name="md_theme_secondary">#506352</color>
+    <color name="md_theme_on_secondary">#FFFFFF</color>
+    <color name="md_theme_secondary_container">#D3E8D2</color>
+    <color name="md_theme_on_secondary_container">#0E1F12</color>
+    
+    <color name="md_theme_tertiary">#39656E</color>
+    <color name="md_theme_on_tertiary">#FFFFFF</color>
+    <color name="md_theme_tertiary_container">#BDEAF4</color>
+    <color name="md_theme_on_tertiary_container">#001F24</color>
+    
+    <color name="md_theme_error">#BA1A1A</color>
+    <color name="md_theme_on_error">#FFFFFF</color>
+    <color name="md_theme_error_container">#FFDAD6</color>
+    <color name="md_theme_on_error_container">#410002</color>
+    
+    <color name="md_theme_background">#FCFEF8</color>
+    <color name="md_theme_on_background">#1A1C19</color>
+    <color name="md_theme_surface">#FCFEF8</color>
+    <color name="md_theme_on_surface">#1A1C19</color>
+    <color name="md_theme_surface_variant">#DEE5DA</color>
+    <color name="md_theme_on_surface_variant">#424940</color>
+    <color name="md_theme_outline">#727970</color>
+    <color name="md_theme_outline_variant">#C2C9BE</color>
+
+    <!-- Application specific colors -->
+    <color name="income_green">#4CAF50</color>
+    <color name="expense_red">#F44336</color>
+    <color name="budget_blue">#2196F3</color>
+    <color name="warning_orange">#FF9800</color>
+    
+    <!-- Chart colors -->
+    <color name="chart_color_1">#4CAF50</color>
+    <color name="chart_color_2">#2196F3</color>
+    <color name="chart_color_3">#FF9800</color>
+    <color name="chart_color_4">#9C27B0</color>
+    <color name="chart_color_5">#F44336</color>
+    <color name="chart_color_6">#00BCD4</color>
+    
+    <!-- Status colors -->
+    <color name="success">#4CAF50</color>
+    <color name="warning">#FF9800</color>
+    <color name="danger">#F44336</color>
+    <color name="info">#2196F3</color>
+    
+    <!-- Semantic colors for MD3 -->
+    <color name="md_theme_success">#4CAF50</color>
+    <color name="md_theme_on_success">#FFFFFF</color>
+    <color name="md_theme_success_container">#E8F5E8</color>
+    <color name="md_theme_on_success_container">#1B5E20</color>
+</resources>

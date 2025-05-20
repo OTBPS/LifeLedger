@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/financeFragment"
+        android:icon="@drawable/ic_account_balance_wallet"
+        android:title="@string/nav_finance" />
+
+    <item
+        android:id="@+id/todoFragment"
+        android:icon="@drawable/ic_check_circle"
+        android:title="@string/nav_todo" />
+
+    <item
+        android:id="@+id/statisticsFragment"
+        android:icon="@drawable/ic_bar_chart"
+        android:title="@string/nav_statistics" />
+
+    <item
+        android:id="@+id/settingsFragment"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/nav_settings" />
+
+</menu> 

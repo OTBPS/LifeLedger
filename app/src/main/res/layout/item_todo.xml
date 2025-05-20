@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="todo"
+            type="com.example.life_ledger.data.model.TodoItem" />
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="4dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="2dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/colorOutlineVariant">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- 主要内容行 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- 完成状态复选框 -->
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/checkboxCompleted"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:checked="@{todo.isCompleted}"
+                    app:buttonTint="?attr/colorPrimary" />
+
+                <!-- 内容区域 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <!-- 标题和优先级 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <!-- 优先级指示器 -->
+                        <View
+                            android:id="@+id/viewPriorityIndicator"
+                            android:layout_width="4dp"
+                            android:layout_height="16dp"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/priority_indicator"
+                            tools:backgroundTint="@color/md_theme_error" />
+
+                        <!-- 任务标题 -->
+                        <TextView
+                            android:id="@+id/tvTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@{todo.title}"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold"
+                            android:maxLines="2"
+                            android:ellipsize="end"
+                            tools:text="完成项目报告" />
+
+                        <!-- 优先级标签 -->
+                        <TextView
+                            android:id="@+id/tvPriority"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/tag_background"
+                            android:paddingHorizontal="6dp"
+                            android:paddingVertical="2dp"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                            android:textColor="?attr/colorOnPrimary"
+                            tools:text="高" />
+
+                    </LinearLayout>
+
+                    <!-- 描述 -->
+                    <TextView
+                        android:id="@+id/tvDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@{todo.description}"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:visibility="gone"
+                        tools:text="需要整理这个月的工作总结和下个月的计划"
+                        tools:visibility="visible" />
+
+                    <!-- 进度条 -->
+                    <LinearLayout
+                        android:id="@+id/layoutProgress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:visibility="gone"
+                        tools:visibility="visible">
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/progressBar"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            app:trackThickness="6dp"
+                            app:indicatorColor="?attr/colorPrimary"
+                            app:trackColor="?attr/colorSurfaceVariant"
+                            tools:progress="60" />
+
+                        <TextView
+                            android:id="@+id/tvProgress"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            tools:text="60%" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- 操作按钮 -->
+                <ImageButton
+                    android:id="@+id/btnMore"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_more_vert"
+                    android:contentDescription="更多操作"
+                    app:tint="?attr/colorOnSurfaceVariant" />
+
+            </LinearLayout>
+
+            <!-- 底部信息栏 -->
+            <LinearLayout
+                android:id="@+id/layoutBottomInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- 分类标签 -->
+                <TextView
+                    android:id="@+id/tvCategory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/tag_background"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                    android:textColor="?attr/colorPrimary"
+                    android:visibility="gone"
+                    tools:text="工作"
+                    tools:visibility="visible" />
+
+                <!-- 标签列表 -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvTags"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:visibility="visible" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <!-- 截止时间 -->
+                <LinearLayout
+                    android:id="@+id/layoutDueDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginEnd="4dp"
+                        android:src="@drawable/ic_access_time"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:id="@+id/tvDueDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        tools:text="明天 15:30" />
+
+                </LinearLayout>
+
+                <!-- 提醒指示器 -->
+                <ImageView
+                    android:id="@+id/iconReminder"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_notifications"
+                    android:visibility="gone"
+                    app:tint="?attr/colorPrimary"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout> 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 背景圆环 -->
+    <item>
+        <shape
+            android:innerRadiusRatio="3"
+            android:shape="ring"
+            android:thicknessRatio="8"
+            android:useLevel="false">
+            <solid android:color="@color/surface_variant" />
+        </shape>
+    </item>
+    
+    <!-- 进度圆环 -->
+    <item>
+        <rotate
+            android:fromDegrees="-90"
+            android:toDegrees="-90">
+            <shape
+                android:innerRadiusRatio="3"
+                android:shape="ring"
+                android:thicknessRatio="8"
+                android:useLevel="true">
+                <gradient
+                    android:startColor="@color/success"
+                    android:endColor="@color/primary"
+                    android:type="sweep" />
+            </shape>
+        </rotate>
+    </item>
+</layer-list> 

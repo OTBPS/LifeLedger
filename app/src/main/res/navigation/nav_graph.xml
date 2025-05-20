@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/financeFragment">
+
+    <!-- 财务管理页面 -->
+    <fragment
+        android:id="@+id/financeFragment"
+        android:name="com.example.life_ledger.ui.finance.FinanceFragment"
+        android:label="@string/nav_finance"
+        tools:layout="@layout/fragment_finance" />
+
+    <!-- 待办事项页面 -->
+    <fragment
+        android:id="@+id/todoFragment"
+        android:name="com.example.life_ledger.ui.todo.TodoFragment"
+        android:label="@string/nav_todo"
+        tools:layout="@layout/fragment_todo" />
+
+    <!-- 统计分析页面 -->
+    <fragment
+        android:id="@+id/statisticsFragment"
+        android:name="com.example.life_ledger.ui.statistics.StatisticsFragment"
+        android:label="@string/nav_statistics"
+        tools:layout="@layout/fragment_statistics" />
+
+    <!-- 设置页面 -->
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.life_ledger.ui.settings.SettingsFragment"
+        android:label="@string/nav_settings"
+        tools:layout="@layout/fragment_settings" />
+
+</navigation> 

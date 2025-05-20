@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- 标题 -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="创建预算"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"
+        android:layout_marginBottom="16dp" />
+
+    <!-- 预算名称 -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilBudgetName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="预算名称"
+        app:boxStrokeColor="@color/primary"
+        app:hintTextColor="@color/primary"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etBudgetName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:maxLines="1"
+            tools:text="月度生活费" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- 预算金额 -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilBudgetAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="预算金额（元）"
+        app:boxStrokeColor="@color/primary"
+        app:hintTextColor="@color/primary"
+        app:prefixText="¥"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etBudgetAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:maxLines="1"
+            tools:text="3000" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- 预算周期 -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="预算周期"
+        app:boxStrokeColor="@color/primary"
+        app:hintTextColor="@color/primary"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+
+        <AutoCompleteTextView
+            android:id="@+id/spinnerPeriod"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:focusable="false"
+            tools:text="每月" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- 预算分类 -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="预算分类"
+        app:boxStrokeColor="@color/primary"
+        app:hintTextColor="@color/primary"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+
+        <AutoCompleteTextView
+            android:id="@+id/spinnerCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:focusable="false"
+            tools:text="总预算(不限分类)" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- 预算描述 -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="预算描述（可选）"
+        app:boxStrokeColor="@color/primary"
+        app:hintTextColor="@color/primary"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:maxLines="3"
+            android:gravity="top"
+            tools:text="每月的基本生活开支预算" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- 警告阈值设置 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_warning"
+                app:tint="@color/warning" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="警告阈值"
+                android:textSize="16sp"
+                android:textColor="@color/text_primary" />
+
+            <TextView
+                android:id="@+id/tvAlertThreshold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="80%"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/warning" />
+
+        </LinearLayout>
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/sliderAlertThreshold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:valueFrom="50"
+            android:valueTo="100"
+            android:stepSize="5"
+            android:value="80"
+            app:thumbColor="@color/warning"
+            app:trackColorActive="@color/warning"
+            app:trackColorInactive="@color/surface_variant" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="当支出达到此百分比时发送警告通知"
+            android:textSize="12sp"
+            android:textColor="@color/text_secondary"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+    <!-- 预算设置选项 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:orientation="vertical">
+
+        <!-- 定期预算开关 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_refresh"
+                app:tint="@color/primary" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="定期预算"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="到期后自动续期下个周期"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary" />
+
+            </LinearLayout>
+
+            <Switch
+                android:id="@+id/switchRecurring"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true" />
+
+        </LinearLayout>
+
+        <!-- 警告通知开关 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_notification"
+                app:tint="@color/primary" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="警告通知"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="达到警告阈值时发送通知"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary" />
+
+            </LinearLayout>
+
+            <Switch
+                android:id="@+id/switchAlertEnabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- 操作按钮 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="取消"
+            style="@style/Widget.Material3.Button.TextButton" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="保存"
+            style="@style/Widget.Material3.Button" />
+
+    </LinearLayout>
+
+</LinearLayout> 

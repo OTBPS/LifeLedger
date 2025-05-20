@@ -1,0 +1,33 @@
+<resources>
+    <!-- 应用基本信息 -->
+    <string name="app_name">LifeLedger</string>
+    <string name="app_subtitle">智能追踪，智能规划</string>
+    <string name="app_logo">应用图标</string>
+    
+    <!-- 欢迎页面 -->
+    <string name="welcome_title">欢迎使用 LifeLedger</string>
+    <string name="setup_message">项目依赖配置已完成！现在可以开始构建您的个人财务和任务管理平台。</string>
+    
+    <!-- 通用文本 -->
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="save">保存</string>
+    <string name="delete">删除</string>
+    <string name="edit">编辑</string>
+    <string name="add">添加</string>
+    <string name="search">搜索</string>
+    <string name="filter">筛选</string>
+    <string name="settings">设置</string>
+    
+    <!-- 导航标签 -->
+    <string name="nav_finance">财务</string>
+    <string name="nav_todo">待办</string>
+    <string name="nav_statistics">统计</string>
+    <string name="nav_settings">设置</string>
+    
+    <!-- 错误信息 -->
+    <string name="error_network">网络连接错误</string>
+    <string name="error_loading">加载失败</string>
+    <string name="error_save">保存失败</string>
+    <string name="error_invalid_input">输入无效</string>
+</resources>

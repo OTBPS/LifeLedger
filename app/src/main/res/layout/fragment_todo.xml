@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <!-- 数据绑定变量，后续添加ViewModel -->
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.todo.TodoFragment">
+
+        <!-- 下拉刷新布局 -->
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <!-- 筛选选项卡 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="2dp">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="12dp"
+                        app:singleLine="true"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipAll"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="全部" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipPending"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="待完成" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipCompleted"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="已完成" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipHighPriority"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="高优先级" />
+
+                    </com.google.android.material.chip.ChipGroup>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 任务概览卡片 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="20dp">
+
+                        <!-- 今日任务 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="今日任务"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+
+                            <TextView
+                                android:id="@+id/tvTodayTasks"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+                                android:textColor="?attr/colorPrimary"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <!-- 待完成 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="待完成"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+
+                            <TextView
+                                android:id="@+id/tvPendingTasks"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                                android:textColor="@color/md_theme_error" />
+
+                        </LinearLayout>
+
+                        <!-- 已完成 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="已完成"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+
+                            <TextView
+                                android:id="@+id/tvCompletedTasks"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                                android:textColor="@color/md_theme_success" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 任务列表 -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvTodoItems"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:paddingHorizontal="16dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/item_todo" />
+
+                <!-- 空状态视图 -->
+                <LinearLayout
+                    android:id="@+id/layoutEmptyState"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_marginBottom="16dp"
+                        android:alpha="0.6"
+                        android:src="@drawable/ic_check_circle"
+                        android:tint="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="暂无待办事项"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="点击下方按钮添加任务"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <!-- 浮动操作按钮 -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAddTodo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:contentDescription="添加待办事项"
+            app:srcCompat="@drawable/ic_add"
+            app:tint="?attr/colorOnPrimary" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout> 
