@@ -10,7 +10,33 @@
         android:id="@+id/financeFragment"
         android:name="com.example.life_ledger.ui.finance.FinanceFragment"
         android:label="@string/nav_finance"
-        tools:layout="@layout/fragment_finance" />
+        tools:layout="@layout/fragment_finance">
+        <action
+            android:id="@+id/action_financeFragment_to_addEditTransactionFragment"
+            app:destination="@id/addEditTransactionFragment" />
+    </fragment>
+
+    <!-- 添加/编辑交易记录页面 -->
+    <fragment
+        android:id="@+id/addEditTransactionFragment"
+        android:name="com.example.life_ledger.ui.finance.AddEditTransactionFragment"
+        android:label="添加记录"
+        tools:layout="@layout/fragment_add_edit_transaction">
+        <argument
+            android:name="transactionId"
+            android:defaultValue=""
+            app:argType="string" />
+        <action
+            android:id="@+id/action_addEditTransactionFragment_to_categoryManagementFragment"
+            app:destination="@id/categoryManagementFragment" />
+    </fragment>
+
+    <!-- 分类管理页面 -->
+    <fragment
+        android:id="@+id/categoryManagementFragment"
+        android:name="com.example.life_ledger.ui.finance.CategoryManagementFragment"
+        android:label="分类管理"
+        tools:layout="@layout/fragment_category_management" />
 
     <!-- 待办事项页面 -->
     <fragment

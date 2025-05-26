@@ -47,7 +47,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="16dp"
-                                android:text="账户总览"
+                                android:text="财务概览"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                                 android:textColor="?attr/colorOnSurface" />
 
@@ -56,7 +56,7 @@
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal">
 
-                                <!-- 总余额 -->
+                                <!-- 账户余额 -->
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
@@ -66,12 +66,12 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="总余额"
+                                        android:text="余额"
                                         android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                         android:textColor="?attr/colorOnSurfaceVariant" />
 
                                     <TextView
-                                        android:id="@+id/tvTotalBalance"
+                                        android:id="@+id/textViewBalance"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="¥ 0.00"
@@ -81,7 +81,7 @@
 
                                 </LinearLayout>
 
-                                <!-- 本月收入 -->
+                                <!-- 收入 -->
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
@@ -91,12 +91,12 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="本月收入"
+                                        android:text="收入"
                                         android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                         android:textColor="?attr/colorOnSurfaceVariant" />
 
                                     <TextView
-                                        android:id="@+id/tvMonthlyIncome"
+                                        android:id="@+id/textViewIncome"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="¥ 0.00"
@@ -105,7 +105,7 @@
 
                                 </LinearLayout>
 
-                                <!-- 本月支出 -->
+                                <!-- 支出 -->
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
@@ -115,12 +115,12 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="本月支出"
+                                        android:text="支出"
                                         android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                         android:textColor="?attr/colorOnSurfaceVariant" />
 
                                     <TextView
-                                        android:id="@+id/tvMonthlyExpense"
+                                        android:id="@+id/textViewExpense"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="¥ 0.00"
@@ -130,6 +130,16 @@
                                 </LinearLayout>
 
                             </LinearLayout>
+
+                            <!-- 交易数量显示 -->
+                            <TextView
+                                android:id="@+id/textViewTransactionCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="共0笔交易"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
 
                         </LinearLayout>
 
@@ -143,95 +153,123 @@
                         android:orientation="horizontal">
 
                         <!-- 快速收入 -->
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/cardQuickIncome"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/buttonQuickIncome"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
                             android:layout_weight="1"
-                            android:clickable="true"
-                            android:focusable="true"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="2dp"
-                            app:rippleColor="?attr/colorPrimary">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:padding="16dp">
-
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:src="@drawable/ic_add_circle"
-                                    android:tint="@color/md_theme_success" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="快速收入"
-                                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                                    android:textColor="?attr/colorOnSurface" />
-
-                            </LinearLayout>
-
-                        </com.google.android.material.card.MaterialCardView>
+                            android:text="添加收入"
+                            android:textColor="@color/md_theme_success"
+                            app:icon="@drawable/ic_add_circle"
+                            app:iconTint="@color/md_theme_success"
+                            app:strokeColor="@color/md_theme_success" />
 
                         <!-- 快速支出 -->
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/cardQuickExpense"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/buttonQuickExpense"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:layout_weight="1"
-                            android:clickable="true"
-                            android:focusable="true"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="2dp"
-                            app:rippleColor="?attr/colorPrimary">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:padding="16dp">
-
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:layout_marginBottom="8dp"
-                                    android:src="@drawable/ic_remove_circle"
-                                    android:tint="@color/md_theme_error" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="快速支出"
-                                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                                    android:textColor="?attr/colorOnSurface" />
-
-                            </LinearLayout>
-
-                        </com.google.android.material.card.MaterialCardView>
+                            android:text="添加支出"
+                            android:textColor="@color/md_theme_error"
+                            app:icon="@drawable/ic_remove_circle"
+                            app:iconTint="@color/md_theme_error"
+                            app:strokeColor="@color/md_theme_error" />
 
                     </LinearLayout>
 
-                    <!-- 最近交易标题 -->
+                    <!-- 搜索和筛选区域 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="vertical">
+
+                        <!-- 搜索框 -->
+                        <androidx.appcompat.widget.SearchView
+                            android:id="@+id/searchView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            android:background="?attr/colorSurface"
+                            app:iconifiedByDefault="false"
+                            app:queryHint="搜索交易记录..." />
+
+                        <!-- 筛选标签和日期范围 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <!-- 筛选标签组 -->
+                            <com.google.android.material.chip.ChipGroup
+                                android:id="@+id/chipGroupFilter"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                app:checkedChip="@+id/chipAll"
+                                app:selectionRequired="true"
+                                app:singleSelection="true">
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/chipAll"
+                                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="全部" />
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/chipIncome"
+                                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="收入" />
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/chipExpense"
+                                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="支出" />
+
+                            </com.google.android.material.chip.ChipGroup>
+
+                            <!-- 日期范围选择 -->
+                            <TextView
+                                android:id="@+id/textViewDateRange"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginStart="16dp"
+                                android:background="?attr/selectableItemBackground"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:padding="8dp"
+                                android:text="本月"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                                android:textColor="?attr/colorPrimary"
+                                app:drawableEndCompat="@drawable/ic_chevron_right" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- 交易记录列表标题 -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
-                        android:text="最近交易"
+                        android:text="交易记录"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                         android:textColor="?attr/colorOnSurface" />
 
                     <!-- 交易记录列表 -->
                     <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rvTransactions"
+                        android:id="@+id/recyclerViewTransactions"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:nestedScrollingEnabled="false"
@@ -240,7 +278,7 @@
 
                     <!-- 空状态视图 -->
                     <LinearLayout
-                        android:id="@+id/layoutEmptyState"
+                        android:id="@+id/layoutEmpty"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="32dp"
@@ -282,7 +320,7 @@
 
         <!-- 浮动操作按钮 -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabAddTransaction"
+            android:id="@+id/fabAdd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"

@@ -369,12 +369,7 @@ class AddEditTransactionFragment : Fragment() {
             return
         }
         
-        android.util.Log.d("AddEditTransactionFragment", "开始保存交易记录")
-        android.util.Log.d("AddEditTransactionFragment", "选择的日期: ${dateFormat.format(selectedDate.time)} (${selectedDate.timeInMillis})")
-        android.util.Log.d("AddEditTransactionFragment", "是否编辑模式: $isEditMode")
-        
         if (!validateInput()) {
-            android.util.Log.e("AddEditTransactionFragment", "输入验证失败")
             return
         }
 
@@ -386,8 +381,6 @@ class AddEditTransactionFragment : Fragment() {
         }
         
         val selectedCategory = getSelectedCategory()
-        android.util.Log.d("AddEditTransactionFragment", "交易信息: 金额=$amount, 类型=$type, 分类=${selectedCategory?.name}")
-        
         val description = binding.editDescription.text.toString().trim()
         val tagsText = binding.editTags.text.toString().trim()
         val tagsList = if (tagsText.isNotEmpty()) {
@@ -489,21 +482,6 @@ class AddEditTransactionFragment : Fragment() {
             if (amount > 999999999) {
                 editAmount.error = "金额过大"
                 editAmount.requestFocus()
-                return false
-            }
-
-            // 验证日期
-            if (selectedDate.timeInMillis <= 0) {
-                Snackbar.make(root, "请选择有效日期", Snackbar.LENGTH_SHORT).show()
-                return false
-            }
-
-            val now = System.currentTimeMillis()
-            val oneYearAgo = now - 365L * 24 * 60 * 60 * 1000
-            val oneYearFromNow = now + 365L * 24 * 60 * 60 * 1000
-
-            if (selectedDate.timeInMillis < oneYearAgo || selectedDate.timeInMillis > oneYearFromNow) {
-                Snackbar.make(root, "日期必须在一年范围内", Snackbar.LENGTH_SHORT).show()
                 return false
             }
 
