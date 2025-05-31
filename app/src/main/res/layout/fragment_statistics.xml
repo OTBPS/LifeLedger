@@ -4,15 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <!-- 数据绑定变量，后续添加ViewModel -->
+        <!-- 移除viewModel数据绑定变量 -->
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.statistics.StatisticsFragment">
+        android:fitsSystemWindows="true">
 
-        <!-- 下拉刷新布局 -->
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
@@ -29,44 +28,71 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- 时间段选择 -->
+                    <!-- 页面标题 -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:text="数据统计"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textStyle="bold" />
+
+                    <!-- 时间范围选择 -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="8dp"
-                        app:cardElevation="2dp">
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="4dp">
 
-                        <com.google.android.material.chip.ChipGroup
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="12dp"
-                            app:singleLine="true"
-                            app:singleSelection="true">
+                            android:orientation="horizontal"
+                            android:padding="16dp">
 
-                            <com.google.android.material.chip.Chip
-                                android:id="@+id/chipWeek"
-                                style="@style/Widget.MaterialComponents.Chip.Choice"
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_weight="1"
+                                android:text="统计时间范围："
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                                android:textStyle="bold" />
+
+                            <com.google.android.material.chip.ChipGroup
+                                android:id="@+id/chipGroupTimeRange"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="本周" />
+                                app:checkedChip="@+id/chipThisMonth"
+                                app:selectionRequired="true"
+                                app:singleSelection="true">
 
-                            <com.google.android.material.chip.Chip
-                                android:id="@+id/chipMonth"
-                                style="@style/Widget.MaterialComponents.Chip.Choice"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:checked="true"
-                                android:text="本月" />
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/chipThisWeek"
+                                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="本周" />
 
-                            <com.google.android.material.chip.Chip
-                                android:id="@+id/chipYear"
-                                style="@style/Widget.MaterialComponents.Chip.Choice"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="本年" />
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/chipThisMonth"
+                                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="本月" />
 
-                        </com.google.android.material.chip.ChipGroup>
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/chipThisYear"
+                                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="今年" />
+
+                            </com.google.android.material.chip.ChipGroup>
+
+                        </LinearLayout>
 
                     </com.google.android.material.card.MaterialCardView>
 
@@ -90,14 +116,14 @@
                                 android:layout_marginBottom="16dp"
                                 android:text="财务概览"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                                android:textColor="?attr/colorOnSurface" />
+                                android:textStyle="bold" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal">
 
-                                <!-- 收入 -->
+                                <!-- 总收入 -->
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
@@ -107,7 +133,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="收入"
+                                        android:text="总收入"
                                         android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                         android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -115,13 +141,14 @@
                                         android:id="@+id/tvTotalIncome"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="¥ 0.00"
+                                        android:text="¥0.00"
                                         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                                        android:textColor="@color/md_theme_success" />
+                                        android:textColor="@color/md_theme_success"
+                                        android:textStyle="bold" />
 
                                 </LinearLayout>
 
-                                <!-- 支出 -->
+                                <!-- 总支出 -->
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
@@ -131,7 +158,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="支出"
+                                        android:text="总支出"
                                         android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                         android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -139,13 +166,14 @@
                                         android:id="@+id/tvTotalExpense"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="¥ 0.00"
+                                        android:text="¥0.00"
                                         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                                        android:textColor="@color/md_theme_error" />
+                                        android:textColor="@color/md_theme_error"
+                                        android:textStyle="bold" />
 
                                 </LinearLayout>
 
-                                <!-- 净收入 -->
+                                <!-- 净收支 -->
                                 <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
@@ -155,17 +183,18 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="净收入"
+                                        android:text="净收支"
                                         android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                         android:textColor="?attr/colorOnSurfaceVariant" />
 
                                     <TextView
-                                        android:id="@+id/tvNetIncome"
+                                        android:id="@+id/tvNetBalance"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="¥ 0.00"
+                                        android:text="¥0.00"
                                         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                                        android:textColor="?attr/colorPrimary" />
+                                        android:textColor="?attr/colorPrimary"
+                                        android:textStyle="bold" />
 
                                 </LinearLayout>
 
@@ -175,7 +204,7 @@
 
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- 收支趋势图表 -->
+                    <!-- 支出趋势折线图 -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -187,168 +216,198 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="20dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="16dp"
-                                android:text="收支趋势"
-                                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                                android:textColor="?attr/colorOnSurface" />
-
-                            <!-- 图表视图 (后续使用MPAndroidChart) -->
-                            <View
-                                android:id="@+id/chartIncomeExpense"
-                                android:layout_width="match_parent"
-                                android:layout_height="200dp"
-                                android:background="@color/md_theme_surface_variant"
-                                android:alpha="0.3" />
-
-                        </LinearLayout>
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- 分类统计 -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="20dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="16dp"
-                                android:text="支出分类"
-                                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                                android:textColor="?attr/colorOnSurface" />
-
-                            <!-- 饼图 (后续使用MPAndroidChart) -->
-                            <View
-                                android:id="@+id/chartExpenseCategory"
-                                android:layout_width="match_parent"
-                                android:layout_height="200dp"
-                                android:background="@color/md_theme_surface_variant"
-                                android:alpha="0.3" />
-
-                        </LinearLayout>
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- 任务完成度 -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="20dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="16dp"
-                                android:text="任务完成度"
-                                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                                android:textColor="?attr/colorOnSurface" />
+                            android:padding="16dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginBottom="12dp"
                                 android:orientation="horizontal">
 
-                                <!-- 总任务数 -->
-                                <LinearLayout
+                                <TextView
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
-                                    android:orientation="vertical">
+                                    android:text="趋势统计"
+                                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                                    android:textStyle="bold" />
 
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="总任务"
-                                        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                                        android:textColor="?attr/colorOnSurfaceVariant" />
-
-                                    <TextView
-                                        android:id="@+id/tvTotalTasks"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="0"
-                                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                                        android:textColor="?attr/colorOnSurface" />
-
-                                </LinearLayout>
-
-                                <!-- 已完成 -->
-                                <LinearLayout
-                                    android:layout_width="0dp"
+                                <com.google.android.material.chip.ChipGroup
+                                    android:id="@+id/chipGroupTrendType"
+                                    android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:orientation="vertical">
+                                    app:checkedChip="@+id/chipExpenseTrend"
+                                    app:selectionRequired="true"
+                                    app:singleSelection="true">
 
-                                    <TextView
+                                    <com.google.android.material.chip.Chip
+                                        android:id="@+id/chipExpenseTrend"
+                                        style="@style/Widget.MaterialComponents.Chip.Choice"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="已完成"
-                                        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                                        android:textColor="?attr/colorOnSurfaceVariant" />
+                                        android:text="支出" />
 
-                                    <TextView
-                                        android:id="@+id/tvCompletedTasks"
+                                    <com.google.android.material.chip.Chip
+                                        android:id="@+id/chipIncomeTrend"
+                                        style="@style/Widget.MaterialComponents.Chip.Choice"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="0"
-                                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                                        android:textColor="@color/md_theme_success" />
+                                        android:text="收入" />
 
-                                </LinearLayout>
-
-                                <!-- 完成率 -->
-                                <LinearLayout
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:orientation="vertical">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="完成率"
-                                        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                                        android:textColor="?attr/colorOnSurfaceVariant" />
-
-                                    <TextView
-                                        android:id="@+id/tvCompletionRate"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="0%"
-                                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                                        android:textColor="?attr/colorPrimary" />
-
-                                </LinearLayout>
+                                </com.google.android.material.chip.ChipGroup>
 
                             </LinearLayout>
+
+                            <com.github.mikephil.charting.charts.LineChart
+                                android:id="@+id/lineChartExpenseTrend"
+                                android:layout_width="match_parent"
+                                android:layout_height="250dp" />
 
                         </LinearLayout>
 
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- 空状态视图 -->
+                    <!-- 收支分类饼图 -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="4dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="12dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="分类统计"
+                                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                                    android:textStyle="bold" />
+
+                                <com.google.android.material.chip.ChipGroup
+                                    android:id="@+id/chipGroupPieType"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    app:checkedChip="@+id/chipExpenseCategory"
+                                    app:selectionRequired="true"
+                                    app:singleSelection="true">
+
+                                    <com.google.android.material.chip.Chip
+                                        android:id="@+id/chipExpenseCategory"
+                                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="支出" />
+
+                                    <com.google.android.material.chip.Chip
+                                        android:id="@+id/chipIncomeCategory"
+                                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="收入" />
+
+                                </com.google.android.material.chip.ChipGroup>
+
+                            </LinearLayout>
+
+                            <com.github.mikephil.charting.charts.PieChart
+                                android:id="@+id/pieChartCategories"
+                                android:layout_width="match_parent"
+                                android:layout_height="300dp" />
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- 月度支出条形图 -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="4dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="12dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="月度统计"
+                                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                                    android:textStyle="bold" />
+
+                                <com.google.android.material.chip.ChipGroup
+                                    android:id="@+id/chipGroupMonthlyRange"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    app:checkedChip="@+id/chipLast12Months"
+                                    app:selectionRequired="true"
+                                    app:singleSelection="true">
+
+                                    <com.google.android.material.chip.Chip
+                                        android:id="@+id/chipLast12Months"
+                                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="近12月" />
+
+                                    <com.google.android.material.chip.Chip
+                                        android:id="@+id/chipMonthlyThisYear"
+                                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="今年" />
+
+                                    <com.google.android.material.chip.Chip
+                                        android:id="@+id/chipMonthlyLastYear"
+                                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="去年" />
+
+                                    <com.google.android.material.chip.Chip
+                                        android:id="@+id/chipLast24Months"
+                                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="近24月" />
+
+                                </com.google.android.material.chip.ChipGroup>
+
+                            </LinearLayout>
+
+                            <com.github.mikephil.charting.charts.BarChart
+                                android:id="@+id/barChartMonthly"
+                                android:layout_width="match_parent"
+                                android:layout_height="280dp" />
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- 空状态 -->
                     <LinearLayout
                         android:id="@+id/layoutEmptyState"
                         android:layout_width="match_parent"
@@ -357,7 +416,7 @@
                         android:gravity="center"
                         android:orientation="vertical"
                         android:visibility="gone"
-                        tools:visibility="gone">
+                        tools:visibility="visible">
 
                         <ImageView
                             android:layout_width="64dp"
@@ -378,7 +437,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="添加一些数据后查看统计信息"
+                            android:text="先添加一些交易记录吧"
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 

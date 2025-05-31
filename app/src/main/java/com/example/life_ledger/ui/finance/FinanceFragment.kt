@@ -266,7 +266,7 @@ class FinanceFragment : Fragment() {
      */
     private fun showDateRangeDialog() {
         val options = arrayOf("今天", "本周", "本月", "今年", "全部")
-        val currentSelection = when (viewModel.currentDateRange) {
+        val currentSelection = when (viewModel.getCurrentDateRange()) {
             DateRange.TODAY -> 0
             DateRange.THIS_WEEK -> 1
             DateRange.THIS_MONTH -> 2
@@ -289,6 +289,14 @@ class FinanceFragment : Fragment() {
                 dialog.dismiss()
             }
             .show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 在Fragment可见时刷新数据，确保从AddEditTransactionFragment返回时能看到最新数据
+        if (::viewModel.isInitialized) {
+            viewModel.refresh()
+        }
     }
 
     override fun onDestroyView() {

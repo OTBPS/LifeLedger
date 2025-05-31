@@ -3,21 +3,21 @@ package com.example.life_ledger.ui.finance
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.asLiveData
 import com.example.life_ledger.data.model.Transaction
 import com.example.life_ledger.data.repository.TransactionRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * 财务管理ViewModel
- * 处理财务记录的CRUD操作、筛选、搜索等功能
+ * 财务模块ViewModel
+ * 处理财务记录的CRUD操作和数据展示逻辑
  */
 class FinanceViewModel(
-    private val repository: TransactionRepository
+    private val transactionRepository: TransactionRepository
 ) : ViewModel() {
 
     // 所有交易记录
@@ -42,12 +42,12 @@ class FinanceViewModel(
 
     // 当前筛选条件
     private var currentFilter = FilterOption.ALL
-    private var _currentDateRange = DateRange.ALL
-    private var currentSortOrder = com.example.life_ledger.ui.finance.SortOrder.DATE_DESC
-    private var currentTagFilter = emptyList<String>()
+    private var currentDateRange = DateRange.THIS_MONTH
 
-    // 暴露当前日期范围给Fragment使用
-    val currentDateRange: DateRange get() = _currentDateRange
+    /**
+     * 获取当前日期范围
+     */
+    fun getCurrentDateRange(): DateRange = currentDateRange
 
     init {
         loadTransactions()
@@ -56,14 +56,14 @@ class FinanceViewModel(
     /**
      * 加载所有交易记录
      */
-    private fun loadTransactions() {
+    fun loadTransactions() {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
-                _isLoading.value = true
-                repository.getAllTransactions().asLiveData().observeForever { transactionList ->
-                    _transactions.value = transactionList
-                    applyFilter()
-                }
+                val allTransactions = transactionRepository.getAllTransactions().first()
+                _transactions.value = allTransactions
+                applyFilter()
+                calculateSummary(allTransactions)
             } catch (e: Exception) {
                 _operationResult.value = OperationResult(
                     isSuccess = false,
@@ -81,12 +81,12 @@ class FinanceViewModel(
     fun addTransaction(transaction: Transaction) {
         viewModelScope.launch {
             try {
-                repository.insertTransaction(transaction)
+                transactionRepository.insertTransaction(transaction)
                 _operationResult.value = OperationResult(
                     isSuccess = true,
                     message = "记录添加成功"
                 )
-                loadTransactions()
+                loadTransactions() // 重新加载数据
             } catch (e: Exception) {
                 _operationResult.value = OperationResult(
                     isSuccess = false,
@@ -102,12 +102,12 @@ class FinanceViewModel(
     fun updateTransaction(transaction: Transaction) {
         viewModelScope.launch {
             try {
-                repository.updateTransaction(transaction)
+                transactionRepository.updateTransaction(transaction)
                 _operationResult.value = OperationResult(
                     isSuccess = true,
                     message = "记录更新成功"
                 )
-                loadTransactions()
+                loadTransactions() // 重新加载数据
             } catch (e: Exception) {
                 _operationResult.value = OperationResult(
                     isSuccess = false,
@@ -123,12 +123,12 @@ class FinanceViewModel(
     fun deleteTransaction(transaction: Transaction) {
         viewModelScope.launch {
             try {
-                repository.deleteTransaction(transaction)
+                transactionRepository.deleteTransaction(transaction)
                 _operationResult.value = OperationResult(
                     isSuccess = true,
                     message = "记录删除成功"
                 )
-                loadTransactions()
+                loadTransactions() // 重新加载数据
             } catch (e: Exception) {
                 _operationResult.value = OperationResult(
                     isSuccess = false,
@@ -143,12 +143,8 @@ class FinanceViewModel(
      */
     suspend fun getTransactionById(id: String): Transaction? {
         return try {
-            repository.getTransactionById(id)
+            transactionRepository.getTransactionById(id)
         } catch (e: Exception) {
-            _operationResult.value = OperationResult(
-                isSuccess = false,
-                message = "获取记录失败: ${e.message}"
-            )
             null
         }
     }
@@ -165,39 +161,8 @@ class FinanceViewModel(
      * 设置日期范围
      */
     fun setDateRange(dateRange: DateRange) {
-        _currentDateRange = dateRange
+        currentDateRange = dateRange
         applyFilter()
-    }
-
-    /**
-     * 设置排序方式
-     */
-    fun setSortOrder(sortOrder: com.example.life_ledger.ui.finance.SortOrder) {
-        currentSortOrder = sortOrder
-        applyFilter()
-    }
-
-    /**
-     * 按标签筛选
-     */
-    fun filterByTags(tags: List<String>) {
-        currentTagFilter = tags
-        applyFilter()
-    }
-
-    /**
-     * 清除标签筛选
-     */
-    fun clearTagFilter() {
-        currentTagFilter = emptyList()
-        applyFilter()
-    }
-
-    /**
-     * 获取所有已使用的标签
-     */
-    fun getAllUsedTags(): List<String> {
-        return _transactions.value?.flatMap { it.getTagsList() }?.distinct()?.sorted() ?: emptyList()
     }
 
     /**
@@ -213,26 +178,13 @@ class FinanceViewModel(
         }
 
         // 应用日期范围筛选
-        val (startDate, endDate) = getDateRangeMillis(_currentDateRange)
+        val (startDate, endDate) = getDateRangeMillis(currentDateRange)
         filtered = filtered.filter { transaction ->
             transaction.date >= startDate && transaction.date <= endDate
         }
 
-        // 应用标签筛选
-        if (currentTagFilter.isNotEmpty()) {
-            filtered = filtered.filter { transaction ->
-                val transactionTags = transaction.getTagsList()
-                currentTagFilter.any { tag -> transactionTags.contains(tag) }
-            }
-        }
-
-        // 应用排序
-        filtered = when (currentSortOrder) {
-            com.example.life_ledger.ui.finance.SortOrder.DATE_DESC -> filtered.sortedByDescending { it.date }
-            com.example.life_ledger.ui.finance.SortOrder.DATE_ASC -> filtered.sortedBy { it.date }
-            com.example.life_ledger.ui.finance.SortOrder.AMOUNT_DESC -> filtered.sortedByDescending { it.amount }
-            com.example.life_ledger.ui.finance.SortOrder.AMOUNT_ASC -> filtered.sortedBy { it.amount }
-        }
+        // 按日期降序排列
+        filtered = filtered.sortedByDescending { it.date }
 
         _filteredTransactions.value = filtered
         calculateSummary(filtered)

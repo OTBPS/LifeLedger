@@ -3,6 +3,8 @@ package com.example.life_ledger.data.repository
 import com.example.life_ledger.data.dao.*
 import com.example.life_ledger.data.model.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
+import java.util.*
 
 /**
  * LifeLedger应用统一数据仓库
@@ -281,6 +283,125 @@ class LifeLedgerRepository(
             val defaultSettings = UserSettings()
             userSettingsDao.insert(defaultSettings)
         }
+        
+        // 注释掉自动创建示例数据，让用户使用真实的交易记录
+        // val transactionCount = transactionDao.getCount()
+        // if (transactionCount == 0) {
+        //     createSampleTransactionData()
+        // }
+    }
+    
+    /**
+     * 创建示例交易数据（用于测试月度统计图表）
+     */
+    private suspend fun createSampleTransactionData() {
+        try {
+            val categories = categoryDao.getFinancialCategoriesFlow().firstOrNull()
+            if (categories.isNullOrEmpty()) {
+                android.util.Log.w("LifeLedgerRepository", "No categories available for sample data")
+                return
+            }
+
+            val expenseCategories = categories.filter { it.subType == Category.FinancialSubType.EXPENSE }
+            val incomeCategories = categories.filter { it.subType == Category.FinancialSubType.INCOME }
+
+            val sampleTransactions = mutableListOf<Transaction>()
+
+            // 生成最近12个月的示例数据
+            for (monthOffset in 0..11) {
+                val calendar = Calendar.getInstance()
+                
+                // 设置为指定月份的第一天
+                calendar.add(Calendar.MONTH, -monthOffset)
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+
+                val monthStart = calendar.timeInMillis
+                val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+                
+                android.util.Log.d("LifeLedgerRepository", "生成 ${java.text.SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(calendar.time)} 的示例数据")
+
+                // 每个月生成8-20笔交易
+                val transactionCount = (8..20).random()
+                repeat(transactionCount) {
+                    val randomDay = (1..daysInMonth).random()
+                    calendar.set(Calendar.DAY_OF_MONTH, randomDay)
+                    calendar.set(Calendar.HOUR_OF_DAY, (8..22).random())
+                    calendar.set(Calendar.MINUTE, (0..59).random())
+
+                    val isIncome = kotlin.random.Random.nextDouble() < 0.25 // 25%概率为收入
+                    
+                    val transaction = if (isIncome && incomeCategories.isNotEmpty()) {
+                        val category = incomeCategories.random()
+                        Transaction(
+                            amount = (2000..12000).random().toDouble(),
+                            type = Transaction.TransactionType.INCOME,
+                            categoryId = category.id,
+                            title = getRandomIncomeTitle(),
+                            description = "示例收入记录 - ${category.name}",
+                            date = calendar.timeInMillis,
+                            tags = "示例, 收入"
+                        )
+                    } else if (expenseCategories.isNotEmpty()) {
+                        val category = expenseCategories.random()
+                        Transaction(
+                            amount = (20..800).random().toDouble(),
+                            type = Transaction.TransactionType.EXPENSE,
+                            categoryId = category.id,
+                            title = getRandomExpenseTitle(category.name),
+                            description = "示例支出记录 - ${category.name}",
+                            date = calendar.timeInMillis,
+                            tags = "示例, 支出"
+                        )
+                    } else {
+                        // 如果没有合适的分类，创建一个通用支出
+                        Transaction(
+                            amount = (50..300).random().toDouble(),
+                            type = Transaction.TransactionType.EXPENSE,
+                            categoryId = null,
+                            title = "其他支出",
+                            description = "示例支出记录",
+                            date = calendar.timeInMillis,
+                            tags = "示例, 支出"
+                        )
+                    }
+                    
+                    sampleTransactions.add(transaction)
+                }
+            }
+
+            // 批量插入示例数据
+            transactionDao.insertAll(sampleTransactions)
+            android.util.Log.d("LifeLedgerRepository", "Created ${sampleTransactions.size} sample transactions")
+
+        } catch (e: Exception) {
+            android.util.Log.e("LifeLedgerRepository", "Failed to create sample transaction data", e)
+        }
+    }
+
+    /**
+     * 获取随机收入标题
+     */
+    private fun getRandomIncomeTitle(): String {
+        val titles = listOf("工资", "奖金", "兼职收入", "投资收益", "退款", "红包", "其他收入")
+        return titles.random()
+    }
+
+    /**
+     * 获取随机支出标题
+     */
+    private fun getRandomExpenseTitle(categoryName: String): String {
+        return when (categoryName) {
+            "餐饮" -> listOf("早餐", "午餐", "晚餐", "下午茶", "宵夜", "聚餐", "外卖").random()
+            "交通" -> listOf("打车", "地铁", "公交", "加油", "停车费", "高速费", "机票").random()
+            "购物" -> listOf("衣服", "鞋子", "化妆品", "电子产品", "书籍", "日用品", "礼物").random()
+            "娱乐" -> listOf("电影", "KTV", "游戏", "演唱会", "旅游", "运动", "酒吧").random()
+            "医疗" -> listOf("挂号费", "药费", "检查费", "治疗费", "体检", "保险", "康复").random()
+            else -> categoryName
+        }
     }
     
     /**
@@ -298,6 +419,35 @@ class LifeLedgerRepository(
         
         // 删除已完成的旧待办事项（保留30天）
         // 注意：这里需要自定义SQL，暂时跳过
+    }
+
+    /**
+     * 强制重新创建示例数据（用于调试）
+     */
+    suspend fun recreateSampleData() {
+        try {
+            // 删除所有现有交易数据
+            transactionDao.deleteAll()
+            android.util.Log.d("LifeLedgerRepository", "Deleted all existing transactions")
+            
+            // 重新创建示例数据
+            createSampleTransactionData()
+        } catch (e: Exception) {
+            android.util.Log.e("LifeLedgerRepository", "Failed to recreate sample data", e)
+        }
+    }
+
+    /**
+     * 删除所有交易数据
+     */
+    suspend fun deleteAllTransactions() {
+        try {
+            transactionDao.deleteAll()
+            android.util.Log.d("LifeLedgerRepository", "所有交易数据已删除")
+        } catch (e: Exception) {
+            android.util.Log.e("LifeLedgerRepository", "删除交易数据失败", e)
+            throw e
+        }
     }
 }
 

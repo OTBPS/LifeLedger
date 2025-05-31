@@ -161,4 +161,59 @@ object DateUtils {
             else -> timestampToDateString(timestamp)
         }
     }
+    
+    /**
+     * 格式化日期时间
+     */
+    fun formatDateTime(
+        timestamp: Long,
+        format: String = "yyyy年MM月dd日 HH:mm"
+    ): String {
+        val sdf = SimpleDateFormat(format, Locale.getDefault())
+        return sdf.format(Date(timestamp))
+    }
+    
+    /**
+     * 格式化相对日期（用于待办事项截止时间显示）
+     */
+    fun formatRelativeDate(timestamp: Long): String {
+        val now = System.currentTimeMillis()
+        val diff = timestamp - now
+        
+        return when {
+            diff < 0 -> {
+                // 已过期
+                val daysPast = (-diff / (1000 * 60 * 60 * 24)).toInt()
+                when (daysPast) {
+                    0 -> "今天已过期"
+                    1 -> "昨天已过期"
+                    else -> "${daysPast}天前已过期"
+                }
+            }
+            diff < 60 * 60 * 1000 -> {
+                // 1小时内
+                val minutes = (diff / (1000 * 60)).toInt()
+                "${minutes}分钟后"
+            }
+            diff < 24 * 60 * 60 * 1000 -> {
+                // 24小时内
+                val hours = (diff / (1000 * 60 * 60)).toInt()
+                "${hours}小时后"
+            }
+            diff < 7 * 24 * 60 * 60 * 1000 -> {
+                // 7天内
+                val days = (diff / (1000 * 60 * 60 * 24)).toInt()
+                when (days) {
+                    0 -> "今天"
+                    1 -> "明天"
+                    2 -> "后天"
+                    else -> "${days}天后"
+                }
+            }
+            else -> {
+                // 超过7天，显示具体日期
+                timestampToDateString(timestamp, "MM月dd日")
+            }
+        }
+    }
 } 

@@ -43,7 +43,23 @@
         android:id="@+id/todoFragment"
         android:name="com.example.life_ledger.ui.todo.TodoFragment"
         android:label="@string/nav_todo"
-        tools:layout="@layout/fragment_todo" />
+        tools:layout="@layout/fragment_todo">
+        <action
+            android:id="@+id/action_todoFragment_to_addEditTodoFragment"
+            app:destination="@id/addEditTodoFragment" />
+    </fragment>
+
+    <!-- 添加/编辑待办事项页面 -->
+    <fragment
+        android:id="@+id/addEditTodoFragment"
+        android:name="com.example.life_ledger.ui.todo.AddEditTodoFragment"
+        android:label="添加任务"
+        tools:layout="@layout/fragment_add_edit_todo">
+        <argument
+            android:name="todoId"
+            android:defaultValue=""
+            app:argType="string" />
+    </fragment>
 
     <!-- 统计分析页面 -->
     <fragment
