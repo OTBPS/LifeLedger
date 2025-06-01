@@ -42,7 +42,7 @@ class FinanceViewModel(
 
     // 当前筛选条件
     private var currentFilter = FilterOption.ALL
-    private var currentDateRange = DateRange.THIS_MONTH
+    private var currentDateRange = DateRange.ALL
 
     /**
      * 获取当前日期范围
@@ -81,13 +81,21 @@ class FinanceViewModel(
     fun addTransaction(transaction: Transaction) {
         viewModelScope.launch {
             try {
-                transactionRepository.insertTransaction(transaction)
+                android.util.Log.d("FinanceViewModel", "开始添加交易记录：类型=${transaction.type}, 金额=${transaction.amount}, 分类ID=${transaction.categoryId}")
+                
+                val result = transactionRepository.insertTransaction(transaction)
+                android.util.Log.d("FinanceViewModel", "交易记录插入成功，ID=$result")
+                
                 _operationResult.value = OperationResult(
                     isSuccess = true,
                     message = "记录添加成功"
                 )
+                
                 loadTransactions() // 重新加载数据
+                android.util.Log.d("FinanceViewModel", "数据重新加载完成")
+                
             } catch (e: Exception) {
+                android.util.Log.e("FinanceViewModel", "添加交易记录失败", e)
                 _operationResult.value = OperationResult(
                     isSuccess = false,
                     message = "添加失败: ${e.message}"
@@ -171,20 +179,37 @@ class FinanceViewModel(
     private fun applyFilter() {
         val allTransactions = _transactions.value ?: return
         
+        android.util.Log.d("FinanceViewModel", "开始应用筛选：总交易数=${allTransactions.size}, 筛选器=$currentFilter, 日期范围=$currentDateRange")
+        
         var filtered = when (currentFilter) {
             FilterOption.ALL -> allTransactions
             FilterOption.INCOME -> allTransactions.filter { it.type == Transaction.TransactionType.INCOME }
             FilterOption.EXPENSE -> allTransactions.filter { it.type == Transaction.TransactionType.EXPENSE }
         }
+        
+        android.util.Log.d("FinanceViewModel", "类型筛选后：交易数=${filtered.size}")
 
         // 应用日期范围筛选
         val (startDate, endDate) = getDateRangeMillis(currentDateRange)
+        android.util.Log.d("FinanceViewModel", "时间范围：${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(startDate))} 到 ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(endDate))}")
+        
         filtered = filtered.filter { transaction ->
-            transaction.date >= startDate && transaction.date <= endDate
+            val inRange = transaction.date >= startDate && transaction.date <= endDate
+            if (!inRange) {
+                android.util.Log.d("FinanceViewModel", "过滤掉交易：日期=${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(transaction.date))}, 类型=${transaction.type}, 金额=${transaction.amount}")
+            }
+            inRange
         }
+        
+        android.util.Log.d("FinanceViewModel", "日期筛选后：交易数=${filtered.size}")
 
         // 按日期降序排列
         filtered = filtered.sortedByDescending { it.date }
+
+        // 统计收入和支出数量
+        val incomeCount = filtered.count { it.type == Transaction.TransactionType.INCOME }
+        val expenseCount = filtered.count { it.type == Transaction.TransactionType.EXPENSE }
+        android.util.Log.d("FinanceViewModel", "最终结果：总数=${filtered.size}, 收入=${incomeCount}笔, 支出=${expenseCount}笔")
 
         _filteredTransactions.value = filtered
         calculateSummary(filtered)

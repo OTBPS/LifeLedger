@@ -50,17 +50,41 @@ abstract class AppDatabase : RoomDatabase() {
          */
         fun getDatabase(context: android.content.Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
-                    AppConstants.Database.NAME
-                )
-                    .addCallback(DatabaseCallback())
-                    .addMigrations(/* 未来的数据库迁移 */)
-                    .fallbackToDestructiveMigration() // 开发阶段使用，生产环境需要移除
-                    .build()
-                INSTANCE = instance
-                instance
+                try {
+                    android.util.Log.d("AppDatabase", "Creating database instance...")
+                    val instance = Room.databaseBuilder(
+                        context.applicationContext,
+                        AppDatabase::class.java,
+                        AppConstants.Database.NAME
+                    )
+                        .addCallback(DatabaseCallback())
+                        .fallbackToDestructiveMigration() // 开发阶段允许重新创建数据库
+                        .build()
+                    INSTANCE = instance
+                    android.util.Log.d("AppDatabase", "Database instance created successfully")
+                    instance
+                } catch (e: Exception) {
+                    android.util.Log.e("AppDatabase", "Failed to create database instance", e)
+                    // 如果创建失败，尝试删除数据库文件并重新创建
+                    try {
+                        context.deleteDatabase(AppConstants.Database.NAME)
+                        android.util.Log.d("AppDatabase", "Deleted corrupted database, retrying...")
+                        val instance = Room.databaseBuilder(
+                            context.applicationContext,
+                            AppDatabase::class.java,
+                            AppConstants.Database.NAME
+                        )
+                            .addCallback(DatabaseCallback())
+                            .fallbackToDestructiveMigration()
+                            .build()
+                        INSTANCE = instance
+                        android.util.Log.d("AppDatabase", "Database recreated successfully")
+                        instance
+                    } catch (retryException: Exception) {
+                        android.util.Log.e("AppDatabase", "Failed to recreate database", retryException)
+                        throw retryException
+                    }
+                }
             }
         }
         
@@ -79,6 +103,7 @@ abstract class AppDatabase : RoomDatabase() {
     private class DatabaseCallback : RoomDatabase.Callback() {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
+            android.util.Log.d("AppDatabase", "Database created successfully")
             
             // 在后台线程初始化默认数据
             CoroutineScope(Dispatchers.IO).launch {
@@ -88,29 +113,55 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
         
+        override fun onOpen(db: SupportSQLiteDatabase) {
+            super.onOpen(db)
+            android.util.Log.d("AppDatabase", "Database opened successfully")
+        }
+        
         /**
          * 填充默认数据
          */
         private suspend fun populateDatabase(database: AppDatabase) {
             try {
+                android.util.Log.d("AppDatabase", "Starting to populate database with default data")
+                
                 // 插入默认分类
                 val categoryDao = database.categoryDao()
                 
-                // 插入默认财务分类
-                val financialCategories = Category.createDefaultFinancialCategories()
-                categoryDao.insertAll(financialCategories)
+                // 检查是否已经有数据
+                val existingCategories = categoryDao.getAll()
+                android.util.Log.d("AppDatabase", "Existing categories count: ${existingCategories.size}")
                 
-                // 插入默认待办分类
-                val todoCategories = Category.createDefaultTodoCategories()
-                categoryDao.insertAll(todoCategories)
+                if (existingCategories.isEmpty()) {
+                    // 插入默认财务分类
+                    val financialCategories = Category.createDefaultFinancialCategories()
+                    categoryDao.insertAll(financialCategories)
+                    android.util.Log.d("AppDatabase", "Inserted ${financialCategories.size} financial categories")
+                    
+                    // 插入默认待办分类
+                    val todoCategories = Category.createDefaultTodoCategories()
+                    categoryDao.insertAll(todoCategories)
+                    android.util.Log.d("AppDatabase", "Inserted ${todoCategories.size} todo categories")
+                } else {
+                    android.util.Log.d("AppDatabase", "Categories already exist, skipping insertion")
+                }
                 
                 // 创建默认用户设置
                 val userSettingsDao = database.userSettingsDao()
-                val defaultSettings = UserSettings()
-                userSettingsDao.insert(defaultSettings)
+                val existingSettings = userSettingsDao.getByUserId("default_user")
+                if (existingSettings == null) {
+                    val defaultSettings = UserSettings()
+                    userSettingsDao.insert(defaultSettings)
+                    android.util.Log.d("AppDatabase", "Inserted default user settings")
+                } else {
+                    android.util.Log.d("AppDatabase", "User settings already exist, skipping insertion")
+                }
+                
+                android.util.Log.d("AppDatabase", "Database population completed successfully")
                 
             } catch (e: Exception) {
                 // 记录错误，但不阻塞应用启动
+                android.util.Log.e("AppDatabase", "Error populating database", e)
                 e.printStackTrace()
             }
         }
@@ -205,102 +256,5 @@ class DatabaseTypeConverters {
     @TypeConverter
     fun toStringList(value: String): List<String> {
         return if (value.isEmpty()) emptyList() else value.split(",")
-    }
-    
-    @TypeConverter
-    fun fromLongList(value: List<Long>): String {
-        return value.joinToString(",")
-    }
-    
-    @TypeConverter
-    fun toLongList(value: String): List<Long> {
-        return if (value.isEmpty()) {
-            emptyList()
-        } else {
-            value.split(",").mapNotNull { it.toLongOrNull() }
-        }
-    }
-    
-    // ==================== 特殊数据类型转换器 ====================
-    
-    /**
-     * Map<String, String> 转换器
-     * 用于存储键值对数据
-     */
-    @TypeConverter
-    fun fromStringMap(value: Map<String, String>): String {
-        return value.entries.joinToString(";") { "${it.key}:${it.value}" }
-    }
-    
-    @TypeConverter
-    fun toStringMap(value: String): Map<String, String> {
-        if (value.isEmpty()) return emptyMap()
-        return value.split(";").associate { pair ->
-            val (key, value) = pair.split(":", limit = 2)
-            key to value
-        }
-    }
-    
-    /**
-     * JSON字符串处理
-     * 用于复杂对象的序列化存储
-     */
-    @TypeConverter
-    fun fromJson(json: String?): Map<String, Any>? {
-        return if (json.isNullOrEmpty()) {
-            null
-        } else {
-            try {
-                // 这里可以使用Gson或其他JSON解析库
-                // 为简化示例，使用简单的键值对解析
-                parseSimpleJson(json)
-            } catch (e: Exception) {
-                null
-            }
-        }
-    }
-    
-    @TypeConverter
-    fun toJson(data: Map<String, Any>?): String? {
-        return if (data == null || data.isEmpty()) {
-            null
-        } else {
-            try {
-                // 简单的JSON序列化
-                buildSimpleJson(data)
-            } catch (e: Exception) {
-                null
-            }
-        }
-    }
-    
-    /**
-     * 简单的JSON解析（仅支持字符串值）
-     */
-    private fun parseSimpleJson(json: String): Map<String, Any> {
-        val result = mutableMapOf<String, Any>()
-        // 移除大括号
-        val content = json.trim().removeSurrounding("{", "}")
-        if (content.isNotEmpty()) {
-            content.split(",").forEach { pair ->
-                val parts = pair.split(":", limit = 2)
-                if (parts.size == 2) {
-                    val key = parts[0].trim().removeSurrounding("\"")
-                    val value = parts[1].trim().removeSurrounding("\"")
-                    result[key] = value
-                }
-            }
-        }
-        return result
-    }
-    
-    /**
-     * 简单的JSON构建（仅支持字符串值）
-     */
-    private fun buildSimpleJson(data: Map<String, Any>): String {
-        val pairs = data.entries.joinToString(",") { (key, value) ->
-            "\"$key\":\"$value\""
-        }
-        return "{$pairs}"
     }
 } 

@@ -204,6 +204,66 @@
 
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- AI智能分析 -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="?attr/colorPrimaryContainer">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="16dp"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_analytics"
+                                app:tint="?attr/colorPrimary"
+                                android:layout_marginEnd="16dp" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="AI智能分析"
+                                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                                    android:textStyle="bold"
+                                    android:textColor="?attr/colorOnPrimaryContainer" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="基于您的财务数据，AI为您提供专业的分析和建议"
+                                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                                    android:textColor="?attr/colorOnPrimaryContainer"
+                                    android:layout_marginTop="4dp" />
+
+                            </LinearLayout>
+
+                            <Button
+                                android:id="@+id/buttonAiAnalysis"
+                                style="@style/Widget.MaterialComponents.Button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="立即分析"
+                                app:icon="@drawable/ic_lightbulb"
+                                android:layout_marginStart="8dp" />
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
                     <!-- 支出趋势折线图 -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
@@ -354,7 +414,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
-                                    android:text="月度统计"
+                                    android:text="近期统计"
                                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                                     android:textStyle="bold" />
 
@@ -362,16 +422,16 @@
                                     android:id="@+id/chipGroupMonthlyRange"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    app:checkedChip="@+id/chipLast12Months"
+                                    app:checkedChip="@+id/chipLast7Days"
                                     app:selectionRequired="true"
                                     app:singleSelection="true">
 
                                     <com.google.android.material.chip.Chip
-                                        android:id="@+id/chipLast12Months"
+                                        android:id="@+id/chipLast7Days"
                                         style="@style/Widget.MaterialComponents.Chip.Choice"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="近12月" />
+                                        android:text="近7天" />
 
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/chipMonthlyThisYear"
@@ -402,6 +462,247 @@
                                 android:id="@+id/barChartMonthly"
                                 android:layout_width="match_parent"
                                 android:layout_height="280dp" />
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- 数据分析卡片 -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="4dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="20dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="16dp"
+                                android:text="智能分析报告"
+                                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                                android:textStyle="bold" />
+
+                            <!-- 财务健康度 -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="16dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="8dp"
+                                    android:text="财务健康度"
+                                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                                    android:textStyle="bold" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:id="@+id/tvHealthScore"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="--分"
+                                            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+                                            android:textColor="?attr/colorPrimary"
+                                            android:textStyle="bold" />
+
+                                        <TextView
+                                            android:id="@+id/tvHealthLevel"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="评估中..."
+                                            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                                    </LinearLayout>
+
+                                    <com.google.android.material.button.MaterialButton
+                                        android:id="@+id/btnViewHealthDetails"
+                                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="查看详情" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <!-- 预算跟踪 -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="16dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="8dp"
+                                    android:text="预算执行情况"
+                                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                                    android:textStyle="bold" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:orientation="horizontal">
+
+                                        <LinearLayout
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:orientation="vertical">
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="正常"
+                                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                                                android:textColor="?attr/colorOnSurfaceVariant" />
+
+                                            <TextView
+                                                android:id="@+id/tvSafeBudgets"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="0"
+                                                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                                                android:textColor="@color/md_theme_success"
+                                                android:textStyle="bold" />
+
+                                        </LinearLayout>
+
+                                        <LinearLayout
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:orientation="vertical">
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="警告"
+                                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                                                android:textColor="?attr/colorOnSurfaceVariant" />
+
+                                            <TextView
+                                                android:id="@+id/tvWarningBudgets"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="0"
+                                                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                                                android:textColor="#FF9800"
+                                                android:textStyle="bold" />
+
+                                        </LinearLayout>
+
+                                        <LinearLayout
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:orientation="vertical">
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="超支"
+                                                android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                                                android:textColor="?attr/colorOnSurfaceVariant" />
+
+                                            <TextView
+                                                android:id="@+id/tvOverBudgets"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="0"
+                                                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                                                android:textColor="@color/md_theme_error"
+                                                android:textStyle="bold" />
+
+                                        </LinearLayout>
+
+                                    </LinearLayout>
+
+                                    <com.google.android.material.button.MaterialButton
+                                        android:id="@+id/btnViewBudgetDetails"
+                                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="查看详情" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <!-- 支出模式分析 -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="8dp"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="支出模式分析"
+                                        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                                        android:textStyle="bold" />
+
+                                    <com.google.android.material.button.MaterialButton
+                                        android:id="@+id/btnViewPatternDetails"
+                                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="查看详情" />
+
+                                </LinearLayout>
+
+                                <TextView
+                                    android:id="@+id/tvTopSpendingCategory"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="主要支出类别：计算中..."
+                                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                                    android:textColor="?attr/colorOnSurfaceVariant" />
+
+                                <TextView
+                                    android:id="@+id/tvSpendingTrend"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:text="支出趋势：计算中..."
+                                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                                    android:textColor="?attr/colorOnSurfaceVariant" />
+
+                            </LinearLayout>
 
                         </LinearLayout>
 

@@ -1,5 +1,6 @@
 package com.example.life_ledger.data.model
 
+import android.os.Parcelable
 import androidx.room.*
 import com.example.life_ledger.constants.AppConstants
 import java.util.*
@@ -16,14 +17,6 @@ import java.util.*
         Index(value = ["startDate"]),
         Index(value = ["endDate"]),
         Index(value = ["isActive"])
-    ],
-    foreignKeys = [
-        ForeignKey(
-            entity = Category::class,
-            parentColumns = ["id"],
-            childColumns = ["categoryId"],
-            onDelete = ForeignKey.CASCADE
-        )
     ]
 )
 data class Budget(

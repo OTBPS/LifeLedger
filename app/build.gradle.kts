@@ -50,6 +50,10 @@ android {
         buildConfig = true
     }
 
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -89,6 +93,9 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
+    
+    // WorkManager - 后台任务管理
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
     
     // 协程支持
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")

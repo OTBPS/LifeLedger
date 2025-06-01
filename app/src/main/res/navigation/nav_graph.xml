@@ -66,7 +66,18 @@
         android:id="@+id/statisticsFragment"
         android:name="com.example.life_ledger.ui.statistics.StatisticsFragment"
         android:label="@string/nav_statistics"
-        tools:layout="@layout/fragment_statistics" />
+        tools:layout="@layout/fragment_statistics">
+        <action
+            android:id="@+id/action_statisticsFragment_to_aiAnalysisFragment"
+            app:destination="@id/aiAnalysisFragment" />
+    </fragment>
+
+    <!-- AI分析页面 -->
+    <fragment
+        android:id="@+id/aiAnalysisFragment"
+        android:name="com.example.life_ledger.ui.ai.AIAnalysisFragment"
+        android:label="AI智能分析"
+        tools:layout="@layout/fragment_ai_analysis" />
 
     <!-- 设置页面 -->
     <fragment

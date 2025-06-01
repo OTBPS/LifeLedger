@@ -130,6 +130,7 @@ class LifeLedgerRepository(
     suspend fun deleteBudget(budget: Budget) = budgetDao.delete(budget)
     suspend fun getBudgetById(id: String) = budgetDao.getById(id)
     fun getAllBudgets() = budgetDao.getAllFlow()
+    suspend fun getCurrentBudgetsList(): List<Budget> = budgetDao.getAll()
     
     // 当前预算
     fun getCurrentBudgets() = budgetDao.getCurrentBudgetsFlow(System.currentTimeMillis())
@@ -151,6 +152,10 @@ class LifeLedgerRepository(
     
     // 统计
     suspend fun getBudgetOverview() = budgetDao.getCurrentBudgetOverview(System.currentTimeMillis())
+    
+    // 按日期范围查询
+    suspend fun getBudgetsByDateRange(startDate: Long, endDate: Long) = 
+        budgetDao.getByDateRange(startDate, endDate)
     
     // 搜索
     fun searchBudgets(query: String) = budgetDao.searchBudgetsFlow(query)
@@ -447,6 +452,25 @@ class LifeLedgerRepository(
         } catch (e: Exception) {
             android.util.Log.e("LifeLedgerRepository", "删除交易数据失败", e)
             throw e
+        }
+    }
+    
+    companion object {
+        @Volatile
+        private var INSTANCE: LifeLedgerRepository? = null
+        
+        fun getInstance(database: com.example.life_ledger.data.database.AppDatabase): LifeLedgerRepository {
+            return INSTANCE ?: synchronized(this) {
+                val instance = LifeLedgerRepository(
+                    transactionDao = database.transactionDao(),
+                    todoDao = database.todoDao(),
+                    categoryDao = database.categoryDao(),
+                    budgetDao = database.budgetDao(),
+                    userSettingsDao = database.userSettingsDao()
+                )
+                INSTANCE = instance
+                instance
+            }
         }
     }
 }

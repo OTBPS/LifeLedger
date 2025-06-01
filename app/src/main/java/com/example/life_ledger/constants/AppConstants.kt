@@ -8,8 +8,8 @@ object AppConstants {
     
     // 数据库相关常量
     object Database {
-        const val NAME = "life_ledger_db"
-        const val VERSION = 1
+        const val NAME = "life_ledger_db_v2"  // 修改数据库名称以创建全新数据库
+        const val VERSION = 1  // 重置版本号
         
         // 表名
         const val TABLE_TRANSACTIONS = "transactions"

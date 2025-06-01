@@ -10,6 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.life_ledger.R
 import com.example.life_ledger.data.database.AppDatabase
 import com.example.life_ledger.data.repository.LifeLedgerRepository
@@ -286,12 +287,15 @@ class StatisticsFragment : Fragment() {
 
             // 趋势类型选择
             chipGroupTrendType.setOnCheckedStateChangeListener { _, checkedIds ->
-                currentTrendType = when (checkedIds.firstOrNull()) {
-                    R.id.chipExpenseTrend -> TrendType.EXPENSE
-                    R.id.chipIncomeTrend -> TrendType.INCOME
-                    else -> TrendType.EXPENSE
+                if (checkedIds.isNotEmpty()) {
+                    val trendType = when (checkedIds.first()) {
+                        R.id.chipExpenseTrend -> StatisticsViewModel.TrendType.EXPENSE
+                        R.id.chipIncomeTrend -> StatisticsViewModel.TrendType.INCOME
+                        else -> StatisticsViewModel.TrendType.EXPENSE
+                    }
+                    
+                    viewModel.setTrendType(trendType)
                 }
-                updateTrendChart()
             }
             
             // 饼图类型选择
@@ -307,6 +311,24 @@ class StatisticsFragment : Fragment() {
             // 下拉刷新
             swipeRefreshLayout.setOnRefreshListener {
                 viewModel.refresh()
+            }
+
+            // 数据分析按钮点击处理
+            btnViewHealthDetails.setOnClickListener {
+                showFinancialHealthDetails()
+            }
+
+            btnViewBudgetDetails.setOnClickListener {
+                showBudgetTrackingDetails()
+            }
+
+            btnViewPatternDetails.setOnClickListener {
+                showExpensePatternDetails()
+            }
+
+            // AI分析按钮
+            buttonAiAnalysis.setOnClickListener {
+                navigateToAIAnalysis()
             }
         }
     }
@@ -375,6 +397,32 @@ class StatisticsFragment : Fragment() {
             viewModel.operationResult.collect { result ->
                 val message = if (result.isSuccess) result.message else "操作失败: ${result.message}"
                 Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+            }
+        }
+
+        // 观察月度数据
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.monthlyData.collect { monthlyData ->
+                updateMonthlyChart(monthlyData)
+            }
+        }
+
+        // 观察数据分析结果
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.financialHealthAssessment.collect { assessment ->
+                updateFinancialHealthDisplay(assessment)
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.budgetTrackingStatus.collect { budgetStatus ->
+                updateBudgetTrackingDisplay(budgetStatus)
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.expensePatternAnalysis.collect { patternAnalysis ->
+                updateExpensePatternDisplay(patternAnalysis)
             }
         }
     }
@@ -545,98 +593,125 @@ class StatisticsFragment : Fragment() {
             setValueTextColor(Color.WHITE)
         }
 
-        binding.pieChartCategories.apply {
-            data = pieData
-            centerText = when (currentPieChartType) {
-                PieChartType.EXPENSE -> "支出分类"
-                PieChartType.INCOME -> "收入分类"
-            }
-            animateY(1000, Easing.EaseInOutQuad)
-            highlightValues(null)
-            invalidate()
-        }
+        binding.pieChartCategories.data = pieData
+        binding.pieChartCategories.animateY(1000)
+        binding.pieChartCategories.invalidate()
     }
 
     /**
      * 更新月度图表
      */
-    private fun updateMonthlyChart(monthlyData: List<MonthlyData>) {
+    private fun updateMonthlyChart(monthlyData: List<MonthlyStatistic>) {
         if (monthlyData.isEmpty()) {
-            android.util.Log.d("StatisticsFragment", "月度数据为空，清空图表")
-            binding.barChartMonthly.clear()
-            binding.barChartMonthly.invalidate()
+            binding.barChartMonthly.visibility = View.GONE
+            android.util.Log.d("StatisticsFragment", "月度数据为空，隐藏图表")
             return
         }
 
+        binding.barChartMonthly.visibility = View.VISIBLE
         android.util.Log.d("StatisticsFragment", "更新月度图表：${monthlyData.size} 个月的数据")
 
-        val expenseEntries = monthlyData.mapIndexed { index, data ->
-            BarEntry(index.toFloat(), data.expense.toFloat())
+        val expenseEntries = ArrayList<BarEntry>()
+        monthlyData.forEachIndexed { index: Int, data: MonthlyStatistic ->
+            expenseEntries.add(BarEntry(index.toFloat(), data.expense.toFloat()))
         }
-        
-        val incomeEntries = monthlyData.mapIndexed { index, data ->
-            BarEntry(index.toFloat(), data.income.toFloat())
+
+        val incomeEntries = ArrayList<BarEntry>()
+        monthlyData.forEachIndexed { index: Int, data: MonthlyStatistic ->
+            incomeEntries.add(BarEntry(index.toFloat(), data.income.toFloat()))
         }
 
         val expenseDataSet = BarDataSet(expenseEntries, "支出").apply {
-            color = Color.parseColor("#F44336") // 红色
-            valueTextSize = 9f
-            valueTextColor = Color.BLACK
+            color = Color.parseColor("#E91E63")
+            valueTextColor = Color.WHITE
+            valueTextSize = 10f
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
-                    return if (value > 0) "¥${value.toInt()}" else ""
+                    return if (value > 0) {
+                        String.format("¥%.0f", value)
+                    } else {
+                        ""
+                    }
                 }
             }
         }
 
         val incomeDataSet = BarDataSet(incomeEntries, "收入").apply {
-            color = Color.parseColor("#4CAF50") // 绿色
-            valueTextSize = 9f
-            valueTextColor = Color.BLACK
+            color = Color.parseColor("#4CAF50")
+            valueTextColor = Color.WHITE
+            valueTextSize = 10f
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
-                    return if (value > 0) "¥${value.toInt()}" else ""
+                    return if (value > 0) {
+                        String.format("¥%.0f", value)
+                    } else {
+                        ""
+                    }
                 }
             }
         }
 
+        val monthLabels = ArrayList<String>()
+        monthlyData.forEach { data: MonthlyStatistic ->
+            monthLabels.add(data.period)
+        }
+
         val barData = BarData(expenseDataSet, incomeDataSet).apply {
-            barWidth = 0.35f
+            val groupSpace = 0.1f
+            val barSpace = 0.05f
+            val barWidth = 0.4f
+            
+            setValueTextColor(Color.WHITE)
+            setValueTextSize(10f)
+            
+            this.barWidth = barWidth
+            groupBars(0f, groupSpace, barSpace)
         }
 
         binding.barChartMonthly.apply {
             data = barData
-            
-            // 设置X轴标签
-            val monthLabels = monthlyData.map { data ->
-                try {
-                    val parts = data.month.split("-")
-                    if (parts.size >= 2) {
-                        "${parts[1]}月"
-                    } else {
-                        data.month
-                    }
-                } catch (e: Exception) {
-                    data.month
-                }
+            description.isEnabled = false
+            setTouchEnabled(true)
+            isDragEnabled = true
+            setScaleEnabled(true)
+            setPinchZoom(true)
+
+            if (monthlyData.size > 1) {
+                setVisibleXRangeMaximum(6f)
+                moveViewToX(monthlyData.size.toFloat() - 3f)
             }
-            
+
             xAxis.apply {
-                valueFormatter = IndexAxisValueFormatter(monthLabels)
-                granularity = 1f
                 position = XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(false)
+                granularity = 1f
+                labelCount = monthLabels.size
+                valueFormatter = IndexAxisValueFormatter(monthLabels.toTypedArray())
+                textColor = Color.GRAY
+                textSize = 10f
+                labelRotationAngle = -45f
+                setAvoidFirstLastClipping(true)
             }
-            
-            // 分组显示
-            if (monthlyData.size > 1) {
-                groupBars(0f, 0.3f, 0.05f)
+
+            axisLeft.apply {
+                setDrawGridLines(true)
+                textColor = Color.GRAY
+                setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
+                valueFormatter = object : ValueFormatter() {
+                    override fun getFormattedValue(value: Float): String {
+                        return if (value >= 1000) {
+                            String.format("%.1fk", value / 1000)
+                        } else {
+                            String.format("%.0f", value)
+                        }
+                    }
+                }
             }
-            
-            // 设置图表边距
-            setFitBars(true)
-            
-            animateY(1000, Easing.EaseInOutQuart)
+
+            axisRight.isEnabled = false
+            legend.isEnabled = true
+            legend.textColor = Color.GRAY
+
             invalidate()
         }
     }
@@ -673,12 +748,15 @@ class StatisticsFragment : Fragment() {
      */
     private fun setupTrendTypeChips() {
         binding.chipGroupTrendType.setOnCheckedStateChangeListener { _, checkedIds ->
-            currentTrendType = when (checkedIds.firstOrNull()) {
-                R.id.chipExpenseTrend -> TrendType.EXPENSE
-                R.id.chipIncomeTrend -> TrendType.INCOME
-                else -> TrendType.EXPENSE
+            if (checkedIds.isNotEmpty()) {
+                val trendType = when (checkedIds.first()) {
+                    R.id.chipExpenseTrend -> StatisticsViewModel.TrendType.EXPENSE
+                    R.id.chipIncomeTrend -> StatisticsViewModel.TrendType.INCOME
+                    else -> StatisticsViewModel.TrendType.EXPENSE
+                }
+                
+                viewModel.setTrendType(trendType)
             }
-            updateTrendChart()
         }
     }
 
@@ -702,11 +780,11 @@ class StatisticsFragment : Fragment() {
     private fun setupMonthlyRangeChips() {
         binding.chipGroupMonthlyRange.setOnCheckedStateChangeListener { _, checkedIds ->
             val monthlyTimeRange = when (checkedIds.firstOrNull()) {
-                R.id.chipLast12Months -> StatisticsViewModel.MonthlyTimeRange.LAST_12_MONTHS
+                R.id.chipLast7Days -> StatisticsViewModel.MonthlyTimeRange.LAST_7_DAYS
                 R.id.chipMonthlyThisYear -> StatisticsViewModel.MonthlyTimeRange.THIS_YEAR
                 R.id.chipMonthlyLastYear -> StatisticsViewModel.MonthlyTimeRange.LAST_YEAR
                 R.id.chipLast24Months -> StatisticsViewModel.MonthlyTimeRange.LAST_24_MONTHS
-                else -> StatisticsViewModel.MonthlyTimeRange.LAST_12_MONTHS
+                else -> StatisticsViewModel.MonthlyTimeRange.LAST_7_DAYS
             }
             
             android.util.Log.d("StatisticsFragment", "切换月度时间范围：$monthlyTimeRange")
@@ -732,6 +810,204 @@ class StatisticsFragment : Fragment() {
             kotlinx.coroutines.delay(500)
             android.util.Log.d("StatisticsFragment", "强制刷新月度统计")
             viewModel.forceRefreshMonthlyData()
+        }
+    }
+
+    /**
+     * 更新财务健康度显示
+     */
+    private fun updateFinancialHealthDisplay(assessment: FinancialHealthAssessment?) {
+        binding.apply {
+            if (assessment != null) {
+                tvHealthScore.text = "${assessment.overallScore}分"
+                tvHealthLevel.text = assessment.level.displayName
+                
+                // 设置健康度颜色
+                val color = Color.parseColor(assessment.level.color)
+                tvHealthScore.setTextColor(color)
+            } else {
+                tvHealthScore.text = "--分"
+                tvHealthLevel.text = "评估中..."
+            }
+        }
+    }
+
+    /**
+     * 更新预算跟踪显示
+     */
+    private fun updateBudgetTrackingDisplay(budgetStatus: BudgetTrackingStatus?) {
+        binding.apply {
+            if (budgetStatus != null) {
+                tvSafeBudgets.text = budgetStatus.safeBudgets.toString()
+                tvWarningBudgets.text = budgetStatus.warningBudgets.toString()
+                tvOverBudgets.text = budgetStatus.overBudgets.toString()
+            } else {
+                tvSafeBudgets.text = "0"
+                tvWarningBudgets.text = "0"
+                tvOverBudgets.text = "0"
+            }
+        }
+    }
+
+    /**
+     * 更新支出模式显示
+     */
+    private fun updateExpensePatternDisplay(patternAnalysis: ExpensePatternAnalysis?) {
+        binding.apply {
+            if (patternAnalysis != null) {
+                val topCategory = patternAnalysis.topCategories.firstOrNull()
+                if (topCategory != null) {
+                    tvTopSpendingCategory.text = "主要支出类别：${topCategory.categoryName} (${String.format("%.1f", topCategory.percentage)}%)"
+                } else {
+                    tvTopSpendingCategory.text = "主要支出类别：暂无数据"
+                }
+                
+                val preference = patternAnalysis.weekdayVsWeekendSpending.preference
+                val recentTrend = patternAnalysis.spendingTrends.lastOrNull()
+                val trendText = if (recentTrend != null && recentTrend.changePercentage != 0.0) {
+                    val direction = if (recentTrend.changePercentage > 0) "上升" else "下降"
+                    "$direction ${String.format("%.1f", kotlin.math.abs(recentTrend.changePercentage))}%"
+                } else {
+                    "稳定"
+                }
+                
+                tvSpendingTrend.text = "支出趋势：$trendText，偏好${preference}消费"
+            } else {
+                tvTopSpendingCategory.text = "主要支出类别：计算中..."
+                tvSpendingTrend.text = "支出趋势：计算中..."
+            }
+        }
+    }
+
+    /**
+     * 显示财务健康度详情
+     */
+    private fun showFinancialHealthDetails() {
+        val assessment = viewModel.financialHealthAssessment.value ?: return
+        
+        val message = buildString {
+            appendLine("财务健康度评估：${assessment.overallScore}分 (${assessment.level.displayName})")
+            appendLine()
+            
+            if (assessment.strengths.isNotEmpty()) {
+                appendLine("优势方面：")
+                assessment.strengths.forEach { appendLine("• $it") }
+                appendLine()
+            }
+            
+            if (assessment.concerns.isNotEmpty()) {
+                appendLine("需要关注：")
+                assessment.concerns.forEach { appendLine("• $it") }
+                appendLine()
+            }
+            
+            if (assessment.recommendations.isNotEmpty()) {
+                appendLine("改善建议：")
+                assessment.recommendations.forEach { appendLine("• $it") }
+            }
+        }
+        
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("财务健康度详情")
+            .setMessage(message)
+            .setPositiveButton("确定", null)
+            .show()
+    }
+
+    /**
+     * 显示预算跟踪详情
+     */
+    private fun showBudgetTrackingDetails() {
+        val budgetStatus = viewModel.budgetTrackingStatus.value ?: return
+        
+        val message = buildString {
+            appendLine("预算总览：")
+            appendLine("• 总预算数：${budgetStatus.totalBudgets}")
+            appendLine("• 活跃预算：${budgetStatus.activeBudgets}")
+            appendLine("• 总预算金额：¥${String.format("%.2f", budgetStatus.totalBudgetAmount)}")
+            appendLine("• 已支出金额：¥${String.format("%.2f", budgetStatus.totalSpentAmount)}")
+            appendLine("• 整体进度：${String.format("%.1f", budgetStatus.overallProgress)}%")
+            appendLine()
+            
+            if (budgetStatus.budgetDetails.isNotEmpty()) {
+                appendLine("预算详情：")
+                budgetStatus.budgetDetails.take(5).forEach { budget ->
+                    appendLine("• ${budget.budgetName}: ${String.format("%.1f", budget.spentPercentage)}% (${budget.status})")
+                }
+                
+                if (budgetStatus.budgetDetails.size > 5) {
+                    appendLine("... 还有${budgetStatus.budgetDetails.size - 5}项预算")
+                }
+            }
+        }
+        
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("预算跟踪详情")
+            .setMessage(message)
+            .setPositiveButton("确定", null)
+            .show()
+    }
+
+    /**
+     * 显示支出模式详情
+     */
+    private fun showExpensePatternDetails() {
+        val patternAnalysis = viewModel.expensePatternAnalysis.value ?: return
+        
+        val message = buildString {
+            appendLine("支出模式分析：")
+            appendLine()
+            
+            // 前3大支出类别
+            appendLine("主要支出类别：")
+            patternAnalysis.topCategories.take(3).forEach { category ->
+                val trendText = when (category.trend) {
+                    SpendingTrendType.INCREASING -> "↗️ 上升"
+                    SpendingTrendType.DECREASING -> "↘️ 下降"
+                    SpendingTrendType.STABLE -> "→ 稳定"
+                    SpendingTrendType.VOLATILE -> "🔄 波动"
+                }
+                appendLine("• ${category.categoryName}: ${String.format("%.1f", category.percentage)}% $trendText")
+            }
+            appendLine()
+            
+            // 消费习惯
+            val weekdayWeekend = patternAnalysis.weekdayVsWeekendSpending
+            appendLine("消费习惯：")
+            appendLine("• 工作日日均：¥${String.format("%.2f", weekdayWeekend.weekdayAvgDaily)}")
+            appendLine("• 周末日均：¥${String.format("%.2f", weekdayWeekend.weekendAvgDaily)}")
+            appendLine("• 偏好：${weekdayWeekend.preference}消费")
+            appendLine()
+            
+            // 异常交易
+            if (patternAnalysis.unusualTransactions.isNotEmpty()) {
+                appendLine("异常交易检测：")
+                patternAnalysis.unusualTransactions.take(3).forEach { unusual ->
+                    val date = java.text.SimpleDateFormat("MM-dd", Locale.getDefault()).format(Date(unusual.date))
+                    appendLine("• $date ${unusual.categoryName}: ¥${String.format("%.2f", unusual.amount)} (${unusual.reason})")
+                }
+                if (patternAnalysis.unusualTransactions.size > 3) {
+                    appendLine("... 还有${patternAnalysis.unusualTransactions.size - 3}笔异常交易")
+                }
+            }
+        }
+        
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("支出模式详情")
+            .setMessage(message)
+            .setPositiveButton("确定", null)
+            .show()
+    }
+
+    /**
+     * 导航到AI分析页面
+     */
+    private fun navigateToAIAnalysis() {
+        try {
+            findNavController().navigate(R.id.action_statisticsFragment_to_aiAnalysisFragment)
+        } catch (e: Exception) {
+            android.util.Log.e("StatisticsFragment", "Navigation to AI analysis failed", e)
+            Snackbar.make(binding.root, "暂时无法打开AI分析功能", Snackbar.LENGTH_SHORT).show()
         }
     }
 
