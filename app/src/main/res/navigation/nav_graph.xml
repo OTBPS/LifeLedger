@@ -61,6 +61,34 @@
             app:argType="string" />
     </fragment>
 
+    <!-- 预算管理页面 -->
+    <fragment
+        android:id="@+id/budgetFragment"
+        android:name="com.example.life_ledger.ui.budget.BudgetFragment"
+        android:label="@string/nav_budget"
+        tools:layout="@layout/fragment_budget">
+        <action
+            android:id="@+id/action_budgetFragment_to_budgetAnalysisFragment"
+            app:destination="@id/budgetAnalysisFragment" />
+        <action
+            android:id="@+id/action_budgetFragment_to_budgetSettingsFragment"
+            app:destination="@id/budgetSettingsFragment" />
+    </fragment>
+
+    <!-- 预算分析页面 -->
+    <fragment
+        android:id="@+id/budgetAnalysisFragment"
+        android:name="com.example.life_ledger.ui.budget.BudgetAnalysisFragment"
+        android:label="预算分析"
+        tools:layout="@layout/fragment_budget_analysis" />
+
+    <!-- 预算设置页面 -->
+    <fragment
+        android:id="@+id/budgetSettingsFragment"
+        android:name="com.example.life_ledger.ui.budget.BudgetSettingsFragment"
+        android:label="预算设置"
+        tools:layout="@layout/fragment_budget_settings" />
+
     <!-- 统计分析页面 -->
     <fragment
         android:id="@+id/statisticsFragment"

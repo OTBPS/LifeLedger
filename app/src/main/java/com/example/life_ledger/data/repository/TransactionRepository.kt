@@ -1,6 +1,7 @@
 package com.example.life_ledger.data.repository
 
 import com.example.life_ledger.data.dao.TransactionDao
+import com.example.life_ledger.data.dao.BudgetDao
 import com.example.life_ledger.data.dao.MonthlyStats
 import com.example.life_ledger.data.model.Transaction
 import kotlinx.coroutines.flow.Flow
@@ -10,7 +11,8 @@ import kotlinx.coroutines.flow.Flow
  * 封装Transaction相关的数据访问逻辑
  */
 class TransactionRepository(
-    private val transactionDao: TransactionDao
+    private val transactionDao: TransactionDao,
+    private val budgetDao: BudgetDao
 ) {
     
     // ==================== 基础CRUD操作 ====================
@@ -19,7 +21,14 @@ class TransactionRepository(
      * 添加交易记录
      */
     suspend fun insertTransaction(transaction: Transaction): Long {
-        return transactionDao.insert(transaction)
+        val result = transactionDao.insert(transaction)
+        
+        // 如果是支出记录，更新相关预算
+        if (transaction.type == Transaction.TransactionType.EXPENSE) {
+            updateRelatedBudgets(transaction)
+        }
+        
+        return result
     }
     
     /**
@@ -33,14 +42,28 @@ class TransactionRepository(
      * 更新交易记录
      */
     suspend fun updateTransaction(transaction: Transaction): Int {
-        return transactionDao.update(transaction)
+        val result = transactionDao.update(transaction)
+        
+        // 如果是支出记录，重新计算相关预算
+        if (transaction.type == Transaction.TransactionType.EXPENSE) {
+            recalculateRelatedBudgets(transaction.categoryId)
+        }
+        
+        return result
     }
     
     /**
      * 删除交易记录
      */
     suspend fun deleteTransaction(transaction: Transaction): Int {
-        return transactionDao.delete(transaction)
+        val result = transactionDao.delete(transaction)
+        
+        // 如果是支出记录，重新计算相关预算
+        if (transaction.type == Transaction.TransactionType.EXPENSE) {
+            recalculateRelatedBudgets(transaction.categoryId)
+        }
+        
+        return result
     }
     
     /**
@@ -401,6 +424,59 @@ class TransactionRepository(
      */
     suspend fun getMonthlyStats(): List<MonthlyStats> {
         return transactionDao.getMonthlyStats()
+    }
+    
+    /**
+     * 更新相关预算的花费金额
+     */
+    private suspend fun updateRelatedBudgets(transaction: Transaction) {
+        try {
+            // 更新分类预算
+            transaction.categoryId?.let { categoryId ->
+                val categoryBudget = budgetDao.getCurrentBudgetByCategory(categoryId, System.currentTimeMillis())
+                categoryBudget?.let { budget ->
+                    val newSpent = budget.spent + transaction.amount
+                    budgetDao.updateSpent(budget.id, newSpent, System.currentTimeMillis())
+                }
+            }
+            
+            // 更新总预算（无分类限制）
+            val totalBudget = budgetDao.getCurrentTotalBudget(System.currentTimeMillis())
+            totalBudget?.let { budget ->
+                val newSpent = budget.spent + transaction.amount
+                budgetDao.updateSpent(budget.id, newSpent, System.currentTimeMillis())
+            }
+        } catch (e: Exception) {
+            // 记录错误但不影响主要流程
+            android.util.Log.e("TransactionRepository", "更新预算失败", e)
+        }
+    }
+    
+    /**
+     * 重新计算相关预算的花费金额
+     */
+    private suspend fun recalculateRelatedBudgets(categoryId: String?) {
+        try {
+            // 重新计算分类预算
+            categoryId?.let { catId ->
+                val categoryBudget = budgetDao.getCurrentBudgetByCategory(catId, System.currentTimeMillis())
+                categoryBudget?.let { budget ->
+                    val totalSpent = transactionDao.getExpenseByCategoryAndDateRange(
+                        catId, budget.startDate, budget.endDate
+                    )
+                    budgetDao.updateSpent(budget.id, totalSpent, System.currentTimeMillis())
+                }
+            }
+            
+            // 重新计算总预算
+            val totalBudget = budgetDao.getCurrentTotalBudget(System.currentTimeMillis())
+            totalBudget?.let { budget ->
+                val totalSpent = transactionDao.getExpenseByDateRange(budget.startDate, budget.endDate)
+                budgetDao.updateSpent(budget.id, totalSpent, System.currentTimeMillis())
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("TransactionRepository", "重新计算预算失败", e)
+        }
     }
 }
 

@@ -7,8 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import com.example.life_ledger.R
 import com.example.life_ledger.data.model.Budget
 import com.example.life_ledger.data.model.Category
 import com.example.life_ledger.databinding.DialogAddEditBudgetBinding
@@ -34,23 +35,40 @@ class AddEditBudgetDialog : DialogFragment() {
     private var categoryAdapter: ArrayAdapter<String>? = null
     private val categories = mutableListOf<Category>()
     
-    private val budgetViewModel: BudgetViewModel by viewModels({ requireParentFragment() })
+    // 使用activityViewModels确保与父Fragment共享ViewModel
+    private val budgetViewModel: BudgetViewModel by activityViewModels()
     
     private var selectedPeriod: Budget.BudgetPeriod = Budget.BudgetPeriod.MONTHLY
     
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     
     companion object {
-        private const val ARG_BUDGET = "budget"
+        private const val ARG_BUDGET_ID = "budget_id"
+        private const val ARG_BUDGET_NAME = "budget_name"
+        private const val ARG_BUDGET_AMOUNT = "budget_amount"
+        private const val ARG_BUDGET_CATEGORY_ID = "budget_category_id"
+        private const val ARG_BUDGET_PERIOD = "budget_period"
+        private const val ARG_BUDGET_DESCRIPTION = "budget_description"
+        private const val ARG_BUDGET_ALERT_THRESHOLD = "budget_alert_threshold"
+        private const val ARG_BUDGET_IS_RECURRING = "budget_is_recurring"
+        private const val ARG_BUDGET_IS_ALERT_ENABLED = "budget_is_alert_enabled"
         
         fun newInstance(budget: Budget? = null): AddEditBudgetDialog {
             val dialog = AddEditBudgetDialog()
             val args = Bundle()
+            
             budget?.let {
-                // 使用JSON序列化代替Parcelable
-                val gson = com.google.gson.Gson()
-                args.putString(ARG_BUDGET, gson.toJson(it))
+                args.putString(ARG_BUDGET_ID, it.id)
+                args.putString(ARG_BUDGET_NAME, it.name)
+                args.putDouble(ARG_BUDGET_AMOUNT, it.amount)
+                args.putString(ARG_BUDGET_CATEGORY_ID, it.categoryId)
+                args.putString(ARG_BUDGET_PERIOD, it.period.name)
+                args.putString(ARG_BUDGET_DESCRIPTION, it.description)
+                args.putDouble(ARG_BUDGET_ALERT_THRESHOLD, it.alertThreshold)
+                args.putBoolean(ARG_BUDGET_IS_RECURRING, it.isRecurring)
+                args.putBoolean(ARG_BUDGET_IS_ALERT_ENABLED, it.isAlertEnabled)
             }
+            
             dialog.arguments = args
             return dialog
         }
@@ -58,7 +76,12 @@ class AddEditBudgetDialog : DialogFragment() {
     
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        // 设置对话框样式 - 使用Material主题而不是透明背景
+        dialog.window?.apply {
+            setBackgroundDrawableResource(R.drawable.dialog_background)
+            // 设置进入和退出动画
+            attributes?.windowAnimations = R.style.DialogAnimation
+        }
         return dialog
     }
     
@@ -70,10 +93,22 @@ class AddEditBudgetDialog : DialogFragment() {
         _binding = DialogAddEditBudgetBinding.inflate(inflater, container, false)
         
         // 获取传入的预算数据
-        val budgetJson = arguments?.getString(ARG_BUDGET)
-        currentBudget = budgetJson?.let {
-            val gson = com.google.gson.Gson()
-            gson.fromJson(it, Budget::class.java)
+        arguments?.let { args ->
+            if (args.containsKey(ARG_BUDGET_ID)) {
+                currentBudget = Budget(
+                    id = args.getString(ARG_BUDGET_ID, ""),
+                    name = args.getString(ARG_BUDGET_NAME, ""),
+                    amount = args.getDouble(ARG_BUDGET_AMOUNT, 0.0),
+                    categoryId = args.getString(ARG_BUDGET_CATEGORY_ID),
+                    period = Budget.BudgetPeriod.valueOf(args.getString(ARG_BUDGET_PERIOD, "MONTHLY")),
+                    startDate = System.currentTimeMillis(),
+                    endDate = System.currentTimeMillis() + 30 * 24 * 60 * 60 * 1000L,
+                    description = args.getString(ARG_BUDGET_DESCRIPTION),
+                    alertThreshold = args.getDouble(ARG_BUDGET_ALERT_THRESHOLD, 0.8),
+                    isRecurring = args.getBoolean(ARG_BUDGET_IS_RECURRING, true),
+                    isAlertEnabled = args.getBoolean(ARG_BUDGET_IS_ALERT_ENABLED, true)
+                )
+            }
         }
         
         return binding.root
@@ -92,7 +127,7 @@ class AddEditBudgetDialog : DialogFragment() {
         super.onStart()
         // 设置对话框大小
         dialog?.window?.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
+            (resources.displayMetrics.widthPixels * 0.9).toInt(),
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
     }
@@ -133,6 +168,8 @@ class AddEditBudgetDialog : DialogFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             budgetViewModel.successMessage.collect { message ->
                 message?.let {
+                    // 重置按钮状态
+                    resetButtonState()
                     dismiss()
                 }
             }
@@ -140,20 +177,33 @@ class AddEditBudgetDialog : DialogFragment() {
         
         budgetViewModel.error.observe(viewLifecycleOwner) { message ->
             message?.let {
+                // 重置按钮状态
+                resetButtonState()
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
             }
         }
     }
     
+    private fun resetButtonState() {
+        binding.btnSave.apply {
+            isEnabled = true
+            text = if (currentBudget != null) "更新" else "保存"
+        }
+        binding.btnCancel.isEnabled = true
+    }
+    
     private fun setupClickListeners() {
-        // 取消按钮
+        // 取消按钮 - 添加防重复点击
         binding.btnCancel.setOnClickListener {
+            it.isEnabled = false  // 临时禁用按钮
             dismiss()
         }
         
-        // 保存按钮
+        // 保存按钮 - 添加防重复点击和加载状态
         binding.btnSave.setOnClickListener {
-            if (validateInput()) {
+            if (it.isEnabled && validateInput()) {
+                it.isEnabled = false  // 防止重复点击
+                binding.btnSave.text = "保存中..."
                 saveBudget()
             }
         }

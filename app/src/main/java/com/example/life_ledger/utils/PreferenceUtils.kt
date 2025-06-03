@@ -144,6 +144,34 @@ object PreferenceUtils {
     }
     
     /**
+     * 获取主题模式
+     */
+    fun getThemeMode(): String {
+        return getString(AppConstants.Preferences.KEY_THEME_MODE, AppConstants.Theme.MODE_SYSTEM)
+    }
+    
+    /**
+     * 设置主题模式
+     */
+    fun setThemeMode(mode: String) {
+        putString(AppConstants.Preferences.KEY_THEME_MODE, mode)
+    }
+    
+    /**
+     * 获取自定义主题
+     */
+    fun getCustomTheme(): String {
+        return getString(AppConstants.Preferences.KEY_CUSTOM_THEME, AppConstants.Theme.THEME_DEFAULT)
+    }
+    
+    /**
+     * 设置自定义主题
+     */
+    fun setCustomTheme(theme: String) {
+        putString(AppConstants.Preferences.KEY_CUSTOM_THEME, theme)
+    }
+    
+    /**
      * 是否启用通知
      */
     fun isNotificationEnabled(): Boolean {

@@ -10,6 +10,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.life_ledger.databinding.ActivityMainBinding
+import com.example.life_ledger.ui.theme.ThemeManager
 
 /**
  * LifeLedger 主Activity
@@ -20,6 +21,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     
     override fun onCreate(savedInstanceState: Bundle?) {
+        // 在super.onCreate之前应用主题
+        applyTheme()
+        
         super.onCreate(savedInstanceState)
         
         // 初始化DataBinding
@@ -34,6 +38,14 @@ class MainActivity : AppCompatActivity() {
         
         // 设置导航
         setupNavigation()
+    }
+    
+    /**
+     * 应用主题
+     */
+    private fun applyTheme() {
+        val customTheme = ThemeManager.getCurrentCustomTheme()
+        ThemeManager.applyCustomTheme(this, customTheme)
     }
     
     /**

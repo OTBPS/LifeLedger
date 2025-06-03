@@ -2,7 +2,6 @@ package com.example.life_ledger.ui.budget.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -13,9 +12,7 @@ import com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation
 /**
  * 预算建议列表适配器
  */
-class BudgetRecommendationAdapter(
-    private val onItemClick: (BudgetRecommendation) -> Unit
-) : ListAdapter<BudgetRecommendation, BudgetRecommendationAdapter.ViewHolder>(DiffCallback()) {
+class BudgetRecommendationAdapter : ListAdapter<BudgetRecommendation, BudgetRecommendationAdapter.ViewHolder>(DiffCallback()) {
     
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemBudgetRecommendationBinding.inflate(
@@ -57,15 +54,6 @@ class BudgetRecommendationAdapter(
                     BudgetRecommendation.Priority.LOW -> R.color.info
                 }
                 ivPriority.setColorFilter(itemView.context.getColor(priorityColor))
-                
-                // 设置操作按钮
-                recommendation.actionText?.let { actionText ->
-                    btnAction.text = actionText
-                    btnAction.setOnClickListener { onItemClick(recommendation) }
-                }
-                
-                // 设置卡片点击
-                cardRecommendation.setOnClickListener { onItemClick(recommendation) }
             }
         }
     }

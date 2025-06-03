@@ -1,6 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 应用基本信息 -->
-    <string name="app_name">LifeLedger</string>
+    <string name="app_name">Life Ledger</string>
     <string name="app_subtitle">智能追踪，智能规划</string>
     <string name="app_logo">应用图标</string>
     
@@ -18,10 +19,16 @@
     <string name="search">搜索</string>
     <string name="filter">筛选</string>
     <string name="settings">设置</string>
+    <string name="loading">加载中...</string>
+    <string name="error">错误</string>
+    <string name="success">成功</string>
+    <string name="warning">警告</string>
+    <string name="info">信息</string>
     
     <!-- 导航标签 -->
     <string name="nav_finance">财务</string>
     <string name="nav_todo">待办</string>
+    <string name="nav_budget">预算</string>
     <string name="nav_statistics">统计</string>
     <string name="nav_settings">设置</string>
     
@@ -30,4 +37,32 @@
     <string name="error_loading">加载失败</string>
     <string name="error_save">保存失败</string>
     <string name="error_invalid_input">输入无效</string>
+    
+    <!-- 主题相关字符串 -->
+    <string name="theme_settings">主题设置</string>
+    <string name="theme_mode">主题模式</string>
+    <string name="theme_mode_light">浅色模式</string>
+    <string name="theme_mode_dark">深色模式</string>
+    <string name="theme_mode_system">跟随系统</string>
+    
+    <string name="custom_theme">自定义主题</string>
+    <string name="theme_default">默认绿色</string>
+    <string name="theme_blue">蓝色</string>
+    <string name="theme_purple">紫色</string>
+    <string name="theme_orange">橙色</string>
+    <string name="theme_red">红色</string>
+    <string name="theme_teal">青色</string>
+    <string name="theme_pink">粉色</string>
+    
+    <string name="select_theme_mode">选择主题模式</string>
+    <string name="select_custom_theme">选择主题颜色</string>
+    <string name="theme_applied">主题已应用</string>
+    <string name="restart_required">重启应用以完全应用主题</string>
+    
+    <!-- 设置页面 -->
+    <string name="appearance_settings">外观设置</string>
+    <string name="dark_mode">深色模式</string>
+    <string name="enable_dark_theme">启用深色主题</string>
+    <string name="theme_color">主题颜色</string>
+    <string name="select_theme_color_scheme">选择主题配色方案</string>
 </resources>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material Design 3 Dark Theme Colors -->
+    <color name="md_theme_primary">#7ADB9A</color>
+    <color name="md_theme_on_primary">#00210E</color>
+    <color name="md_theme_primary_container">#00522A</color>
+    <color name="md_theme_on_primary_container">#94F7B4</color>
+    
+    <color name="md_theme_secondary">#B7CCB8</color>
+    <color name="md_theme_on_secondary">#233426</color>
+    <color name="md_theme_secondary_container">#394B3C</color>
+    <color name="md_theme_on_secondary_container">#D3E8D2</color>
+    
+    <color name="md_theme_tertiary">#A1CED8</color>
+    <color name="md_theme_on_tertiary">#00363D</color>
+    <color name="md_theme_tertiary_container">#1F4D55</color>
+    <color name="md_theme_on_tertiary_container">#BDEAF4</color>
+    
+    <color name="md_theme_error">#FFB4AB</color>
+    <color name="md_theme_on_error">#690005</color>
+    <color name="md_theme_error_container">#93000A</color>
+    <color name="md_theme_on_error_container">#FFDAD6</color>
+    
+    <color name="md_theme_background">#101410</color>
+    <color name="md_theme_on_background">#E1E3DD</color>
+    <color name="md_theme_surface">#101410</color>
+    <color name="md_theme_on_surface">#E1E3DD</color>
+    <color name="md_theme_surface_variant">#424940</color>
+    <color name="md_theme_on_surface_variant">#C2C9BE</color>
+    <color name="md_theme_outline">#8C9389</color>
+    <color name="md_theme_outline_variant">#424940</color>
+
+    <!-- Application specific colors for dark theme -->
+    <color name="income_green">#66BB6A</color>
+    <color name="expense_red">#EF5350</color>
+    <color name="budget_blue">#42A5F5</color>
+    <color name="warning_orange">#FFA726</color>
+    
+    <!-- Chart colors for dark theme -->
+    <color name="chart_color_1">#66BB6A</color>
+    <color name="chart_color_2">#42A5F5</color>
+    <color name="chart_color_3">#FFA726</color>
+    <color name="chart_color_4">#AB47BC</color>
+    <color name="chart_color_5">#EF5350</color>
+    <color name="chart_color_6">#26C6DA</color>
+    
+    <!-- Status colors for dark theme -->
+    <color name="success">#66BB6A</color>
+    <color name="warning">#FFA726</color>
+    <color name="danger">#EF5350</color>
+    <color name="info">#42A5F5</color>
+    
+    <!-- Semantic colors for MD3 Dark -->
+    <color name="md_theme_success">#66BB6A</color>
+    <color name="md_theme_on_success">#1B5E20</color>
+    <color name="md_theme_success_container">#2E7D32</color>
+    <color name="md_theme_on_success_container">#C8E6C9</color>
+    
+    <color name="md_theme_warning">#FFA726</color>
+    <color name="md_theme_on_warning">#E65100</color>
+    <color name="md_theme_warning_container">#F57C00</color>
+    <color name="md_theme_on_warning_container">#FFE0B2</color>
+    
+    <!-- Color aliases for easier reference -->
+    <color name="primary">@color/md_theme_primary</color>
+    <color name="primary_container">@color/md_theme_primary_container</color>
+    <color name="surface_variant">@color/md_theme_surface_variant</color>
+    <color name="background">@color/md_theme_background</color>
+    <color name="surface">@color/md_theme_surface</color>
+    <color name="error">@color/md_theme_error</color>
+    <color name="outline">@color/md_theme_outline</color>
+    
+    <!-- Text colors for dark theme -->
+    <color name="text_primary">@color/md_theme_on_surface</color>
+    <color name="text_secondary">@color/md_theme_on_surface_variant</color>
+    <color name="text_on_primary">@color/md_theme_on_primary</color>
+    <color name="text_on_primary_container">@color/md_theme_on_primary_container</color>
+    
+    <!-- 优先级背景颜色 (深色主题) -->
+    <color name="priority_high_background">#4D1F1F</color>
+    <color name="priority_high_border">#EF5350</color>
+    <color name="priority_medium_background">#4D3D1F</color>
+    <color name="priority_medium_border">#FFA726</color>
+    <color name="priority_low_background">#1F4D2A</color>
+    <color name="priority_low_border">#66BB6A</color>
+    
+    <!-- 状态指示颜色 (深色主题) -->
+    <color name="success_color">#66BB6A</color>
+    <color name="warning_color">#FFA726</color>
+    <color name="error_color">#EF5350</color>
+</resources> 

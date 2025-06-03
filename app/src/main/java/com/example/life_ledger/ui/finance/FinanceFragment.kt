@@ -62,7 +62,7 @@ class FinanceFragment : Fragment() {
     private fun setupViewModel() {
         try {
             val database = AppDatabase.getDatabase(requireContext())
-            val repository = TransactionRepository(database.transactionDao())
+            val repository = TransactionRepository(database.transactionDao(), database.budgetDao())
             val factory = FinanceViewModelFactory(repository)
             viewModel = ViewModelProvider(this, factory)[FinanceViewModel::class.java]
         } catch (e: Exception) {

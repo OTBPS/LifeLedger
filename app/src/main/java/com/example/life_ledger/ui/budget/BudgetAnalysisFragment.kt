@@ -22,6 +22,8 @@ import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.snackbar.Snackbar
+import androidx.navigation.fragment.findNavController
+import androidx.appcompat.app.AlertDialog
 
 /**
  * 预算分析页面
@@ -56,15 +58,16 @@ class BudgetAnalysisFragment : Fragment() {
     }
     
     private fun setupViews() {
-        // 设置建议列表
-        recommendationAdapter = BudgetRecommendationAdapter { recommendation ->
-            handleRecommendationClick(recommendation)
-        }
+        // 设置建议列表 - 简化，不需要点击处理
+        recommendationAdapter = BudgetRecommendationAdapter()
         
         binding.recyclerViewRecommendations.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = recommendationAdapter
         }
+        
+        // 设置图表切换
+        setupChartTabs()
     }
     
     private fun setupObservers() {
@@ -95,13 +98,36 @@ class BudgetAnalysisFragment : Fragment() {
         // 观察建议数据
         viewModel.recommendations.observe(viewLifecycleOwner) { recommendations ->
             recommendationAdapter.submitList(recommendations)
+            updateRecommendationsUI(recommendations)
+        }
+        
+        // 观察加载状态
+        viewModel.isLoadingRecommendations.observe(viewLifecycleOwner) { isLoading ->
+            updateLoadingState(isLoading)
+        }
+        
+        // 观察错误信息
+        viewModel.recommendationError.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                showError(it)
+            }
         }
     }
     
     private fun setupClickListeners() {
+        // 返回按钮
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+        
         // 刷新按钮
         binding.fabRefresh.setOnClickListener {
-            // 重新加载数据
+            refreshAnalysisData()
+        }
+        
+        // 智能建议按钮
+        binding.btnSmartRecommendations?.setOnClickListener {
+            viewModel.generateSmartRecommendations()
         }
         
         // 时间范围选择
@@ -119,27 +145,104 @@ class BudgetAnalysisFragment : Fragment() {
         }
     }
     
-    private fun handleRecommendationClick(recommendation: BudgetRecommendation) {
-        when (recommendation.type) {
-            BudgetRecommendation.RecommendationType.OVERSPENDING -> {
-                // 处理超支建议点击
+    private fun updateRecommendationsUI(recommendations: List<BudgetRecommendation>) {
+        if (recommendations.isEmpty()) {
+            binding.layoutEmptyRecommendations.visibility = View.VISIBLE
+            binding.recyclerViewRecommendations.visibility = View.GONE
+            binding.tvNoRecommendations.text = "暂无建议，点击智能建议获取AI分析"
+        } else {
+            binding.layoutEmptyRecommendations.visibility = View.GONE
+            binding.recyclerViewRecommendations.visibility = View.VISIBLE
+        }
+    }
+    
+    private fun updateLoadingState(isLoading: Boolean) {
+        binding.btnSmartRecommendations.apply {
+            isEnabled = !isLoading
+            text = if (isLoading) "分析中..." else "智能建议"
+        }
+        
+        binding.progressRecommendations.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
+    
+    private fun showError(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+    }
+    
+    private fun setupChartTabs() {
+        binding.tabLayoutCharts.addOnTabSelectedListener(object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
+                when (tab?.position) {
+                    0 -> showChart(ChartType.PIE)
+                    1 -> showChart(ChartType.LINE)
+                    2 -> showChart(ChartType.BAR)
+                }
             }
-            BudgetRecommendation.RecommendationType.BUDGET_ADJUSTMENT -> {
-                // 处理预算调整建议点击
-            }
-            BudgetRecommendation.RecommendationType.SAVINGS_OPPORTUNITY -> {
-                // 处理节省机会建议点击
-            }
-            BudgetRecommendation.RecommendationType.CATEGORY_OPTIMIZATION -> {
-                // 处理分类优化建议点击
-            }
-            BudgetRecommendation.RecommendationType.SPENDING_PATTERN -> {
-                // 处理支出模式建议点击
-            }
-            BudgetRecommendation.RecommendationType.GOAL_SETTING -> {
-                // 处理目标设置建议点击
+            
+            override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {}
+            override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {}
+        })
+    }
+    
+    private fun showChart(type: ChartType) {
+        binding.apply {
+            // 隐藏所有图表
+            pieChart.visibility = View.GONE
+            lineChart.visibility = View.GONE
+            barChart.visibility = View.GONE
+            layoutEmptyChart.visibility = View.GONE
+            
+            // 显示选中的图表
+            when (type) {
+                ChartType.PIE -> {
+                    pieChart.visibility = View.VISIBLE
+                    // 如果有数据则更新饼图
+                    viewModel.budgetUsageData.value?.let { usageDataList ->
+                        if (usageDataList.isNotEmpty()) {
+                            updateUsageChart(usageDataList.first())
+                        } else {
+                            layoutEmptyChart.visibility = View.VISIBLE
+                        }
+                    }
+                }
+                ChartType.LINE -> {
+                    lineChart.visibility = View.VISIBLE
+                    // 如果有数据则更新趋势图
+                    viewModel.budgetTrendData.value?.let { trendDataList ->
+                        if (trendDataList.isNotEmpty()) {
+                            updateTrendChart(trendDataList)
+                        } else {
+                            layoutEmptyChart.visibility = View.VISIBLE
+                        }
+                    }
+                }
+                ChartType.BAR -> {
+                    barChart.visibility = View.VISIBLE
+                    // 如果有数据则更新对比图
+                    viewModel.budgetComparisonData.value?.let { comparisonDataList ->
+                        if (comparisonDataList.isNotEmpty()) {
+                            updateComparisonChart(comparisonDataList)
+                        } else {
+                            layoutEmptyChart.visibility = View.VISIBLE
+                        }
+                    }
+                }
             }
         }
+    }
+    
+    private fun refreshAnalysisData() {
+        // 重新加载所有数据
+        viewModel.loadAnalysisData()
+    }
+    
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+    
+    enum class ChartType {
+        PIE, LINE, BAR
     }
     
     private fun updateOverviewUI(overview: AnalysisOverview) {
@@ -231,11 +334,7 @@ class BudgetAnalysisFragment : Fragment() {
         val entries = mutableListOf<BarEntry>()
         
         comparisonDataList.forEachIndexed { index, data ->
-            val changePercentage = if (data.previousSpent > 0) {
-                (data.change / data.previousSpent * 100).toFloat()
-            } else {
-                100f // 如果之前没有支出，显示100%
-            }
+            val changePercentage = data.changePercentage.toFloat()
             entries.add(BarEntry(index.toFloat(), changePercentage))
         }
         
@@ -248,14 +347,5 @@ class BudgetAnalysisFragment : Fragment() {
         
         binding.barChart.data = data
         binding.barChart.invalidate()
-    }
-    
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-    
-    private enum class ChartType {
-        PIE, LINE, BAR
     }
 } 

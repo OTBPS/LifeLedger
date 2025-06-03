@@ -101,7 +101,7 @@ class AddEditTransactionFragment : Fragment() {
     private fun setupViewModel() {
         try {
             val database = AppDatabase.getDatabase(requireContext())
-            val transactionRepository = com.example.life_ledger.data.repository.TransactionRepository(database.transactionDao())
+            val transactionRepository = com.example.life_ledger.data.repository.TransactionRepository(database.transactionDao(), database.budgetDao())
             val factory = FinanceViewModelFactory(transactionRepository)
             viewModel = ViewModelProvider(this, factory)[FinanceViewModel::class.java]
         } catch (e: Exception) {
@@ -241,6 +241,7 @@ class AddEditTransactionFragment : Fragment() {
             requireContext(),
             { _, year, month, dayOfMonth ->
                 selectedDate.set(year, month, dayOfMonth)
+                android.util.Log.d("AddEditTransactionFragment", "用户选择日期: ${dateFormat.format(selectedDate.time)} (时间戳: ${selectedDate.timeInMillis})")
                 updateDateDisplay()
             },
             selectedDate.get(Calendar.YEAR),
@@ -500,10 +501,10 @@ class AddEditTransactionFragment : Fragment() {
 
             val now = System.currentTimeMillis()
             val oneYearAgo = now - 365L * 24 * 60 * 60 * 1000
-            val oneYearFromNow = now + 365L * 24 * 60 * 60 * 1000
+            val oneWeekFromNow = now + 7L * 24 * 60 * 60 * 1000 // 允许未来一周内的日期
 
-            if (selectedDate.timeInMillis < oneYearAgo || selectedDate.timeInMillis > oneYearFromNow) {
-                Snackbar.make(root, "日期必须在一年范围内", Snackbar.LENGTH_SHORT).show()
+            if (selectedDate.timeInMillis < oneYearAgo || selectedDate.timeInMillis > oneWeekFromNow) {
+                Snackbar.make(root, "日期必须在过去一年到未来一周的范围内", Snackbar.LENGTH_SHORT).show()
                 return false
             }
 

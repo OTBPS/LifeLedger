@@ -121,6 +121,40 @@ class AIAnalysisService {
         }
     }
     
+    /**
+     * 获取预算智能建议
+     */
+    suspend fun getBudgetRecommendations(
+        budgets: List<com.example.life_ledger.data.model.Budget>,
+        transactions: List<Transaction>,
+        categories: List<Category>
+    ): Result<List<com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation>> = withContext(Dispatchers.IO) {
+        try {
+            val budgetData = prepareBudgetAnalysisData(budgets, transactions, categories)
+            val prompt = buildBudgetRecommendationPrompt(budgetData)
+            
+            val response = apiService.chatCompletion(
+                ChatCompletionRequest(
+                    messages = listOf(
+                        Message("system", "你是一个专业的预算管理顾问，专门分析用户的预算执行情况并提供实用的优化建议。"),
+                        Message("user", prompt)
+                    ),
+                    max_tokens = 1500,
+                    temperature = 0.7
+                )
+            )
+            
+            if (response.isSuccessful && response.body()?.choices?.isNotEmpty() == true) {
+                val recommendations = parseBudgetRecommendations(response.body()!!.choices[0].message.content)
+                Result.success(recommendations)
+            } else {
+                Result.failure(Exception("预算建议生成失败: ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
     // 数据准备方法
     
     private fun prepareExpenseData(transactions: List<Transaction>, categories: List<Category>): ExpenseData {
@@ -219,6 +253,53 @@ class AIAnalysisService {
         )
     }
     
+    private fun prepareBudgetAnalysisData(
+        budgets: List<com.example.life_ledger.data.model.Budget>,
+        transactions: List<Transaction>,
+        categories: List<Category>
+    ): BudgetAnalysisData {
+        val categoryMap = categories.associateBy { it.id }
+        val currentTime = System.currentTimeMillis()
+        
+        val budgetPerformance = budgets.map { budget ->
+            val categoryName = budget.categoryId?.let { categoryMap[it]?.name } ?: "总预算"
+            val usageRate = if (budget.amount > 0) (budget.spent / budget.amount * 100) else 0.0
+            val remainingDays = maxOf(0, ((budget.endDate - currentTime) / (24 * 60 * 60 * 1000)).toInt())
+            val isOverBudget = budget.spent > budget.amount
+            val warningTriggered = usageRate >= budget.alertThreshold * 100
+            
+            BudgetPerformance(
+                name = budget.name,
+                category = categoryName,
+                budgetAmount = budget.amount,
+                spentAmount = budget.spent,
+                usageRate = usageRate,
+                remainingDays = remainingDays,
+                isOverBudget = isOverBudget,
+                warningTriggered = warningTriggered,
+                period = budget.period.displayName
+            )
+        }
+        
+        val recentTransactions = transactions.filter { 
+            it.type == Transaction.TransactionType.EXPENSE && 
+            it.date >= currentTime - 30 * 24 * 60 * 60 * 1000L // 最近30天
+        }
+        
+        val categorySpending = recentTransactions
+            .groupBy { it.categoryId }
+            .mapValues { (_, txs) -> txs.sumOf { it.amount } }
+            .mapKeys { (categoryId, _) -> categoryMap[categoryId]?.name ?: "其他" }
+        
+        return BudgetAnalysisData(
+            budgetPerformance = budgetPerformance,
+            categorySpending = categorySpending,
+            totalBudgets = budgets.size,
+            overBudgetCount = budgetPerformance.count { it.isOverBudget },
+            averageUsageRate = budgetPerformance.map { it.usageRate }.average()
+        )
+    }
+    
     // Prompt构建方法
     
     private fun buildExpenseAnalysisPrompt(data: ExpenseData): String {
@@ -290,6 +371,41 @@ class AIAnalysisService {
         
         建议要实用、具体、符合用户特点。
         """.trimIndent()
+    }
+    
+    private fun buildBudgetRecommendationPrompt(data: BudgetAnalysisData): String {
+        return buildString {
+            appendLine("作为专业的预算分析师，请分析以下预算使用情况，并提供2-4条简洁实用的建议：")
+            appendLine()
+            
+            appendLine("【预算使用情况分析】")
+            data.budgetPerformance.forEach { budget ->
+                val remaining = budget.budgetAmount - budget.spentAmount
+                appendLine("• ${budget.name}：")
+                appendLine("  - 预算总额：¥${String.format("%.0f", budget.budgetAmount)}")
+                appendLine("  - 已使用：¥${String.format("%.0f", budget.spentAmount)}")
+                appendLine("  - 剩余金额：¥${String.format("%.0f", remaining)}")
+                appendLine("  - 使用率：${String.format("%.1f", budget.usageRate)}%")
+                appendLine("  - 剩余时间：${budget.remainingDays}天")
+                appendLine()
+            }
+            
+            appendLine("【总体情况】")
+            appendLine("- 预算总数：${data.totalBudgets}个")
+            appendLine("- 超支预算：${data.overBudgetCount}个")
+            appendLine("- 平均使用率：${String.format("%.1f", data.averageUsageRate)}%")
+            appendLine()
+            
+            appendLine("请基于以上数据提供建议，每条建议格式如下：")
+            appendLine("建议标题|详细分析和具体建议（包含数据分析和改进措施）|优先级（高/中/低）")
+            appendLine()
+            appendLine("要求：")
+            appendLine("1. 每条建议要完整详细，无需点击查看更多")
+            appendLine("2. 结合具体数据进行分析")
+            appendLine("3. 提供可执行的改进措施")
+            appendLine("4. 优先分析使用率异常的预算")
+            appendLine("5. 建议控制在150字以内但要包含关键信息")
+        }
     }
     
     // 解析方法
@@ -373,6 +489,86 @@ class AIAnalysisService {
         }
     }
     
+    private fun parseBudgetRecommendations(content: String): List<com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation> {
+        val recommendations = mutableListOf<com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation>()
+        
+        // 按行分割并处理新格式：建议标题|详细描述|优先级
+        val lines = content.split("\n").filter { it.trim().isNotEmpty() }
+        
+        for (line in lines) {
+            val trimmedLine = line.trim()
+            
+            // 检查是否为建议格式（包含 | 分隔符）
+            if (trimmedLine.contains("|") && !trimmedLine.startsWith("建议标题")) {
+                val parts = trimmedLine.split("|")
+                if (parts.size >= 2) {
+                    val title = parts[0].trim()
+                    val description = parts[1].trim()
+                    val priorityText = if (parts.size >= 3) parts[2].trim() else "中"
+                    
+                    // 确定优先级
+                    val priority = when {
+                        priorityText.contains("高") -> com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.Priority.HIGH
+                        priorityText.contains("低") -> com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.Priority.LOW
+                        else -> com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.Priority.MEDIUM
+                    }
+                    
+                    // 根据建议内容确定类型
+                    val type = when {
+                        title.contains("超支") || description.contains("超支") -> 
+                            com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.RecommendationType.OVERSPENDING
+                        title.contains("调整") || description.contains("调整") -> 
+                            com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.RecommendationType.BUDGET_ADJUSTMENT
+                        title.contains("节省") || description.contains("节省") -> 
+                            com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.RecommendationType.SAVINGS_OPPORTUNITY
+                        title.contains("分类") || description.contains("分类") -> 
+                            com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.RecommendationType.CATEGORY_OPTIMIZATION
+                        title.contains("习惯") || description.contains("习惯") -> 
+                            com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.RecommendationType.SPENDING_PATTERN
+                        else -> com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.RecommendationType.BUDGET_ADJUSTMENT
+                    }
+                    
+                    recommendations.add(
+                        com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation(
+                            id = "ai_rec_${System.currentTimeMillis()}_${recommendations.size}",
+                            type = type,
+                            title = title,
+                            description = description,
+                            priority = priority,
+                            actionText = null // 不需要操作按钮
+                        )
+                    )
+                }
+            }
+        }
+        
+        // 如果解析失败或没有建议，返回基于数据的默认建议
+        if (recommendations.isEmpty()) {
+            recommendations.addAll(generateDataBasedRecommendations())
+        }
+        
+        return recommendations.take(4) // 最多4条建议
+    }
+    
+    private fun generateDataBasedRecommendations(): List<com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation> {
+        return listOf(
+            com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation(
+                id = "data_based_1",
+                type = com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.RecommendationType.BUDGET_ADJUSTMENT,
+                title = "预算执行分析",
+                description = "根据当前预算使用情况，建议定期检查和调整预算分配，确保预算设置符合实际消费需求。可以将使用率低的预算金额转移到使用率高的分类中。",
+                priority = com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.Priority.MEDIUM
+            ),
+            com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation(
+                id = "data_based_2",
+                type = com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.RecommendationType.SPENDING_PATTERN,
+                title = "支出习惯优化",
+                description = "建议记录每笔支出的详细信息，养成记账习惯。定期分析支出模式，识别不必要的开支，逐步培养理性消费的习惯。",
+                priority = com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.Priority.LOW
+            )
+        )
+    }
+    
     private fun extractSection(content: String, startMarker: String, endMarker: String?): String? {
         val startIndex = content.indexOf(startMarker)
         if (startIndex == -1) return null
@@ -452,4 +648,24 @@ data class ConsumptionAdvice(
     val expectedEffect: String,
     val difficulty: String, // "简单", "中等", "困难"
     val priority: Int
+)
+
+data class BudgetAnalysisData(
+    val budgetPerformance: List<BudgetPerformance>,
+    val categorySpending: Map<String, Double>,
+    val totalBudgets: Int,
+    val overBudgetCount: Int,
+    val averageUsageRate: Double
+)
+
+data class BudgetPerformance(
+    val name: String,
+    val category: String,
+    val budgetAmount: Double,
+    val spentAmount: Double,
+    val usageRate: Double,
+    val remainingDays: Int,
+    val isOverBudget: Boolean,
+    val warningTriggered: Boolean,
+    val period: String
 ) 

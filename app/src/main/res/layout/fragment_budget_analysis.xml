@@ -243,7 +243,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- 图表区域 -->
+            <!-- 数据可视化 -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -257,81 +257,67 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- 图表类型选择 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="16dp">
+                        android:text="数据可视化"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="16dp" />
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="数据可视化"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
+                    <!-- 可视化选项卡 -->
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/tabLayoutCharts"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginBottom="16dp"
+                        app:tabMode="fixed"
+                        app:tabGravity="fill">
 
-                        <com.google.android.material.button.MaterialButtonToggleGroup
-                            android:id="@+id/toggleGroupChart"
+                        <com.google.android.material.tabs.TabItem
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            app:singleSelection="true"
-                            app:checkedButton="@+id/btnPieChart">
+                            android:text="饼图" />
 
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btnPieChart"
-                                android:layout_width="wrap_content"
-                                android:layout_height="32dp"
-                                android:text="饼图"
-                                android:textSize="12sp"
-                                style="@style/Widget.Material3.Button.OutlinedButton" />
+                        <com.google.android.material.tabs.TabItem
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="趋势" />
 
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btnLineChart"
-                                android:layout_width="wrap_content"
-                                android:layout_height="32dp"
-                                android:text="趋势"
-                                android:textSize="12sp"
-                                style="@style/Widget.Material3.Button.OutlinedButton" />
+                        <com.google.android.material.tabs.TabItem
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="对比" />
 
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btnBarChart"
-                                android:layout_width="wrap_content"
-                                android:layout_height="32dp"
-                                android:text="对比"
-                                android:textSize="12sp"
-                                style="@style/Widget.Material3.Button.OutlinedButton" />
-
-                        </com.google.android.material.button.MaterialButtonToggleGroup>
-
-                    </LinearLayout>
+                    </com.google.android.material.tabs.TabLayout>
 
                     <!-- 图表容器 -->
                     <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="300dp">
+                        android:layout_height="320dp"
+                        android:background="@drawable/chart_background">
 
                         <!-- 饼图 -->
                         <com.github.mikephil.charting.charts.PieChart
                             android:id="@+id/pieChart"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:visibility="visible" />
+                            android:layout_margin="8dp" />
 
-                        <!-- 折线图 -->
+                        <!-- 趋势图 -->
                         <com.github.mikephil.charting.charts.LineChart
                             android:id="@+id/lineChart"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:layout_margin="8dp"
                             android:visibility="gone" />
 
-                        <!-- 柱状图 -->
+                        <!-- 对比图 -->
                         <com.github.mikephil.charting.charts.BarChart
                             android:id="@+id/barChart"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:layout_margin="8dp"
                             android:visibility="gone" />
 
                         <!-- 加载指示器 -->
@@ -341,6 +327,32 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:visibility="gone" />
+
+                        <!-- 空状态提示 -->
+                        <LinearLayout
+                            android:id="@+id/layoutEmptyChart"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="暂无数据"
+                                android:textSize="16sp"
+                                android:textColor="@color/text_secondary" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="请先创建预算"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_hint"
+                                android:layout_marginTop="8dp" />
+
+                        </LinearLayout>
 
                     </FrameLayout>
 
@@ -361,13 +373,40 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="智能建议"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="16dp" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="智能建议"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <ProgressBar
+                            android:id="@+id/progressRecommendations"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginEnd="8dp"
+                            android:visibility="gone" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnSmartRecommendations"
+                            android:layout_width="wrap_content"
+                            android:layout_height="48dp"
+                            android:text="智能建议"
+                            android:textSize="14sp"
+                            android:paddingHorizontal="16dp"
+                            app:icon="@drawable/ic_auto_awesome"
+                            app:iconSize="18dp"
+                            style="@style/Widget.Material3.Button.OutlinedButton" />
+
+                    </LinearLayout>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recyclerViewRecommendations"
@@ -376,7 +415,7 @@
                         android:nestedScrollingEnabled="false"
                         tools:itemCount="3" />
 
-                    <!-- 空状态 -->
+                    <!-- 空状态/无建议提示 -->
                     <LinearLayout
                         android:id="@+id/layoutEmptyRecommendations"
                         android:layout_width="match_parent"
@@ -393,12 +432,14 @@
                             app:tint="@color/text_secondary" />
 
                         <TextView
+                            android:id="@+id/tvNoRecommendations"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
-                            android:text="暂无建议"
+                            android:text="暂无建议，点击智能建议获取AI分析"
                             android:textSize="16sp"
-                            android:textColor="@color/text_secondary" />
+                            android:textColor="@color/text_secondary"
+                            android:textAlignment="center" />
 
                     </LinearLayout>
 

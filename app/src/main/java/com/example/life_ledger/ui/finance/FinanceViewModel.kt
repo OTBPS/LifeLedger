@@ -242,43 +242,93 @@ class FinanceViewModel(
      */
     private fun getDateRangeMillis(dateRange: DateRange): Pair<Long, Long> {
         val calendar = Calendar.getInstance()
-        val endDate = calendar.timeInMillis
-
+        
         when (dateRange) {
             DateRange.TODAY -> {
-                calendar.set(Calendar.HOUR_OF_DAY, 0)
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.SECOND, 0)
-                calendar.set(Calendar.MILLISECOND, 0)
-                return Pair(calendar.timeInMillis, endDate)
+                // 今天的开始时间
+                val startOfDay = calendar.apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.timeInMillis
+                
+                // 今天的结束时间
+                val endOfDay = calendar.apply {
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                    set(Calendar.SECOND, 59)
+                    set(Calendar.MILLISECOND, 999)
+                }.timeInMillis
+                
+                return Pair(startOfDay, endOfDay)
             }
             DateRange.THIS_WEEK -> {
-                calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
-                calendar.set(Calendar.HOUR_OF_DAY, 0)
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.SECOND, 0)
-                calendar.set(Calendar.MILLISECOND, 0)
-                return Pair(calendar.timeInMillis, endDate)
+                // 本周开始时间
+                val startOfWeek = calendar.apply {
+                    set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.timeInMillis
+                
+                // 本周结束时间
+                val endOfWeek = calendar.apply {
+                    set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
+                    add(Calendar.WEEK_OF_YEAR, 1)
+                    add(Calendar.MILLISECOND, -1)
+                }.timeInMillis
+                
+                return Pair(startOfWeek, endOfWeek)
             }
             DateRange.THIS_MONTH -> {
-                calendar.set(Calendar.DAY_OF_MONTH, 1)
-                calendar.set(Calendar.HOUR_OF_DAY, 0)
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.SECOND, 0)
-                calendar.set(Calendar.MILLISECOND, 0)
-                return Pair(calendar.timeInMillis, endDate)
+                // 本月开始时间
+                val startOfMonth = calendar.apply {
+                    set(Calendar.DAY_OF_MONTH, 1)
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.timeInMillis
+                
+                // 本月结束时间
+                val endOfMonth = calendar.apply {
+                    set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                    set(Calendar.SECOND, 59)
+                    set(Calendar.MILLISECOND, 999)
+                }.timeInMillis
+                
+                return Pair(startOfMonth, endOfMonth)
             }
             DateRange.THIS_YEAR -> {
-                calendar.set(Calendar.MONTH, Calendar.JANUARY)
-                calendar.set(Calendar.DAY_OF_MONTH, 1)
-                calendar.set(Calendar.HOUR_OF_DAY, 0)
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.SECOND, 0)
-                calendar.set(Calendar.MILLISECOND, 0)
-                return Pair(calendar.timeInMillis, endDate)
+                // 今年开始时间
+                val startOfYear = calendar.apply {
+                    set(Calendar.MONTH, Calendar.JANUARY)
+                    set(Calendar.DAY_OF_MONTH, 1)
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.timeInMillis
+                
+                // 今年结束时间
+                val endOfYear = calendar.apply {
+                    set(Calendar.MONTH, Calendar.DECEMBER)
+                    set(Calendar.DAY_OF_MONTH, 31)
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                    set(Calendar.SECOND, 59)
+                    set(Calendar.MILLISECOND, 999)
+                }.timeInMillis
+                
+                return Pair(startOfYear, endOfYear)
             }
             DateRange.ALL -> {
-                return Pair(0L, endDate)
+                // 所有时间：从最早到最晚
+                return Pair(0L, Long.MAX_VALUE)
             }
         }
     }

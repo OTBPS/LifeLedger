@@ -1662,34 +1662,28 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 获取调试信息
+     * 打印调试信息
      */
-    fun getDebugInfo() {
+    fun debugInfo() {
         viewModelScope.launch {
-            android.util.Log.d("StatisticsViewModel", "=== 统计调试信息 ===")
+            android.util.Log.d("StatisticsViewModel", "=== StatisticsViewModel 调试信息 ===")
             
-            // 获取所有交易
-            val allTransactions = repository.getTransactionsByDateRange(0, System.currentTimeMillis()).first()
+            // 查看原始数据状态
+            val allTransactions = repository.getAllTransactions().first()
             android.util.Log.d("StatisticsViewModel", "数据库中总交易数：${allTransactions.size}")
             
-            if (allTransactions.isNotEmpty()) {
-                val earliestDate = allTransactions.minByOrNull { it.date }?.date ?: 0
-                val latestDate = allTransactions.maxByOrNull { it.date }?.date ?: 0
-                android.util.Log.d("StatisticsViewModel", "最早交易：${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(earliestDate))}")
-                android.util.Log.d("StatisticsViewModel", "最晚交易：${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(latestDate))}")
-                
-                // 按月份统计所有交易
-                val monthFormat = SimpleDateFormat("yyyy-MM", Locale.getDefault())
-                val transactionsByMonth = allTransactions.groupBy { transaction ->
-                    monthFormat.format(Date(transaction.date))
-                }
-                
-                android.util.Log.d("StatisticsViewModel", "按月份分布的交易数：")
-                transactionsByMonth.forEach { (month, transactions) ->
-                    val income = transactions.filter { it.type == Transaction.TransactionType.INCOME }.sumOf { it.amount }
-                    val expense = transactions.filter { it.type == Transaction.TransactionType.EXPENSE }.sumOf { it.amount }
-                    android.util.Log.d("StatisticsViewModel", "  $month: ${transactions.size}笔交易, 收入=$income, 支出=$expense")
-                }
+            val incomeTransactions = allTransactions.filter { it.type == Transaction.TransactionType.INCOME }
+            val expenseTransactions = allTransactions.filter { it.type == Transaction.TransactionType.EXPENSE }
+            
+            android.util.Log.d("StatisticsViewModel", "收入交易数：${incomeTransactions.size}")
+            android.util.Log.d("StatisticsViewModel", "支出交易数：${expenseTransactions.size}")
+            
+            // 查看最近的几条交易
+            val recentTransactions = allTransactions.sortedByDescending { it.date }.take(5)
+            android.util.Log.d("StatisticsViewModel", "最近5条交易：")
+            recentTransactions.forEach { transaction ->
+                val dateStr = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(transaction.date))
+                android.util.Log.d("StatisticsViewModel", "  ${transaction.type}: ${transaction.amount}元, 日期: $dateStr, 分类: ${transaction.title}")
             }
             
             // 查看当前选择的时间范围
@@ -1712,15 +1706,6 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                 android.util.Log.d("StatisticsViewModel", "  ${categoryData.categoryName}: ${categoryData.amount}元 (${categoryData.transactionCount}笔)")
             }
         }
-    }
-
-    /**
-     * 设置趋势类型
-     */
-    fun setTrendType(trendType: TrendType) {
-        currentTrendType = trendType
-        // 触发趋势数据重新计算
-        loadStatistics()
     }
 }
 

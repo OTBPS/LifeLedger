@@ -8,7 +8,7 @@
     android:layout_margin="8dp"
     app:cardCornerRadius="12dp"
     app:cardElevation="2dp"
-    app:strokeWidth="2dp"
+    app:strokeWidth="1dp"
     app:strokeColor="@color/primary">
 
     <LinearLayout
@@ -16,13 +16,14 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:gravity="center_vertical">
+        android:gravity="top">
 
         <!-- 图标 -->
         <ImageView
             android:id="@+id/ivIcon"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginTop="4dp"
             android:src="@drawable/ic_lightbulb"
             app:tint="@color/primary"
             tools:ignore="ContentDescription" />
@@ -50,7 +51,7 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary"
-                    tools:text="预算超支提醒" />
+                    tools:text="预算使用率分析" />
 
                 <ImageView
                     android:id="@+id/ivPriority"
@@ -63,32 +64,18 @@
 
             </LinearLayout>
 
-            <!-- 描述 -->
+            <!-- 详细描述 -->
             <TextView
                 android:id="@+id/tvDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
                 android:textSize="14sp"
                 android:textColor="@color/text_secondary"
-                android:maxLines="2"
-                android:ellipsize="end"
-                tools:text="您有2个预算超支，建议调整支出计划或增加预算额度" />
+                android:lineSpacingExtra="2dp"
+                tools:text="根据您的预算使用情况分析，建议适当调整各分类的预算分配。目前餐饮预算使用率达到85%，而交通预算仅使用了30%，可以考虑将部分预算从交通转移到餐饮类别。" />
 
         </LinearLayout>
-
-        <!-- 操作按钮 -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAction"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:text="查看详情"
-            android:textSize="12sp"
-            style="@style/Widget.Material3.Button.TextButton"
-            app:icon="@drawable/ic_arrow_forward"
-            app:iconSize="16dp"
-            app:iconGravity="end" />
 
     </LinearLayout>
 

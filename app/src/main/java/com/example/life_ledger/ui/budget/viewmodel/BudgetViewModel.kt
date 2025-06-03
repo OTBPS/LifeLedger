@@ -27,8 +27,8 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
     val budgets: LiveData<List<Budget>> = _budgets
     
     // 预算总览
-    private val _budgetOverview = MutableLiveData<com.example.life_ledger.ui.budget.viewmodel.BudgetOverview>()
-    val budgetOverview: LiveData<com.example.life_ledger.ui.budget.viewmodel.BudgetOverview> = _budgetOverview
+    private val _budgetOverview = MutableLiveData<com.example.life_ledger.data.dao.BudgetOverview>()
+    val budgetOverview: LiveData<com.example.life_ledger.data.dao.BudgetOverview> = _budgetOverview
     
     // 当前预算（按类别分组）
     private val _currentBudgets = MutableStateFlow<List<Budget>>(emptyList())
@@ -152,6 +152,7 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             try {
                 _isLoading.value = true
+                _error.value = null
                 
                 val startDate = System.currentTimeMillis()
                 val endDate = calculateEndDate(startDate, period)
@@ -171,6 +172,9 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
                 
                 repository.insertBudget(budget)
                 _successMessage.value = "预算创建成功"
+                
+                // 重新加载预算列表
+                loadBudgets()
                 
             } catch (e: Exception) {
                 _error.value = "创建预算失败: ${e.message}"
@@ -374,14 +378,12 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
                 val totalSpent = budgets.sumOf { it.spent }
                 val remainingAmount = totalAmount - totalSpent
                 
-                val overview = com.example.life_ledger.ui.budget.viewmodel.BudgetOverview(
-                    totalBudgets = totalBudgets,
-                    activeBudgets = activeBudgets,
+                val overview = com.example.life_ledger.data.dao.BudgetOverview(
+                    totalCount = totalBudgets,
                     totalAmount = totalAmount,
                     totalSpent = totalSpent,
-                    remainingAmount = remainingAmount,
-                    overBudgetCount = overspentBudgets,
-                    warningCount = warningBudgets
+                    avgUsageRate = if (totalAmount > 0) (totalSpent / totalAmount * 100) else 0.0,
+                    overspentCount = overspentBudgets
                 )
                 
                 _budgetOverview.value = overview
@@ -403,8 +405,8 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
             val usageRate = if (it.totalAmount > 0) (it.totalSpent / it.totalAmount) * 100 else 0.0
             
             when {
-                it.overBudgetCount > 0 -> {
-                    recommendations.add("您有${it.overBudgetCount}个预算超支，建议调整支出计划")
+                it.overspentCount > 0 -> {
+                    recommendations.add("您有${it.overspentCount}个预算超支，建议调整支出计划")
                 }
                 usageRate > 80 -> {
                     recommendations.add("预算使用率较高，请谨慎消费")
@@ -414,7 +416,7 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
                 }
             }
             
-            if (it.totalBudgets == 0) {
+            if (it.totalCount == 0) {
                 recommendations.add("建议创建预算来管理您的支出")
             }
         }
@@ -447,14 +449,12 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
         val overBudgetCount = activeBudgets.count { it.getBudgetStatus() == Budget.BudgetStatus.EXCEEDED }
         val warningCount = activeBudgets.count { it.getBudgetStatus() == Budget.BudgetStatus.WARNING }
         
-        _budgetOverview.value = com.example.life_ledger.ui.budget.viewmodel.BudgetOverview(
-            totalBudgets = budgets.size,
-            activeBudgets = activeBudgets.size,
+        _budgetOverview.value = com.example.life_ledger.data.dao.BudgetOverview(
+            totalCount = budgets.size,
             totalAmount = totalAmount,
             totalSpent = totalSpent,
-            remainingAmount = remainingAmount,
-            overBudgetCount = overBudgetCount,
-            warningCount = warningCount
+            avgUsageRate = if (totalAmount > 0) (totalSpent / totalAmount * 100) else 0.0,
+            overspentCount = overBudgetCount
         )
     }
 } 

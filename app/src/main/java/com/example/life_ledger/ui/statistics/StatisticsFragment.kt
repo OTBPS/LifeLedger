@@ -288,13 +288,14 @@ class StatisticsFragment : Fragment() {
             // 趋势类型选择
             chipGroupTrendType.setOnCheckedStateChangeListener { _, checkedIds ->
                 if (checkedIds.isNotEmpty()) {
-                    val trendType = when (checkedIds.first()) {
-                        R.id.chipExpenseTrend -> StatisticsViewModel.TrendType.EXPENSE
-                        R.id.chipIncomeTrend -> StatisticsViewModel.TrendType.INCOME
-                        else -> StatisticsViewModel.TrendType.EXPENSE
+                    currentTrendType = when (checkedIds.first()) {
+                        R.id.chipExpenseTrend -> TrendType.EXPENSE
+                        R.id.chipIncomeTrend -> TrendType.INCOME
+                        else -> TrendType.EXPENSE
                     }
                     
-                    viewModel.setTrendType(trendType)
+                    // 立即更新趋势图显示
+                    updateTrendChartDisplay()
                 }
             }
             
@@ -397,13 +398,6 @@ class StatisticsFragment : Fragment() {
             viewModel.operationResult.collect { result ->
                 val message = if (result.isSuccess) result.message else "操作失败: ${result.message}"
                 Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
-            }
-        }
-
-        // 观察月度数据
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.monthlyData.collect { monthlyData ->
-                updateMonthlyChart(monthlyData)
             }
         }
 
@@ -522,6 +516,22 @@ class StatisticsFragment : Fragment() {
                         updateTrendChart(trendData, "收入")
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * 立即更新趋势图显示
+     */
+    private fun updateTrendChartDisplay() {
+        when (currentTrendType) {
+            TrendType.EXPENSE -> {
+                val trendData = viewModel.expenseTrendData.value
+                updateTrendChart(trendData, "支出")
+            }
+            TrendType.INCOME -> {
+                val trendData = viewModel.incomeTrendData.value
+                updateTrendChart(trendData, "收入")
             }
         }
     }
@@ -749,13 +759,14 @@ class StatisticsFragment : Fragment() {
     private fun setupTrendTypeChips() {
         binding.chipGroupTrendType.setOnCheckedStateChangeListener { _, checkedIds ->
             if (checkedIds.isNotEmpty()) {
-                val trendType = when (checkedIds.first()) {
-                    R.id.chipExpenseTrend -> StatisticsViewModel.TrendType.EXPENSE
-                    R.id.chipIncomeTrend -> StatisticsViewModel.TrendType.INCOME
-                    else -> StatisticsViewModel.TrendType.EXPENSE
+                currentTrendType = when (checkedIds.first()) {
+                    R.id.chipExpenseTrend -> TrendType.EXPENSE
+                    R.id.chipIncomeTrend -> TrendType.INCOME
+                    else -> TrendType.EXPENSE
                 }
                 
-                viewModel.setTrendType(trendType)
+                // 立即更新趋势图显示
+                updateTrendChartDisplay()
             }
         }
     }
@@ -804,7 +815,7 @@ class StatisticsFragment : Fragment() {
             kotlinx.coroutines.delay(1000) // 等待1秒让数据加载完成
             
             android.util.Log.d("StatisticsFragment", "输出详细调试信息")
-            viewModel.getDebugInfo()
+            viewModel.debugInfo()
             
             // 强制刷新月度统计
             kotlinx.coroutines.delay(500)
@@ -944,7 +955,15 @@ class StatisticsFragment : Fragment() {
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
             .setTitle("预算跟踪详情")
             .setMessage(message)
-            .setPositiveButton("确定", null)
+            .setPositiveButton("管理预算") { _, _ ->
+                try {
+                    // 导航到预算管理页面
+                    findNavController().navigate(R.id.budgetFragment)
+                } catch (e: Exception) {
+                    Snackbar.make(binding.root, "跳转到预算页面失败", Snackbar.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("关闭", null)
             .show()
     }
 

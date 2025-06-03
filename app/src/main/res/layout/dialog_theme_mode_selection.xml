@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- 标题 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="@string/select_theme_mode"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+        android:textColor="?attr/colorOnSurface" />
+
+    <!-- 主题模式选项 -->
+    <RadioGroup
+        android:id="@+id/radioGroupThemeMode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <!-- 跟随系统 -->
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/radioSystem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/theme_mode_system"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+
+        <!-- 浅色模式 -->
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/radioLight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/theme_mode_light"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+
+        <!-- 深色模式 -->
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/radioDark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/theme_mode_dark"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+
+    </RadioGroup>
+
+    <!-- 按钮区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="@string/cancel" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnApply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ok" />
+
+    </LinearLayout>
+
+</LinearLayout> 

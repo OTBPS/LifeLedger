@@ -1,8 +1,15 @@
 package com.example.life_ledger
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
+import androidx.room.Room
+import com.example.life_ledger.constants.AppConstants
 import com.example.life_ledger.data.database.AppDatabase
 import com.example.life_ledger.service.BudgetNotificationService
+import com.example.life_ledger.ui.theme.ThemeManager
 import com.example.life_ledger.utils.PreferenceUtils
 import java.io.File
 
@@ -11,6 +18,17 @@ import java.io.File
  * 负责全局初始化和依赖管理
  */
 class LifeLedgerApplication : Application() {
+    
+    // 数据库实例
+    val database by lazy {
+        Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java,
+            AppConstants.Database.NAME
+        )
+        .fallbackToDestructiveMigration() // 开发阶段允许破坏性迁移
+        .build()
+    }
     
     override fun onCreate() {
         super.onCreate()
@@ -59,6 +77,9 @@ class LifeLedgerApplication : Application() {
         // 初始化SharedPreferences工具类
         PreferenceUtils.init(this)
         
+        // 初始化主题管理器
+        ThemeManager.init(this)
+        
         // 初始化其他全局组件
         initializeNotificationChannels()
         
@@ -77,6 +98,49 @@ class LifeLedgerApplication : Application() {
     private fun initializeNotificationChannels() {
         // 预算通知服务会自动创建通知渠道
         // 这里可以添加其他通知渠道的创建
+        
+        // 创建通知渠道
+        createNotificationChannels()
+    }
+    
+    /**
+     * 创建通知渠道
+     */
+    private fun createNotificationChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            
+            // 提醒通知渠道
+            val reminderChannel = NotificationChannel(
+                AppConstants.Notification.CHANNEL_ID_REMINDERS,
+                "提醒通知",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = "待办事项和财务提醒"
+            }
+            
+            // 预算警告通知渠道
+            val budgetChannel = NotificationChannel(
+                AppConstants.Notification.CHANNEL_ID_BUDGET,
+                "预算警告",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "预算超支警告"
+            }
+            
+            // 一般通知渠道
+            val generalChannel = NotificationChannel(
+                AppConstants.Notification.CHANNEL_ID_GENERAL,
+                "一般通知",
+                NotificationManager.IMPORTANCE_LOW
+            ).apply {
+                description = "应用一般通知"
+            }
+            
+            notificationManager.createNotificationChannels(
+                listOf(reminderChannel, budgetChannel, generalChannel)
+            )
+        }
     }
     
     /**
@@ -110,5 +174,30 @@ class LifeLedgerApplication : Application() {
         
         // 启动预算通知服务
         startBudgetNotificationService()
+    }
+    
+    /**
+     * 设置全局异常处理器
+     */
+    private fun setupGlobalExceptionHandler() {
+        Thread.setDefaultUncaughtExceptionHandler { thread, exception ->
+            // 记录异常信息
+            android.util.Log.e("LifeLedger", "Uncaught exception in thread ${thread.name}", exception)
+            
+            // 这里可以添加崩溃报告逻辑
+            // 例如发送到崩溃分析服务
+            
+            // 调用系统默认处理器
+            System.exit(1)
+        }
+    }
+    
+    companion object {
+        /**
+         * 获取应用实例
+         */
+        fun getInstance(context: Context): LifeLedgerApplication {
+            return context.applicationContext as LifeLedgerApplication
+        }
     }
 } 

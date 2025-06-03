@@ -40,6 +40,34 @@ object AppConstants {
         const val KEY_NOTIFICATION_ENABLED = "notification_enabled"
         const val KEY_CURRENCY = "currency"
         const val KEY_LANGUAGE = "language"
+        const val KEY_THEME_MODE = "theme_mode"
+        const val KEY_CUSTOM_THEME = "custom_theme"
+    }
+    
+    // 主题相关常量
+    object Theme {
+        const val MODE_SYSTEM = "system"
+        const val MODE_LIGHT = "light"
+        const val MODE_DARK = "dark"
+        
+        // 自定义主题
+        const val THEME_DEFAULT = "default"
+        const val THEME_BLUE = "blue"
+        const val THEME_PURPLE = "purple"
+        const val THEME_ORANGE = "orange"
+        const val THEME_RED = "red"
+        const val THEME_TEAL = "teal"
+        const val THEME_PINK = "pink"
+        
+        val AVAILABLE_THEMES = listOf(
+            THEME_DEFAULT,
+            THEME_BLUE,
+            THEME_PURPLE,
+            THEME_ORANGE,
+            THEME_RED,
+            THEME_TEAL,
+            THEME_PINK
+        )
     }
     
     // 日期格式常量
