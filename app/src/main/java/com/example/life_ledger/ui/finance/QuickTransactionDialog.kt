@@ -65,6 +65,11 @@ class QuickTransactionDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        // 在创建Dialog前检查Fragment状态
+        if (!isAdded || isDetached || activity == null) {
+            return super.onCreateDialog(savedInstanceState)
+        }
+
         val view = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_quick_transaction, null)
 
@@ -78,15 +83,15 @@ class QuickTransactionDialog : DialogFragment() {
         // 设置快速金额按钮点击事件
         setQuickAmountListeners(view, editAmount)
 
-        // 设置交易类型切换
+        // 设置交易类型切换 - 添加Fragment生命周期检查
         radioIncome?.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
+            if (isChecked && isAdded && !isDetached && context != null) {
                 updateCategorySpinner(spinnerCategory, Transaction.TransactionType.INCOME)
             }
         }
 
         radioExpense?.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
+            if (isChecked && isAdded && !isDetached && context != null) {
                 updateCategorySpinner(spinnerCategory, Transaction.TransactionType.EXPENSE)
             }
         }
@@ -109,42 +114,89 @@ class QuickTransactionDialog : DialogFragment() {
         loadCategories()
 
         return MaterialAlertDialogBuilder(requireContext())
-            .setTitle("快速记录")
+            .setTitle(R.string.quick_record)
             .setView(view)
-            .setPositiveButton("保存") { _, _ ->
-                saveQuickTransaction(view)
+            .setPositiveButton(R.string.save) { _, _ ->
+                // 检查Dialog和Fragment状态
+                if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                    try {
+                        saveQuickTransaction(view)
+                    } catch (e: Exception) {
+                        android.util.Log.e("QuickTransactionDialog", "Error in save button", e)
+                        // 如果发生错误，安全关闭Dialog
+                        try {
+                            if (isAdded && !isDetached) {
+                                dismiss()
+                            }
+                        } catch (dismissError: Exception) {
+                            android.util.Log.w("QuickTransactionDialog", "Error dismissing after error", dismissError)
+                        }
+                    }
+                }
+                // 注意：不要在这里调用dismiss()，让saveQuickTransaction处理
             }
-            .setNegativeButton("取消", null)
+            .setNegativeButton(R.string.cancel) { dialog, _ ->
+                // 安全关闭Dialog
+                try {
+                    if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                        dialog.dismiss()
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.w("QuickTransactionDialog", "Error dismissing dialog", e)
+                }
+            }
             .create()
     }
 
     private fun setupRepository() {
-        val database = AppDatabase.getDatabase(requireContext())
-        repository = LifeLedgerRepository(
-            database.transactionDao(),
-            database.todoDao(),
-            database.categoryDao(),
-            database.budgetDao(),
-            database.userSettingsDao()
-        )
+        try {
+            if (isAdded && context != null) {
+                val database = AppDatabase.getDatabase(requireContext())
+                repository = LifeLedgerRepository(
+                    database.transactionDao(),
+                    database.todoDao(),
+                    database.categoryDao(),
+                    database.budgetDao(),
+                    database.userSettingsDao()
+                )
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("QuickTransactionDialog", "Failed to setup repository", e)
+        }
     }
 
     private fun loadCategories() {
+        // 检查Fragment状态
+        if (!isAdded || isDetached || !::repository.isInitialized) {
+            android.util.Log.w("QuickTransactionDialog", "Fragment not ready for loading categories")
+            return
+        }
+
         lifecycleScope.launch {
             try {
+                // 再次检查状态，因为协程可能延迟执行
+                if (!isAdded || isDetached) {
+                    return@launch
+                }
+                
                 repository.getFinancialCategories().collect { categories ->
-                    allCategories = categories
-                    
-                    // 数据加载完成后，更新当前显示的Spinner
-                    val currentType = getCurrentSelectedType()
-                    updateCategorySpinner(spinnerCategory, currentType)
+                    // 检查Fragment是否仍然活跃
+                    if (isAdded && !isDetached && context != null) {
+                        allCategories = categories
+                        
+                        // 数据加载完成后，更新当前显示的Spinner
+                        val currentType = getCurrentSelectedType()
+                        updateCategorySpinner(spinnerCategory, currentType)
+                    }
                 }
             } catch (e: Exception) {
                 android.util.Log.e("QuickTransactionDialog", "Failed to load categories", e)
-                // 如果加载失败，创建一些默认分类
-                allCategories = createDefaultCategories()
-                val currentType = getCurrentSelectedType()
-                updateCategorySpinner(spinnerCategory, currentType)
+                // 如果加载失败且Fragment仍然活跃，创建一些默认分类
+                if (isAdded && !isDetached && context != null) {
+                    allCategories = createDefaultCategories()
+                    val currentType = getCurrentSelectedType()
+                    updateCategorySpinner(spinnerCategory, currentType)
+                }
             }
         }
     }
@@ -165,40 +217,44 @@ class QuickTransactionDialog : DialogFragment() {
      * 创建默认分类（当从数据库加载失败时使用）
      */
     private fun createDefaultCategories(): List<Category> {
-        return listOf(
-            Category(
-                id = "default_food",
-                name = "餐饮",
-                type = Category.CategoryType.FINANCIAL,
-                subType = Category.FinancialSubType.EXPENSE,
-                isActive = true,
-                sortOrder = 1
-            ),
-            Category(
-                id = "default_transport",
-                name = "交通",
-                type = Category.CategoryType.FINANCIAL,
-                subType = Category.FinancialSubType.EXPENSE,
-                isActive = true,
-                sortOrder = 2
-            ),
-            Category(
-                id = "default_salary",
-                name = "工资",
-                type = Category.CategoryType.FINANCIAL,
-                subType = Category.FinancialSubType.INCOME,
-                isActive = true,
-                sortOrder = 1
-            ),
-            Category(
-                id = "default_bonus",
-                name = "奖金",
-                type = Category.CategoryType.FINANCIAL,
-                subType = Category.FinancialSubType.INCOME,
-                isActive = true,
-                sortOrder = 2
+        return if (isAdded && context != null) {
+            listOf(
+                Category(
+                    id = "default_food",
+                    name = getString(R.string.category_food),
+                    type = Category.CategoryType.FINANCIAL,
+                    subType = Category.FinancialSubType.EXPENSE,
+                    isActive = true,
+                    sortOrder = 1
+                ),
+                Category(
+                    id = "default_transport",
+                    name = getString(R.string.category_transport),
+                    type = Category.CategoryType.FINANCIAL,
+                    subType = Category.FinancialSubType.EXPENSE,
+                    isActive = true,
+                    sortOrder = 2
+                ),
+                Category(
+                    id = "default_salary",
+                    name = getString(R.string.category_salary),
+                    type = Category.CategoryType.FINANCIAL,
+                    subType = Category.FinancialSubType.INCOME,
+                    isActive = true,
+                    sortOrder = 1
+                ),
+                Category(
+                    id = "default_bonus",
+                    name = getString(R.string.category_bonus),
+                    type = Category.CategoryType.FINANCIAL,
+                    subType = Category.FinancialSubType.INCOME,
+                    isActive = true,
+                    sortOrder = 2
+                )
             )
-        )
+        } else {
+            emptyList()
+        }
     }
 
     private fun setQuickAmountListeners(view: android.view.View, editAmount: TextInputEditText) {
@@ -209,13 +265,22 @@ class QuickTransactionDialog : DialogFragment() {
 
         buttonIds.forEachIndexed { index, buttonId ->
             view.findViewById<android.widget.Button>(buttonId)?.setOnClickListener {
-                editAmount.setText(quickAmounts[index].toInt().toString())
+                // 添加Fragment生命周期检查
+                if (isAdded && !isDetached && context != null) {
+                    try {
+                        editAmount.setText(quickAmounts[index].toInt().toString())
+                    } catch (e: Exception) {
+                        android.util.Log.w("QuickTransactionDialog", "Error setting amount", e)
+                    }
+                }
             }
         }
     }
 
     private fun updateCategorySpinner(spinner: Spinner?, type: Transaction.TransactionType) {
-        if (spinner == null) return
+        if (spinner == null || !isAdded || isDetached || context == null) {
+            return
+        }
         
         val categories = allCategories.filter { category ->
             when (type) {
@@ -228,7 +293,7 @@ class QuickTransactionDialog : DialogFragment() {
         
         // 如果没有分类，显示提示信息
         val displayNames = if (categoryNames.isEmpty()) {
-            listOf("暂无可用分类")
+            listOf(getString(R.string.no_available_categories))
         } else {
             categoryNames
         }
@@ -250,77 +315,140 @@ class QuickTransactionDialog : DialogFragment() {
     }
 
     private fun saveQuickTransaction(view: android.view.View) {
-        val editAmount = view.findViewById<TextInputEditText>(R.id.editAmount)
-        val radioIncome = view.findViewById<RadioButton>(R.id.radioIncome)
-
-        val amountText = editAmount.text.toString().trim()
-        if (amountText.isEmpty()) {
-            Snackbar.make(view, "请输入金额", Snackbar.LENGTH_SHORT).show()
+        // 严格检查Dialog和Fragment是否还活跃
+        if (!isAdded || isDetached || activity == null || activity?.isFinishing == true || context == null) {
+            android.util.Log.w("QuickTransactionDialog", "Dialog not active, cannot save")
             return
         }
 
-        val amount = try {
-            amountText.toDouble()
-        } catch (e: NumberFormatException) {
-            Snackbar.make(view, "请输入有效金额", Snackbar.LENGTH_SHORT).show()
-            return
-        }
+        try {
+            val editAmount = view.findViewById<TextInputEditText>(R.id.editAmount)
+            val radioIncome = view.findViewById<RadioButton>(R.id.radioIncome)
 
-        if (amount <= 0) {
-            Snackbar.make(view, "金额必须大于0", Snackbar.LENGTH_SHORT).show()
-            return
-        }
-
-        val type = if (radioIncome?.isChecked == true) {
-            Transaction.TransactionType.INCOME
-        } else {
-            Transaction.TransactionType.EXPENSE
-        }
-
-        // 获取当前类型的分类
-        val availableCategories = allCategories.filter { category ->
-            when (type) {
-                Transaction.TransactionType.INCOME -> category.isIncomeCategory()
-                Transaction.TransactionType.EXPENSE -> category.isExpenseCategory()
+            val amountText = editAmount.text.toString().trim()
+            if (amountText.isEmpty()) {
+                showSnackbarSafely(view, getString(R.string.please_enter_amount))
+                return
             }
-        }.filter { it.isActive }
 
-        val selectedPosition = spinnerCategory?.selectedItemPosition ?: -1
-        val selectedCategory = if (selectedPosition >= 0 && selectedPosition < availableCategories.size) {
-            availableCategories[selectedPosition]
-        } else {
-            // 如果没有选择有效分类，尝试使用第一个可用分类
-            availableCategories.firstOrNull()
-        }
+            val amount = try {
+                amountText.toDouble()
+            } catch (e: NumberFormatException) {
+                showSnackbarSafely(view, getString(R.string.please_enter_valid_amount))
+                return
+            }
 
-        // 如果选择了"暂无可用分类"或没有分类，提示用户
-        if (selectedCategory == null || selectedCategory.name == "暂无可用分类") {
-            Snackbar.make(view, "请先添加分类或选择有效分类", Snackbar.LENGTH_SHORT).show()
-            return
-        }
+            if (amount <= 0) {
+                showSnackbarSafely(view, getString(R.string.amount_must_be_greater_than_zero))
+                return
+            }
 
-        val transaction = Transaction(
-            amount = amount,
-            type = type,
-            categoryId = selectedCategory.id,
-            title = selectedCategory.name,
-            description = "快速记录",
-            date = System.currentTimeMillis()
-        )
+            val type = if (radioIncome?.isChecked == true) {
+                Transaction.TransactionType.INCOME
+            } else {
+                Transaction.TransactionType.EXPENSE
+            }
 
-        onTransactionAddedListener?.invoke(transaction)
+            // 获取当前类型的分类
+            val availableCategories = allCategories.filter { category ->
+                when (type) {
+                    Transaction.TransactionType.INCOME -> category.isIncomeCategory()
+                    Transaction.TransactionType.EXPENSE -> category.isExpenseCategory()
+                }
+            }.filter { it.isActive }
 
-        // 更新分类使用次数
-        lifecycleScope.launch {
+            val selectedPosition = spinnerCategory?.selectedItemPosition ?: -1
+            val selectedCategory = if (selectedPosition >= 0 && selectedPosition < availableCategories.size) {
+                availableCategories[selectedPosition]
+            } else {
+                // 如果没有选择有效分类，尝试使用第一个可用分类
+                availableCategories.firstOrNull()
+            }
+
+            // 如果选择了"暂无可用分类"或没有分类，提示用户
+            if (selectedCategory == null || selectedCategory.name == getString(R.string.no_available_categories)) {
+                showSnackbarSafely(view, getString(R.string.please_add_category_first))
+                return
+            }
+
+            val transaction = Transaction(
+                amount = amount,
+                type = type,
+                categoryId = selectedCategory.id,
+                title = selectedCategory.name,
+                description = getString(R.string.quick_record_description),
+                date = System.currentTimeMillis()
+            )
+
+            android.util.Log.d("QuickTransactionDialog", "Transaction created: $transaction")
+            
+            // 安全调用回调
             try {
-                repository.incrementCategoryUsage(selectedCategory.id)
+                onTransactionAddedListener?.invoke(transaction)
+                android.util.Log.d("QuickTransactionDialog", "Transaction callback invoked successfully")
             } catch (e: Exception) {
-                android.util.Log.w("QuickTransactionDialog", "Failed to update category usage", e)
+                android.util.Log.e("QuickTransactionDialog", "Error invoking callback", e)
+                showSnackbarSafely(view, getString(R.string.save_failed_format, e.message))
+                return
             }
+
+            // 更新分类使用次数 - 在后台线程进行
+            if (::repository.isInitialized) {
+                lifecycleScope.launch {
+                    try {
+                        repository.incrementCategoryUsage(selectedCategory.id)
+                        android.util.Log.d("QuickTransactionDialog", "Category usage updated successfully")
+                    } catch (e: Exception) {
+                        android.util.Log.w("QuickTransactionDialog", "Failed to update category usage", e)
+                    }
+                }
+            }
+            
+            // 在主线程中关闭对话框 - 再次检查状态
+            dismissDialogSafely()
+            
+        } catch (e: Exception) {
+            android.util.Log.e("QuickTransactionDialog", "Error saving transaction", e)
+            if (isAdded && !isDetached && context != null) {
+                showSnackbarSafely(view, getString(R.string.save_failed_format, e.message))
+            }
+        }
+    }
+
+    /**
+     * 安全显示Snackbar
+     */
+    private fun showSnackbarSafely(view: android.view.View, message: String) {
+        try {
+            if (isAdded && !isDetached && context != null) {
+                Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            android.util.Log.w("QuickTransactionDialog", "Error showing snackbar", e)
+        }
+    }
+
+    /**
+     * 安全关闭Dialog
+     */
+    private fun dismissDialogSafely() {
+        try {
+            if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                dismiss()
+                android.util.Log.d("QuickTransactionDialog", "Dialog dismissed successfully")
+            }
+        } catch (e: Exception) {
+            android.util.Log.w("QuickTransactionDialog", "Error dismissing dialog", e)
         }
     }
 
     fun setOnTransactionAddedListener(listener: (Transaction) -> Unit) {
         onTransactionAddedListener = listener
+    }
+    
+    override fun onDetach() {
+        super.onDetach()
+        // 清理回调监听器
+        onTransactionAddedListener = null
     }
 } 

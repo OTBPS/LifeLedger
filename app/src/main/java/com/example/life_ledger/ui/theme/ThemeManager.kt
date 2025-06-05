@@ -10,8 +10,8 @@ import com.example.life_ledger.constants.AppConstants
 import com.example.life_ledger.utils.PreferenceUtils
 
 /**
- * 主题管理器
- * 负责管理应用的主题模式和自定义主题
+ * Theme Manager
+ * Responsible for managing application theme mode and custom themes
  */
 object ThemeManager {
     
@@ -22,7 +22,7 @@ object ThemeManager {
     val currentThemeMode: LiveData<String> = _currentThemeMode
     
     /**
-     * 初始化主题管理器
+     * Initialize theme manager
      */
     fun init(context: Context) {
         val savedThemeMode = PreferenceUtils.getString(
@@ -41,7 +41,7 @@ object ThemeManager {
     }
     
     /**
-     * 设置主题模式（浅色/深色/跟随系统）
+     * Set theme mode (light/dark/follow system)
      */
     fun setThemeMode(mode: String) {
         PreferenceUtils.putString(AppConstants.Preferences.KEY_THEME_MODE, mode)
@@ -50,7 +50,7 @@ object ThemeManager {
     }
     
     /**
-     * 设置自定义主题
+     * Set custom theme
      */
     fun setCustomTheme(theme: String) {
         PreferenceUtils.putString(AppConstants.Preferences.KEY_CUSTOM_THEME, theme)
@@ -58,7 +58,7 @@ object ThemeManager {
     }
     
     /**
-     * 应用主题模式
+     * Apply theme mode
      */
     private fun applyThemeMode(mode: String) {
         val nightMode = when (mode) {
@@ -71,7 +71,7 @@ object ThemeManager {
     }
     
     /**
-     * 获取当前主题模式
+     * Get current theme mode
      */
     fun getCurrentThemeMode(): String {
         return PreferenceUtils.getString(
@@ -81,7 +81,7 @@ object ThemeManager {
     }
     
     /**
-     * 获取当前自定义主题
+     * Get current custom theme
      */
     fun getCurrentCustomTheme(): String {
         return PreferenceUtils.getString(
@@ -91,7 +91,7 @@ object ThemeManager {
     }
     
     /**
-     * 检查是否为深色模式
+     * Check if it's dark mode
      */
     fun isDarkMode(context: Context): Boolean {
         val currentNightMode = context.resources.configuration.uiMode and 
@@ -100,22 +100,22 @@ object ThemeManager {
     }
     
     /**
-     * 获取主题资源ID
+     * Get theme resource ID
      */
     fun getThemeResId(customTheme: String): Int {
         return when (customTheme) {
-            AppConstants.Theme.THEME_BLUE -> R.style.Theme_Life_Ledger_Blue
-            AppConstants.Theme.THEME_PURPLE -> R.style.Theme_Life_Ledger_Purple
-            AppConstants.Theme.THEME_ORANGE -> R.style.Theme_Life_Ledger_Orange
-            AppConstants.Theme.THEME_RED -> R.style.Theme_Life_Ledger_Red
-            AppConstants.Theme.THEME_TEAL -> R.style.Theme_Life_Ledger_Teal
+            AppConstants.Theme.THEME_BLUE -> R.style.Theme_LifeLedger_Blue
+            AppConstants.Theme.THEME_PURPLE -> R.style.Theme_LifeLedger_Purple
+            AppConstants.Theme.THEME_ORANGE -> R.style.Theme_LifeLedger_Orange
+            AppConstants.Theme.THEME_RED -> R.style.Theme_LifeLedger_Red
+            AppConstants.Theme.THEME_TEAL -> R.style.Theme_LifeLedger_Teal
             AppConstants.Theme.THEME_PINK -> R.style.Theme_Life_Ledger_Pink
             else -> R.style.Theme_Life_Ledger
         }
     }
     
     /**
-     * 应用自定义主题到Activity
+     * Apply custom theme to Activity
      */
     fun applyCustomTheme(activity: Activity, customTheme: String) {
         val themeResId = getThemeResId(customTheme)
@@ -123,7 +123,7 @@ object ThemeManager {
     }
     
     /**
-     * 获取主题显示名称
+     * Get theme display name
      */
     fun getThemeDisplayName(context: Context, theme: String): String {
         return when (theme) {
@@ -139,7 +139,7 @@ object ThemeManager {
     }
     
     /**
-     * 获取主题模式显示名称
+     * Get theme mode display name
      */
     fun getThemeModeDisplayName(context: Context, mode: String): String {
         return when (mode) {
@@ -151,13 +151,13 @@ object ThemeManager {
     }
     
     /**
-     * 获取主题预览颜色
+     * Get theme preview color
      */
     fun getThemePreviewColor(context: Context, theme: String): Int {
         return when (theme) {
-            AppConstants.Theme.THEME_BLUE -> context.getColor(R.color.theme_blue_primary)
-            AppConstants.Theme.THEME_PURPLE -> context.getColor(R.color.theme_purple_primary)
-            AppConstants.Theme.THEME_ORANGE -> context.getColor(R.color.theme_orange_primary)
+            AppConstants.Theme.THEME_BLUE -> context.getColor(R.color.blue_primary)
+            AppConstants.Theme.THEME_PURPLE -> context.getColor(R.color.purple_primary)
+            AppConstants.Theme.THEME_ORANGE -> context.getColor(R.color.orange_primary)
             AppConstants.Theme.THEME_RED -> context.getColor(R.color.theme_red_primary)
             AppConstants.Theme.THEME_TEAL -> context.getColor(R.color.theme_teal_primary)
             AppConstants.Theme.THEME_PINK -> context.getColor(R.color.theme_pink_primary)

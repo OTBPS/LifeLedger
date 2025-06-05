@@ -113,28 +113,28 @@ class LifeLedgerApplication : Application() {
             // 提醒通知渠道
             val reminderChannel = NotificationChannel(
                 AppConstants.Notification.CHANNEL_ID_REMINDERS,
-                "提醒通知",
+                "Reminder notification",
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
-                description = "待办事项和财务提醒"
+                description = "To dos and financial reminders"
             }
             
             // 预算警告通知渠道
             val budgetChannel = NotificationChannel(
                 AppConstants.Notification.CHANNEL_ID_BUDGET,
-                "预算警告",
+                "Budget Warning",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "预算超支警告"
+                description = "Budget overrun warning"
             }
             
             // 一般通知渠道
             val generalChannel = NotificationChannel(
                 AppConstants.Notification.CHANNEL_ID_GENERAL,
-                "一般通知",
+                "General Notice",
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "应用一般通知"
+                description = "Application General Notification"
             }
             
             notificationManager.createNotificationChannels(

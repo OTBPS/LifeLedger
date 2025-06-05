@@ -24,8 +24,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * 添加/编辑财务记录页面
- * 提供完整的表单界面和数据验证
+ * Add/Edit Financial Record Page
+ * Provides complete form interface and data validation
  */
 class AddEditTransactionFragment : Fragment() {
 
@@ -36,10 +36,10 @@ class AddEditTransactionFragment : Fragment() {
     private lateinit var viewModel: FinanceViewModel
     private lateinit var repository: LifeLedgerRepository
 
-    private var selectedDate = Calendar.getInstance()
-    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    private var selectedDate: Long = System.currentTimeMillis()
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
 
-    // 分类数据
+    // Category data
     private var allCategories = listOf<Category>()
     private var currentCategories = listOf<Category>()
 
@@ -71,18 +71,18 @@ class AddEditTransactionFragment : Fragment() {
         setupObservers()
         loadCategories()
         
-        // 检查是否为编辑模式
-        if (args.transactionId.isNotEmpty()) {
+        // Check if it's edit mode
+        if (!args.transactionId.isNullOrEmpty()) {
             isEditMode = true
-            loadTransactionForEdit(args.transactionId)
+            loadTransactionForEdit(args.transactionId!!)
         } else {
-            // 新增模式，设置默认值
+            // Add mode, set default values
             updateCategorySpinner(Transaction.TransactionType.EXPENSE)
         }
     }
 
     /**
-     * 初始化Repository
+     * Initialize Repository
      */
     private fun setupRepository() {
         val database = AppDatabase.getDatabase(requireContext())
@@ -96,7 +96,7 @@ class AddEditTransactionFragment : Fragment() {
     }
 
     /**
-     * 初始化ViewModel
+     * Initialize ViewModel
      */
     private fun setupViewModel() {
         try {
@@ -105,35 +105,35 @@ class AddEditTransactionFragment : Fragment() {
             val factory = FinanceViewModelFactory(transactionRepository)
             viewModel = ViewModelProvider(this, factory)[FinanceViewModel::class.java]
         } catch (e: Exception) {
-            // 如果ViewModel初始化失败，显示错误并返回
+            // If ViewModel initialization fails, show error and return
             Snackbar.make(
                 binding.root, 
-                "初始化失败: ${e.message}", 
+                getString(R.string.initialization_failed, e.message), 
                 Snackbar.LENGTH_LONG
             ).show()
             
-            // 记录错误日志
+            // Log error
             android.util.Log.e("AddEditTransactionFragment", "ViewModel initialization failed", e)
             
-            // 返回上一页
+            // Return to previous page
             findNavController().navigateUp()
         }
     }
 
     /**
-     * 加载分类数据
+     * Load category data
      */
     private fun loadCategories() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 repository.getFinancialCategories().collect { categories ->
-                    // 检查Fragment是否还活跃
+                    // Check if Fragment is still active
                     if (!isAdded || _binding == null) {
                         return@collect
                     }
                     
                     allCategories = categories
-                    // 根据当前选择的交易类型更新分类列表
+                    // Update category list based on currently selected transaction type
                     val currentType = if (binding.radioGroupType.checkedRadioButtonId == R.id.radioIncome) {
                         Transaction.TransactionType.INCOME
                     } else {
@@ -142,46 +142,46 @@ class AddEditTransactionFragment : Fragment() {
                     updateCategorySpinner(currentType)
                 }
             } catch (e: Exception) {
-                // 检查Fragment是否还活跃
+                // Check if Fragment is still active
                 if (isAdded && _binding != null) {
-                    Snackbar.make(binding.root, "加载分类失败: ${e.message}", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, getString(R.string.loading_categories_failed, e.message), Snackbar.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
     /**
-     * 设置UI组件
+     * Setup UI components
      */
     private fun setupUI() {
         binding.apply {
-            // 设置日期显示
+            // Set date display
             updateDateDisplay()
             
-            // 设置交易类型单选按钮默认选择
+            // Set transaction type radio button default selection
             radioGroupType.check(R.id.radioExpense)
             
-            // 设置标题
-            toolbarAddEdit.title = if (isEditMode) "编辑记录" else "添加记录"
+            // Set title
+            toolbarAddEdit.title = if (isEditMode) getString(R.string.edit_transaction) else getString(R.string.add_record)
         }
     }
 
     /**
-     * 设置点击监听器
+     * Setup click listeners
      */
     private fun setupClickListeners() {
         binding.apply {
-            // 返回按钮
+            // Back button
             toolbarAddEdit.setNavigationOnClickListener {
                 findNavController().navigateUp()
             }
 
-            // 日期选择
+            // Date selection
             layoutDate.setOnClickListener {
                 showDatePicker()
             }
 
-            // 交易类型切换
+            // Transaction type toggle
             radioGroupType.setOnCheckedChangeListener { _, checkedId ->
                 val type = if (checkedId == R.id.radioIncome) {
                     Transaction.TransactionType.INCOME
@@ -191,28 +191,36 @@ class AddEditTransactionFragment : Fragment() {
                 updateCategorySpinner(type)
             }
 
-            // 保存按钮
+            // Save button
             buttonSave.setOnClickListener {
+                // Check if Fragment is still active
+                if (!isAdded || isDetached || activity == null || activity?.isFinishing == true) {
+                    android.util.Log.w("AddEditTransactionFragment", "Fragment not active, cannot save")
+                    return@setOnClickListener
+                }
                 saveTransaction()
             }
 
-            // 删除按钮（仅编辑模式显示）
+            // Delete button (only shown in edit mode)
             buttonDelete.setOnClickListener {
+                // Check if Fragment is still active
+                if (!isAdded || isDetached || activity == null || activity?.isFinishing == true) {
+                    android.util.Log.w("AddEditTransactionFragment", "Fragment not active, cannot delete")
+                    return@setOnClickListener
+                }
                 deleteTransaction()
             }
 
-            // 分类管理按钮
+            // Category management button
             buttonManageCategories.setOnClickListener {
-                // 导航到分类管理页面
-                findNavController().navigate(
-                    AddEditTransactionFragmentDirections.actionAddEditTransactionFragmentToCategoryManagementFragment()
-                )
+                // Navigate to category management page
+                findNavController().navigate(R.id.categoryManagerFragment)
             }
         }
     }
 
     /**
-     * 设置数据观察者
+     * Setup data observers
      */
     private fun setupObservers() {
         if (!::viewModel.isInitialized) {
@@ -223,10 +231,23 @@ class AddEditTransactionFragment : Fragment() {
         viewModel.operationResult.observe(viewLifecycleOwner) { result ->
             result?.let {
                 if (it.isSuccess) {
-                    Snackbar.make(binding.root, it.message, Snackbar.LENGTH_SHORT).show()
-                    findNavController().navigateUp()
+                    if (isAdded && _binding != null) {
+                        Snackbar.make(binding.root, it.message, Snackbar.LENGTH_SHORT).show()
+                    }
+                    // Safe navigation back
+                    try {
+                        if (isAdded && !isDetached && findNavController().currentDestination != null) {
+                            findNavController().navigateUp()
+                        }
+                    } catch (e: Exception) {
+                        android.util.Log.e("AddEditTransactionFragment", "Navigation failed", e)
+                        // If navigation fails, try to close Activity directly
+                        activity?.finish()
+                    }
                 } else {
-                    Snackbar.make(binding.root, it.message, Snackbar.LENGTH_LONG).show()
+                    if (isAdded && _binding != null) {
+                        Snackbar.make(binding.root, it.message, Snackbar.LENGTH_LONG).show()
+                    }
                 }
                 viewModel.clearOperationResult()
             }
@@ -234,32 +255,52 @@ class AddEditTransactionFragment : Fragment() {
     }
 
     /**
-     * 显示日期选择器
+     * Display date picker
      */
     private fun showDatePicker() {
-        DatePickerDialog(
-            requireContext(),
-            { _, year, month, dayOfMonth ->
-                selectedDate.set(year, month, dayOfMonth)
-                android.util.Log.d("AddEditTransactionFragment", "用户选择日期: ${dateFormat.format(selectedDate.time)} (时间戳: ${selectedDate.timeInMillis})")
-                updateDateDisplay()
-            },
-            selectedDate.get(Calendar.YEAR),
-            selectedDate.get(Calendar.MONTH),
-            selectedDate.get(Calendar.DAY_OF_MONTH)
-        ).show()
+        // Check if Fragment is still active
+        if (!isAdded || isDetached || activity == null || activity?.isFinishing == true) {
+            android.util.Log.w("AddEditTransactionFragment", "Fragment not active, cannot show date picker")
+            return
+        }
+
+        try {
+            val context = requireContext()
+            // Use original context instead of configured context to avoid token problem
+            val datePickerDialog = DatePickerDialog(
+                context,
+                { _, year, month, dayOfMonth ->
+                    selectedDate = Calendar.getInstance().apply {
+                        set(year, month, dayOfMonth)
+                    }.timeInMillis
+                    android.util.Log.d("AddEditTransactionFragment", "User selected date: ${dateFormat.format(Date(selectedDate))}")
+                    updateDateDisplay()
+                },
+                Calendar.getInstance().get(Calendar.YEAR),
+                Calendar.getInstance().get(Calendar.MONTH),
+                Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+            )
+            
+            // Check Fragment state again before showing
+            if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                datePickerDialog.show()
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("AddEditTransactionFragment", "Error showing date picker", e)
+            Snackbar.make(binding.root, "Unable to show date picker", Snackbar.LENGTH_SHORT).show()
+        }
     }
 
     /**
-     * 更新日期显示
+     * Update date display
      */
     private fun updateDateDisplay() {
         if (_binding == null) return
-        binding.tvSelectedDate.text = dateFormat.format(selectedDate.time)
+        binding.tvSelectedDate.text = dateFormat.format(Date(selectedDate))
     }
 
     /**
-     * 根据交易类型更新分类下拉菜单
+     * Update category dropdown menu based on transaction type
      */
     private fun updateCategorySpinner(type: Transaction.TransactionType) {
         currentCategories = allCategories.filter { category ->
@@ -271,7 +312,7 @@ class AddEditTransactionFragment : Fragment() {
 
         val categoryNames = currentCategories.map { it.name }
         
-        // 检查binding是否为null
+        // Check if binding is null
         if (_binding == null) return
         
         val adapter = ArrayAdapter(
@@ -283,7 +324,7 @@ class AddEditTransactionFragment : Fragment() {
     }
 
     /**
-     * 获取当前选中的分类
+     * Get currently selected category
      */
     private fun getSelectedCategory(): Category? {
         if (_binding == null) return null
@@ -296,7 +337,7 @@ class AddEditTransactionFragment : Fragment() {
     }
 
     /**
-     * 加载要编辑的交易记录
+     * Load transaction record to edit
      */
     private fun loadTransactionForEdit(transactionId: String) {
         if (!::viewModel.isInitialized) {
@@ -309,17 +350,17 @@ class AddEditTransactionFragment : Fragment() {
             try {
                 editingTransaction = viewModel.getTransactionById(transactionId)
                 
-                // 检查Fragment是否还活跃
+                // Check if Fragment is still active
                 if (!isAdded || _binding == null) {
                     return@launch
                 }
                 
                 editingTransaction?.let { transaction ->
                     binding.apply {
-                        // 设置金额
+                        // Set amount
                         editAmount.setText(transaction.amount.toString())
                         
-                        // 设置交易类型
+                        // Set transaction type
                         val typeRadioId = if (transaction.type == Transaction.TransactionType.INCOME) {
                             R.id.radioIncome
                         } else {
@@ -327,10 +368,10 @@ class AddEditTransactionFragment : Fragment() {
                         }
                         radioGroupType.check(typeRadioId)
                         
-                        // 更新分类下拉菜单
+                        // Update category dropdown menu
                         updateCategorySpinner(transaction.type)
                         
-                        // 设置选中的分类
+                        // Set selected category
                         if (!transaction.categoryId.isNullOrEmpty()) {
                             val categoryIndex = currentCategories.indexOfFirst { it.id == transaction.categoryId }
                             if (categoryIndex >= 0) {
@@ -338,22 +379,22 @@ class AddEditTransactionFragment : Fragment() {
                             }
                         }
                         
-                        // 设置日期
-                        selectedDate.time = Date(transaction.date)
+                        // Set date
+                        selectedDate = transaction.date
                         updateDateDisplay()
                         
-                        // 设置标签和备注
+                        // Set tags and description
                         editTags.setText(transaction.getTagsList().joinToString(", "))
                         editDescription.setText(transaction.description ?: "")
                         
-                        // 显示删除按钮
+                        // Show delete button
                         buttonDelete.visibility = View.VISIBLE
                     }
                 }
             } catch (e: Exception) {
-                // 检查Fragment是否还活跃
+                // Check if Fragment is still active
                 if (isAdded && _binding != null) {
-                    Snackbar.make(binding.root, "加载记录失败", Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(binding.root, getString(R.string.loading_record_failed), Snackbar.LENGTH_LONG).show()
                 }
                 android.util.Log.e("AddEditTransactionFragment", "Failed to load transaction", e)
             }
@@ -361,17 +402,17 @@ class AddEditTransactionFragment : Fragment() {
     }
 
     /**
-     * 保存交易记录
+     * Save transaction record
      */
     private fun saveTransaction() {
         if (!::viewModel.isInitialized) {
             android.util.Log.e("AddEditTransactionFragment", "ViewModel not initialized, cannot save transaction")
-            Snackbar.make(binding.root, "系统错误，无法保存", Snackbar.LENGTH_LONG).show()
+            Snackbar.make(binding.root, getString(R.string.system_error_cannot_save), Snackbar.LENGTH_LONG).show()
             return
         }
         
         android.util.Log.d("AddEditTransactionFragment", "开始保存交易记录")
-        android.util.Log.d("AddEditTransactionFragment", "选择的日期: ${dateFormat.format(selectedDate.time)} (${selectedDate.timeInMillis})")
+        android.util.Log.d("AddEditTransactionFragment", "选择的日期: ${dateFormat.format(Date(selectedDate))}")
         android.util.Log.d("AddEditTransactionFragment", "是否编辑模式: $isEditMode")
         
         if (!validateInput()) {
@@ -398,29 +439,29 @@ class AddEditTransactionFragment : Fragment() {
         }
 
         val transaction = if (isEditMode && editingTransaction != null) {
-            // 更新现有记录
+            // Update existing record
             editingTransaction!!.copy(
                 amount = amount,
                 type = type,
                 categoryId = selectedCategory?.id,
-                title = selectedCategory?.name ?: "未分类",
+                title = selectedCategory?.name ?: getString(R.string.uncategorized),
                 description = description.ifEmpty { null },
-                date = selectedDate.timeInMillis,
+                date = selectedDate,
                 updatedAt = System.currentTimeMillis()
             ).setTagsList(tagsList)
         } else {
-            // 创建新记录
+            // Create new record
             Transaction(
                 amount = amount,
                 type = type,
                 categoryId = selectedCategory?.id,
-                title = selectedCategory?.name ?: "未分类",
+                title = selectedCategory?.name ?: getString(R.string.uncategorized),
                 description = description.ifEmpty { null },
-                date = selectedDate.timeInMillis
+                date = selectedDate
             ).setTagsList(tagsList)
         }
 
-        // 更新分类使用次数
+        // Update category usage count
         selectedCategory?.let { category ->
             viewLifecycleOwner.lifecycleScope.launch {
                 try {
@@ -439,82 +480,78 @@ class AddEditTransactionFragment : Fragment() {
     }
 
     /**
-     * 删除交易记录
+     * Delete transaction record
      */
     private fun deleteTransaction() {
         if (!::viewModel.isInitialized) {
             android.util.Log.e("AddEditTransactionFragment", "ViewModel not initialized, cannot delete transaction")
-            Snackbar.make(binding.root, "系统错误，无法删除", Snackbar.LENGTH_LONG).show()
+            if (isAdded && _binding != null) {
+                Snackbar.make(binding.root, "System error, unable to delete", Snackbar.LENGTH_LONG).show()
+            }
             return
         }
         
         editingTransaction?.let { transaction ->
+            if (!isAdded || isDetached || activity == null || activity?.isFinishing == true) {
+                return
+            }
+            
             androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("确认删除")
-                .setMessage("确定要删除这条记录吗？")
-                .setPositiveButton("删除") { _, _ ->
+                .setTitle("Confirm Delete")
+                .setMessage("Are you sure you want to delete this record?")
+                .setPositiveButton("Delete") { _, _ ->
                     viewModel.deleteTransaction(transaction)
                 }
-                .setNegativeButton("取消", null)
+                .setNegativeButton("Cancel", null)
                 .show()
         }
     }
 
     /**
-     * 验证输入数据
+     * Validate input data
      */
     private fun validateInput(): Boolean {
         binding.apply {
-            // 验证金额
+            // Validate amount
             val amountText = editAmount.text.toString().trim()
             if (amountText.isEmpty()) {
-                editAmount.error = "请输入金额"
-                editAmount.requestFocus()
+                editAmount.error = getString(R.string.please_enter_amount)
                 return false
             }
 
-            val amount = try {
-                amountText.toDouble()
+            try {
+                val amount = amountText.toDouble()
+                if (amount <= 0) {
+                    editAmount.error = getString(R.string.please_enter_valid_amount)
+                    return false
+                }
             } catch (e: NumberFormatException) {
-                editAmount.error = "请输入有效的金额"
-                editAmount.requestFocus()
+                editAmount.error = getString(R.string.please_enter_valid_amount)
                 return false
             }
 
-            if (amount <= 0) {
-                editAmount.error = "金额必须大于0"
-                editAmount.requestFocus()
-                return false
-            }
-
-            if (amount > 999999999) {
-                editAmount.error = "金额过大"
-                editAmount.requestFocus()
-                return false
-            }
-
-            // 验证日期
-            if (selectedDate.timeInMillis <= 0) {
-                Snackbar.make(root, "请选择有效日期", Snackbar.LENGTH_SHORT).show()
+            // Validate date
+            if (selectedDate <= 0) {
+                Snackbar.make(root, getString(R.string.please_select_valid_date), Snackbar.LENGTH_SHORT).show()
                 return false
             }
 
             val now = System.currentTimeMillis()
             val oneYearAgo = now - 365L * 24 * 60 * 60 * 1000
-            val oneWeekFromNow = now + 7L * 24 * 60 * 60 * 1000 // 允许未来一周内的日期
+            val oneWeekFromNow = now + 7L * 24 * 60 * 60 * 1000 // Allow dates within one week from now
 
-            if (selectedDate.timeInMillis < oneYearAgo || selectedDate.timeInMillis > oneWeekFromNow) {
-                Snackbar.make(root, "日期必须在过去一年到未来一周的范围内", Snackbar.LENGTH_SHORT).show()
+            if (selectedDate < oneYearAgo || selectedDate > oneWeekFromNow) {
+                Snackbar.make(root, "The date must be within the range of the past year to the next week", Snackbar.LENGTH_SHORT).show()
                 return false
             }
 
-            // 验证分类选择
+            // Validate category selection
             if (getSelectedCategory() == null) {
-                Snackbar.make(root, "请选择分类", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(root, getString(R.string.please_select_category), Snackbar.LENGTH_SHORT).show()
                 return false
             }
 
-            // 清除之前的错误提示
+            // Clear previous error prompts
             editAmount.error = null
         }
 

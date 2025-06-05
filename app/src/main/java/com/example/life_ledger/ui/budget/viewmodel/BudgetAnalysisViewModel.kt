@@ -132,19 +132,19 @@ class BudgetAnalysisViewModel(application: Application) : AndroidViewModel(appli
                 
                 result.fold(
                     onSuccess = { aiRecommendations ->
-                        // 合并本地建议和AI建议
+                        // Merge local recommendations and AI recommendations
                         val localRecommendations = generateLocalRecommendationsSync(budgets)
-                        val allRecommendations = (localRecommendations + aiRecommendations).take(8) // 最多显示8条
+                        val allRecommendations = (localRecommendations + aiRecommendations).take(8) // Show max 8 recommendations
                         _recommendations.value = allRecommendations
                     },
                     onFailure = { error ->
-                        _recommendationError.value = "智能建议生成失败: ${error.message}"
-                        // 保持显示本地建议
+                        _recommendationError.value = "Smart recommendation generation failed: ${error.message}"
+                        // Keep showing local recommendations
                         generateLocalRecommendations()
                     }
                 )
             } catch (e: Exception) {
-                _recommendationError.value = "网络连接失败，已显示本地建议"
+                _recommendationError.value = "Network connection failed, showing local recommendations"
                 generateLocalRecommendations()
             } finally {
                 _isLoadingRecommendations.value = false
@@ -161,20 +161,20 @@ class BudgetAnalysisViewModel(application: Application) : AndroidViewModel(appli
     private fun generateLocalRecommendationsSync(budgets: List<Budget>): List<BudgetRecommendation> {
         val recommendations = mutableListOf<BudgetRecommendation>()
         
-        // 检查超支预算
+        // Check overspending budgets
         budgets.filter { it.getBudgetStatus() == Budget.BudgetStatus.EXCEEDED }.forEach { budget ->
             recommendations.add(
                 BudgetRecommendation(
                     type = BudgetRecommendation.RecommendationType.OVERSPENDING,
-                    title = "预算超支提醒",
-                    description = "${budget.name}已超支${String.format("%.2f", budget.spent - budget.amount)}元，建议检查近期消费并调整支出计划。",
+                    title = "Budget Overspent Alert",
+                    description = "${budget.name} has overspent by ¥${String.format("%.2f", budget.spent - budget.amount)}. Consider reviewing recent expenses and adjusting spending plan.",
                     priority = BudgetRecommendation.Priority.HIGH,
-                    actionText = "查看详情"
+                    actionText = "View Details"
                 )
             )
         }
         
-        // 检查即将超支的预算
+        // Check budgets about to exceed
         budgets.filter { 
             it.getBudgetStatus() == Budget.BudgetStatus.WARNING && 
             it.getSpentPercentage() > 85 
@@ -182,23 +182,23 @@ class BudgetAnalysisViewModel(application: Application) : AndroidViewModel(appli
             recommendations.add(
                 BudgetRecommendation(
                     type = BudgetRecommendation.RecommendationType.BUDGET_ADJUSTMENT,
-                    title = "预算即将用完",
-                    description = "${budget.name}已使用${String.format("%.1f", budget.getSpentPercentage())}%，请注意控制支出。",
+                    title = "Budget Nearly Exhausted",
+                    description = "${budget.name} has used ${String.format("%.1f", budget.getSpentPercentage())}%. Please monitor spending carefully.",
                     priority = BudgetRecommendation.Priority.MEDIUM,
-                    actionText = "设置提醒"
+                    actionText = "Set Reminder"
                 )
             )
         }
         
-        // 检查长期未使用的预算
+        // Check long-term unused budgets
         budgets.filter { it.spent < it.amount * 0.1 }.forEach { budget ->
             recommendations.add(
                 BudgetRecommendation(
                     type = BudgetRecommendation.RecommendationType.SAVINGS_OPPORTUNITY,
-                    title = "预算利用率低",
-                    description = "${budget.name}使用率较低，可考虑调整预算分配或增加其他分类预算。",
+                    title = "Low Budget Utilization",
+                    description = "${budget.name} has low usage rate. Consider adjusting budget allocation or adding budget for other categories.",
                     priority = BudgetRecommendation.Priority.LOW,
-                    actionText = "调整预算"
+                    actionText = "Adjust Budget"
                 )
             )
         }
@@ -222,14 +222,14 @@ class BudgetAnalysisViewModel(application: Application) : AndroidViewModel(appli
     }
     
     /**
-     * 记录建议交互
+     * Record recommendation interaction
      */
     fun recordRecommendationInteraction(recommendationId: String, action: String) {
         viewModelScope.launch {
             try {
-                // 这里可以记录到数据库或分析服务
-                println("记录建议交互: ID=$recommendationId, Action=$action")
-                // TODO: 实现具体的记录逻辑
+                // This can be recorded to database or analytics service
+                println("Record recommendation interaction: ID=$recommendationId, Action=$action")
+                // TODO: Implement specific recording logic
             } catch (e: Exception) {
                 e.printStackTrace()
             }

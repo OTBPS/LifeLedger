@@ -36,15 +36,15 @@ class ConsumptionAdviceAdapter : ListAdapter<ConsumptionAdvice, ConsumptionAdvic
             binding.apply {
                 textAdviceTitle.text = advice.title
                 textAdviceDescription.text = advice.description
-                textAdviceEffect.text = "预期效果：${advice.expectedEffect}"
+                textAdviceEffect.text = "Expected Effect: ${advice.expectedEffect}"
                 textAdviceDifficulty.text = advice.difficulty
-                textAdvicePriority.text = "优先级：${advice.priority}"
+                textAdvicePriority.text = "Priority: ${advice.priority}"
                 
                 // 根据难度设置不同的颜色
                 val difficultyColor = when (advice.difficulty) {
-                    "简单" -> ContextCompat.getColor(root.context, R.color.md_theme_success)
-                    "中等" -> ContextCompat.getColor(root.context, R.color.md_theme_warning)
-                    "困难" -> ContextCompat.getColor(root.context, R.color.md_theme_error)
+                    "Simple" -> ContextCompat.getColor(root.context, R.color.md_theme_success)
+                    "Medium" -> ContextCompat.getColor(root.context, R.color.md_theme_warning)
+                    "Difficult" -> ContextCompat.getColor(root.context, R.color.md_theme_error)
                     else -> ContextCompat.getColor(root.context, R.color.md_theme_on_surface_variant)
                 }
                 textAdviceDifficulty.setTextColor(difficultyColor)

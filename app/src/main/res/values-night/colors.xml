@@ -76,15 +76,15 @@
     <color name="text_on_primary">@color/md_theme_on_primary</color>
     <color name="text_on_primary_container">@color/md_theme_on_primary_container</color>
     
-    <!-- 优先级背景颜色 (深色主题) -->
-    <color name="priority_high_background">#4D1F1F</color>
-    <color name="priority_high_border">#EF5350</color>
-    <color name="priority_medium_background">#4D3D1F</color>
-    <color name="priority_medium_border">#FFA726</color>
-    <color name="priority_low_background">#1F4D2A</color>
-    <color name="priority_low_border">#66BB6A</color>
+    <!-- Priority background colors (dark theme) -->
+    <color name="priority_high_background">#3F1A1A</color>
+    <color name="priority_high_border">#F44336</color>
+    <color name="priority_medium_background">#3D2914</color>
+    <color name="priority_medium_border">#FF9800</color>
+    <color name="priority_low_background">#1B3A1B</color>
+    <color name="priority_low_border">#4CAF50</color>
     
-    <!-- 状态指示颜色 (深色主题) -->
+    <!-- Status indicator colors (dark theme) -->
     <color name="success_color">#66BB6A</color>
     <color name="warning_color">#FFA726</color>
     <color name="error_color">#EF5350</color>

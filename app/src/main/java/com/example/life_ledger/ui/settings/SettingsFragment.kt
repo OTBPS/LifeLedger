@@ -23,8 +23,8 @@ import com.google.android.material.radiobutton.MaterialRadioButton
 import kotlinx.coroutines.launch
 
 /**
- * 设置页面
- * 提供主题设置、通知偏好、数据管理等功能
+ * Settings page
+ * Provides theme settings, notification preferences, data management and other functions
  */
 class SettingsFragment : Fragment() {
 
@@ -54,10 +54,10 @@ class SettingsFragment : Fragment() {
     }
 
     /**
-     * 设置UI组件
+     * Setup UI components
      */
     private fun setupUI() {
-        // 初始化主题模式开关状态
+        // Initialize theme mode switch status
         val currentThemeMode = ThemeManager.getCurrentThemeMode()
         binding.switchDarkMode.isChecked = when (currentThemeMode) {
             AppConstants.Theme.MODE_DARK -> true
@@ -65,47 +65,47 @@ class SettingsFragment : Fragment() {
             else -> ThemeManager.isDarkMode(requireContext())
         }
         
-        // 初始化其他设置项状态
+        // Initialize other settings status
         binding.switchNotifications.isChecked = PreferenceUtils.isNotificationEnabled()
         binding.switchFinanceReminder.isChecked = PreferenceUtils.getBoolean("finance_reminder", true)
     }
 
     /**
-     * 设置点击监听器
+     * Setup click listeners
      */
     private fun setupClickListeners() {
         binding.apply {
-            // 深色模式开关
+            // Dark mode switch
             switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
                 toggleDarkMode(isChecked)
             }
 
-            // 通知设置
+            // Notification settings
             switchNotifications.setOnCheckedChangeListener { _, isChecked ->
                 toggleNotifications(isChecked)
             }
 
-            // 财务提醒
+            // Financial reminder
             switchFinanceReminder.setOnCheckedChangeListener { _, isChecked ->
                 toggleFinanceReminder(isChecked)
             }
 
-            // 主题选择
+            // Theme selection
             layoutTheme.setOnClickListener { showThemeDialog() }
             
-            // 数据管理
+            // Data management
             layoutBackup.setOnClickListener { performBackup() }
             layoutRestore.setOnClickListener { performRestore() }
             layoutExport.setOnClickListener { exportData() }
             
-            // 其他
+            // Other
             layoutAbout.setOnClickListener { showAboutDialog() }
             layoutPrivacy.setOnClickListener { showPrivacyPolicy() }
         }
     }
 
     /**
-     * 切换深色模式
+     * Toggle dark mode
      */
     private fun toggleDarkMode(enabled: Boolean) {
         val newMode = if (enabled) {
@@ -119,31 +119,31 @@ class SettingsFragment : Fragment() {
     }
 
     /**
-     * 切换通知
+     * Toggle notifications
      */
     private fun toggleNotifications(enabled: Boolean) {
         PreferenceUtils.setNotificationEnabled(enabled)
         Toast.makeText(
             requireContext(),
-            if (enabled) "通知已开启" else "通知已关闭",
+            if (enabled) getString(R.string.notifications_enabled) else getString(R.string.notifications_disabled),
             Toast.LENGTH_SHORT
         ).show()
     }
 
     /**
-     * 切换财务提醒
+     * Toggle financial reminder
      */
     private fun toggleFinanceReminder(enabled: Boolean) {
         PreferenceUtils.putBoolean("finance_reminder", enabled)
         Toast.makeText(
             requireContext(),
-            if (enabled) "财务提醒已开启" else "财务提醒已关闭",
+            if (enabled) getString(R.string.finance_reminder_enabled) else getString(R.string.finance_reminder_disabled),
             Toast.LENGTH_SHORT
         ).show()
     }
 
     /**
-     * 显示主题选择对话框
+     * Show theme selection dialog
      */
     private fun showThemeDialog() {
         val dialogView = LayoutInflater.from(requireContext())
@@ -153,7 +153,7 @@ class SettingsFragment : Fragment() {
         val btnCancel = dialogView.findViewById<MaterialButton>(R.id.btnCancel)
         val btnApply = dialogView.findViewById<MaterialButton>(R.id.btnApply)
         
-        // 设置RecyclerView
+        // Setup RecyclerView
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
         
         val currentTheme = ThemeManager.getCurrentCustomTheme()
@@ -168,12 +168,12 @@ class SettingsFragment : Fragment() {
         }
         recyclerView.adapter = adapter
         
-        // 创建对话框
+        // Create dialog
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setView(dialogView)
             .create()
         
-        // 设置按钮点击事件
+        // Setup button click events
         btnCancel.setOnClickListener {
             dialog.dismiss()
         }
@@ -183,7 +183,7 @@ class SettingsFragment : Fragment() {
                 ThemeManager.setCustomTheme(selectedTheme)
                 showThemeAppliedMessage()
                 
-                // 重新创建Activity以应用新主题
+                // Recreate Activity to apply new theme
                 requireActivity().recreate()
             }
             dialog.dismiss()
@@ -193,7 +193,7 @@ class SettingsFragment : Fragment() {
     }
 
     /**
-     * 显示主题模式选择对话框
+     * Show theme mode selection dialog
      */
     private fun showThemeModeDialog() {
         val dialogView = LayoutInflater.from(requireContext())
@@ -205,7 +205,7 @@ class SettingsFragment : Fragment() {
         val btnCancel = dialogView.findViewById<MaterialButton>(R.id.btnCancel)
         val btnApply = dialogView.findViewById<MaterialButton>(R.id.btnApply)
         
-        // 设置当前选中状态
+        // Set current selection status
         val currentMode = ThemeManager.getCurrentThemeMode()
         when (currentMode) {
             AppConstants.Theme.MODE_SYSTEM -> radioSystem.isChecked = true
@@ -213,12 +213,12 @@ class SettingsFragment : Fragment() {
             AppConstants.Theme.MODE_DARK -> radioDark.isChecked = true
         }
         
-        // 创建对话框
+        // Create dialog
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setView(dialogView)
             .create()
         
-        // 设置按钮点击事件
+        // Setup button click events
         btnCancel.setOnClickListener {
             dialog.dismiss()
         }
@@ -235,7 +235,7 @@ class SettingsFragment : Fragment() {
                 ThemeManager.setThemeMode(newMode)
                 showThemeAppliedMessage()
                 
-                // 更新开关状态
+                // Update switch status
                 binding.switchDarkMode.isChecked = when (newMode) {
                     AppConstants.Theme.MODE_DARK -> true
                     AppConstants.Theme.MODE_LIGHT -> false
@@ -249,7 +249,7 @@ class SettingsFragment : Fragment() {
     }
 
     /**
-     * 显示主题应用成功消息
+     * Show theme applied success message
      */
     private fun showThemeAppliedMessage() {
         Toast.makeText(
@@ -260,56 +260,56 @@ class SettingsFragment : Fragment() {
     }
 
     /**
-     * 执行数据备份
+     * Perform data backup
      */
     private fun performBackup() {
         lifecycleScope.launch {
-            // TODO: 实现数据备份功能
-            Toast.makeText(requireContext(), "备份功能开发中", Toast.LENGTH_SHORT).show()
+            // TODO: Implement data backup functionality
+            Toast.makeText(requireContext(), getString(R.string.backup_in_development), Toast.LENGTH_SHORT).show()
         }
     }
 
     /**
-     * 执行数据恢复
+     * Perform data recovery
      */
     private fun performRestore() {
         lifecycleScope.launch {
-            // TODO: 实现数据恢复功能
-            Toast.makeText(requireContext(), "恢复功能开发中", Toast.LENGTH_SHORT).show()
+            // TODO: Implement data recovery functionality
+            Toast.makeText(requireContext(), getString(R.string.restore_in_development), Toast.LENGTH_SHORT).show()
         }
     }
 
     /**
-     * 导出数据
+     * Export data
      */
     private fun exportData() {
         lifecycleScope.launch {
-            // TODO: 实现数据导出功能
-            Toast.makeText(requireContext(), "导出功能开发中", Toast.LENGTH_SHORT).show()
+            // TODO: Implement data export functionality
+            Toast.makeText(requireContext(), getString(R.string.export_in_development), Toast.LENGTH_SHORT).show()
         }
     }
 
     /**
-     * 显示关于对话框
+     * Show about dialog
      */
     private fun showAboutDialog() {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("关于 Life Ledger")
-            .setMessage("Life Ledger v1.0\n\n一款智能的生活记录应用，帮助您管理财务和待办事项。")
-            .setPositiveButton("确定") { dialog, _ ->
+            .setTitle(getString(R.string.about_life_ledger))
+            .setMessage(getString(R.string.about_app_description))
+            .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
                 dialog.dismiss()
             }
             .show()
     }
 
     /**
-     * 显示隐私政策
+     * Show privacy policy
      */
     private fun showPrivacyPolicy() {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("隐私政策")
-            .setMessage("我们重视您的隐私。所有数据都存储在本地设备上，不会上传到服务器。")
-            .setPositiveButton("确定") { dialog, _ ->
+            .setTitle(getString(R.string.privacy_policy))
+            .setMessage(getString(R.string.privacy_policy_description))
+            .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
                 dialog.dismiss()
             }
             .show()

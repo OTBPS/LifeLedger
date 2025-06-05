@@ -11,6 +11,7 @@ import com.example.life_ledger.data.model.Budget
 import com.example.life_ledger.databinding.ItemBudgetBinding
 import java.text.SimpleDateFormat
 import java.util.*
+import java.text.NumberFormat
 
 /**
  * 预算列表适配器
@@ -23,7 +24,8 @@ class BudgetAdapter(
     private val onToggleClick: (Budget, Boolean) -> Unit
 ) : ListAdapter<Budget, BudgetAdapter.BudgetViewHolder>(BudgetDiffCallback()) {
     
-    private val dateFormat = SimpleDateFormat("MM/dd", Locale.getDefault())
+    private val dateFormat = SimpleDateFormat("MM/dd", Locale.ENGLISH)
+    private val numberFormat = NumberFormat.getCurrencyInstance(Locale.CHINA)
     
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BudgetViewHolder {
         val binding = ItemBudgetBinding.inflate(
@@ -46,12 +48,12 @@ class BudgetAdapter(
             with(binding) {
                 // 基本信息
                 tvBudgetName.text = budget.name
-                tvBudgetDescription.text = budget.description ?: "无描述"
+                tvBudgetDescription.text = budget.description ?: "No description"
                 
                 // 预算金额和已花费
-                tvBudgetAmount.text = "¥${String.format("%.2f", budget.amount)}"
-                tvSpentAmount.text = "¥${String.format("%.2f", budget.spent)}"
-                tvRemainingAmount.text = "¥${String.format("%.2f", budget.getRemainingAmount())}"
+                tvBudgetAmount.text = numberFormat.format(budget.amount)
+                tvSpentAmount.text = numberFormat.format(budget.spent)
+                tvRemainingAmount.text = numberFormat.format(budget.getRemainingAmount())
                 
                 // 花费百分比
                 val spentPercentage = budget.getSpentPercentage()
@@ -66,12 +68,12 @@ class BudgetAdapter(
                 val endDate = dateFormat.format(Date(budget.endDate))
                 tvDateRange.text = "$startDate - $endDate"
                 
-                // 剩余天数
+                // Remaining days
                 val remainingDays = budget.getRemainingDays()
                 tvRemainingDays.text = if (remainingDays > 0) {
-                    "${remainingDays}天"
+                    "$remainingDays days"
                 } else {
-                    "已过期"
+                    "Expired"
                 }
                 
                 // 预算状态
@@ -152,14 +154,14 @@ class BudgetAdapter(
                     showContextMenu(view, budget)
                 }
                 
-                // 根据预算类型显示分类信息
+                // Display category information based on budget type
                 if (budget.categoryId != null) {
-                    // 这里可以根据categoryId获取分类名称
-                    // 暂时显示ID
-                    tvCategoryInfo.text = "分类预算"
+                    // Here we can get category name by categoryId
+                    // Temporarily display ID
+                    tvCategoryInfo.text = "Category Budget"
                     tvCategoryInfo.visibility = android.view.View.VISIBLE
                 } else {
-                    tvCategoryInfo.text = "总预算"
+                    tvCategoryInfo.text = "Total Budget"
                     tvCategoryInfo.visibility = android.view.View.VISIBLE
                 }
             }
@@ -169,7 +171,7 @@ class BudgetAdapter(
             val popup = androidx.appcompat.widget.PopupMenu(view.context, view)
             popup.menuInflater.inflate(R.menu.budget_item_menu, popup.menu)
             
-            // 根据预算状态设置菜单项可见性
+            // Set menu item visibility based on budget status
             popup.menu.findItem(R.id.action_reset_budget)?.isVisible = budget.isExpired() && budget.isRecurring
             popup.menu.findItem(R.id.action_archive_budget)?.isVisible = budget.isExpired()
             
@@ -180,11 +182,11 @@ class BudgetAdapter(
                         true
                     }
                     R.id.action_duplicate_budget -> {
-                        // 这里可以实现复制预算功能
+                        // Budget duplication feature can be implemented here
                         true
                     }
                     R.id.action_reset_budget -> {
-                        // 这里可以实现重置预算功能
+                        // Budget reset feature can be implemented here
                         true
                     }
                     R.id.action_archive_budget -> {

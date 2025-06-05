@@ -33,7 +33,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        android:text="数据统计"
+                        android:text="@string/data_statistics"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
                         android:textColor="?attr/colorOnSurface"
                         android:textStyle="bold" />
@@ -57,7 +57,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_vertical"
                                 android:layout_weight="1"
-                                android:text="统计时间范围："
+                                android:text="@string/statistics_time_range_colon"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                                 android:textStyle="bold" />
 
@@ -74,21 +74,21 @@
                                     style="@style/Widget.MaterialComponents.Chip.Choice"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="本周" />
+                                    android:text="@string/this_week_button" />
 
                                 <com.google.android.material.chip.Chip
                                     android:id="@+id/chipThisMonth"
                                     style="@style/Widget.MaterialComponents.Chip.Choice"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="本月" />
+                                    android:text="@string/this_month_button" />
 
                                 <com.google.android.material.chip.Chip
                                     android:id="@+id/chipThisYear"
                                     style="@style/Widget.MaterialComponents.Chip.Choice"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="今年" />
+                                    android:text="@string/this_year_button" />
 
                             </com.google.android.material.chip.ChipGroup>
 
@@ -114,7 +114,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="16dp"
-                                android:text="财务概览"
+                                android:text="@string/financial_overview"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                                 android:textStyle="bold" />
 
@@ -133,7 +133,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="总收入"
+                                        android:text="@string/total_income"
                                         android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                         android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -158,7 +158,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="总支出"
+                                        android:text="@string/total_expense"
                                         android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                         android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -183,7 +183,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="净收支"
+                                        android:text="@string/net_balance"
                                         android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                         android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -236,7 +236,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="AI智能分析"
+                                    android:text="@string/ai_analysis"
                                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                                     android:textStyle="bold"
                                     android:textColor="?attr/colorOnPrimaryContainer" />
@@ -244,7 +244,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="基于您的财务数据，AI为您提供专业的分析和建议"
+                                    android:text="@string/ai_analysis_description"
                                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                                     android:textColor="?attr/colorOnPrimaryContainer"
                                     android:layout_marginTop="4dp" />
@@ -256,7 +256,7 @@
                                 style="@style/Widget.MaterialComponents.Button"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="立即分析"
+                                android:text="@string/analyze_now"
                                 app:icon="@drawable/ic_lightbulb"
                                 android:layout_marginStart="8dp" />
 
@@ -288,7 +288,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
-                                    android:text="趋势统计"
+                                    android:text="@string/trend_statistics"
                                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                                     android:textStyle="bold" />
 
@@ -305,14 +305,14 @@
                                         style="@style/Widget.MaterialComponents.Chip.Choice"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="支出" />
+                                        android:text="@string/expense" />
 
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/chipIncomeTrend"
                                         style="@style/Widget.MaterialComponents.Chip.Choice"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="收入" />
+                                        android:text="@string/income" />
 
                                 </com.google.android.material.chip.ChipGroup>
 
@@ -351,7 +351,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
-                                    android:text="分类统计"
+                                    android:text="@string/category_statistics"
                                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                                     android:textStyle="bold" />
 
@@ -368,14 +368,14 @@
                                         style="@style/Widget.MaterialComponents.Chip.Choice"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="支出" />
+                                        android:text="@string/expense" />
 
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/chipIncomeCategory"
                                         style="@style/Widget.MaterialComponents.Chip.Choice"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="收入" />
+                                        android:text="@string/income" />
 
                                 </com.google.android.material.chip.ChipGroup>
 
@@ -414,7 +414,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
-                                    android:text="近期统计"
+                                    android:text="@string/recent_statistics"
                                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                                     android:textStyle="bold" />
 
@@ -431,28 +431,28 @@
                                         style="@style/Widget.MaterialComponents.Chip.Choice"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="近7天" />
+                                        android:text="@string/last_7_days" />
 
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/chipMonthlyThisYear"
                                         style="@style/Widget.MaterialComponents.Chip.Choice"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="今年" />
+                                        android:text="@string/this_year" />
 
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/chipMonthlyLastYear"
                                         style="@style/Widget.MaterialComponents.Chip.Choice"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="去年" />
+                                        android:text="@string/last_year" />
 
                                     <com.google.android.material.chip.Chip
                                         android:id="@+id/chipLast24Months"
                                         style="@style/Widget.MaterialComponents.Chip.Choice"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="近24月" />
+                                        android:text="@string/last_24_months" />
 
                                 </com.google.android.material.chip.ChipGroup>
 
@@ -485,7 +485,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="16dp"
-                                android:text="智能分析报告"
+                                android:text="@string/ai_analysis_report"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                                 android:textStyle="bold" />
 
@@ -500,7 +500,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginBottom="8dp"
-                                    android:text="财务健康度"
+                                    android:text="@string/financial_health"
                                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
                                     android:textStyle="bold" />
 
@@ -528,7 +528,7 @@
                                             android:id="@+id/tvHealthLevel"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="评估中..."
+                                            android:text="@string/assessment_in_progress"
                                             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -539,7 +539,7 @@
                                         style="@style/Widget.MaterialComponents.Button.TextButton"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="查看详情" />
+                                        android:text="@string/view_details" />
 
                                 </LinearLayout>
 
@@ -556,7 +556,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginBottom="8dp"
-                                    android:text="预算执行情况"
+                                    android:text="@string/budget_execution"
                                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
                                     android:textStyle="bold" />
 
@@ -580,7 +580,7 @@
                                             <TextView
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content"
-                                                android:text="正常"
+                                                android:text="@string/normal"
                                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -604,7 +604,7 @@
                                             <TextView
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content"
-                                                android:text="警告"
+                                                android:text="@string/warning"
                                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -628,7 +628,7 @@
                                             <TextView
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content"
-                                                android:text="超支"
+                                                android:text="@string/over_budget"
                                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -650,7 +650,7 @@
                                         style="@style/Widget.MaterialComponents.Button.TextButton"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="查看详情" />
+                                        android:text="@string/view_details" />
 
                                 </LinearLayout>
 
@@ -672,7 +672,7 @@
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
                                         android:layout_weight="1"
-                                        android:text="支出模式分析"
+                                        android:text="@string/spending_pattern_analysis"
                                         android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
                                         android:textStyle="bold" />
 
@@ -681,7 +681,7 @@
                                         style="@style/Widget.MaterialComponents.Button.TextButton"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="查看详情" />
+                                        android:text="@string/view_details" />
 
                                 </LinearLayout>
 
@@ -689,7 +689,7 @@
                                     android:id="@+id/tvTopSpendingCategory"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="主要支出类别：计算中..."
+                                    android:text="@string/top_spending_category_calculating"
                                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                                     android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -698,7 +698,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="4dp"
-                                    android:text="支出趋势：计算中..."
+                                    android:text="@string/spending_trend_calculating"
                                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                                     android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -730,7 +730,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="暂无统计数据"
+                            android:text="@string/no_statistics_data"
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -738,7 +738,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="先添加一些交易记录吧"
+                            android:text="@string/add_transactions"
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 

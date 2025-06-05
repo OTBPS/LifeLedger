@@ -46,9 +46,9 @@ class CategoryManagementAdapter(
 
                 // 设置分类类型显示
                 val typeText = when {
-                    category.isIncomeCategory() -> "收入"
-                    category.isExpenseCategory() -> "支出"
-                    else -> "其他"
+                    category.isIncomeCategory() -> "Income"
+                    category.isExpenseCategory() -> "Outcome"
+                    else -> "Others"
                 }
                 tvCategoryType.text = typeText
 

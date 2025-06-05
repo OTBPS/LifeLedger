@@ -53,25 +53,46 @@ class AIAnalysisViewModel(
                 _isLoading.value = true
                 _errorMessage.value = null
                 
+                android.util.Log.d("AIAnalysisViewModel", "Starting expense analysis...")
+                
                 // 获取最近3个月的交易数据
                 val recentTransactions = repository.getAllTransactions().first()
                 val categories = repository.getAllCategories().first()
                 
+                android.util.Log.d("AIAnalysisViewModel", "Loaded ${recentTransactions.size} transactions and ${categories.size} categories")
+                
                 if (recentTransactions.isEmpty()) {
-                    _errorMessage.value = "暂无交易数据，无法进行分析"
+                    _errorMessage.value = "No transaction data available for analysis. Please add some transactions first."
+                    android.util.Log.w("AIAnalysisViewModel", "No transactions found for analysis")
                     return@launch
                 }
+                
+                android.util.Log.d("AIAnalysisViewModel", "Calling AI analysis service...")
                 
                 val result = aiAnalysisService.analyzeExpenses(recentTransactions, categories)
                 
                 result.onSuccess { analysis ->
                     _expenseAnalysis.value = analysis
+                    android.util.Log.d("AIAnalysisViewModel", "Expense analysis completed successfully")
                 }.onFailure { exception ->
-                    _errorMessage.value = "分析失败: ${exception.message}"
+                    val errorMsg = when {
+                        exception.message?.contains("timeout") == true -> 
+                            "Analysis is taking longer than expected. Please check your network connection and try again."
+                        exception.message?.contains("network") == true -> 
+                            "Network connection issue. Please check your internet connection and try again."
+                        exception.message?.contains("failed") == true -> 
+                            "AI service is temporarily unavailable. Please try again in a few minutes."
+                        else -> 
+                            "Analysis failed: ${exception.message}. Please try again."
+                    }
+                    _errorMessage.value = errorMsg
+                    android.util.Log.e("AIAnalysisViewModel", "Expense analysis failed", exception)
                 }
                 
             } catch (e: Exception) {
-                _errorMessage.value = "分析过程中发生错误: ${e.message}"
+                val errorMsg = "An unexpected error occurred during analysis. Please try again."
+                _errorMessage.value = errorMsg
+                android.util.Log.e("AIAnalysisViewModel", "Unexpected error during expense analysis", e)
             } finally {
                 _isLoading.value = false
             }
@@ -91,13 +112,20 @@ class AIAnalysisViewModel(
                 val targetYear = year ?: calendar.get(Calendar.YEAR)
                 val targetMonth = month ?: (calendar.get(Calendar.MONTH) + 1)
                 
+                android.util.Log.d("AIAnalysisViewModel", "Starting monthly report generation for $targetYear-$targetMonth...")
+                
                 val allTransactions = repository.getAllTransactions().first()
                 val categories = repository.getAllCategories().first()
                 
+                android.util.Log.d("AIAnalysisViewModel", "Loaded ${allTransactions.size} transactions and ${categories.size} categories for report")
+                
                 if (allTransactions.isEmpty()) {
-                    _errorMessage.value = "暂无交易数据，无法生成报告"
+                    _errorMessage.value = "No transaction data available to generate report. Please add some transactions first."
+                    android.util.Log.w("AIAnalysisViewModel", "No transactions found for monthly report")
                     return@launch
                 }
+                
+                android.util.Log.d("AIAnalysisViewModel", "Calling AI monthly report service...")
                 
                 val result = aiAnalysisService.generateMonthlyReport(
                     allTransactions, 
@@ -108,12 +136,26 @@ class AIAnalysisViewModel(
                 
                 result.onSuccess { report ->
                     _monthlyReport.value = report
+                    android.util.Log.d("AIAnalysisViewModel", "Monthly report generated successfully")
                 }.onFailure { exception ->
-                    _errorMessage.value = "报告生成失败: ${exception.message}"
+                    val errorMsg = when {
+                        exception.message?.contains("timeout") == true -> 
+                            "Report generation is taking longer than expected. Please check your network connection and try again."
+                        exception.message?.contains("network") == true -> 
+                            "Network connection issue. Please check your internet connection and try again."
+                        exception.message?.contains("failed") == true -> 
+                            "AI service is temporarily unavailable. Please try again in a few minutes."
+                        else -> 
+                            "Report generation failed: ${exception.message}. Please try again."
+                    }
+                    _errorMessage.value = errorMsg
+                    android.util.Log.e("AIAnalysisViewModel", "Monthly report generation failed", exception)
                 }
                 
             } catch (e: Exception) {
-                _errorMessage.value = "报告生成过程中发生错误: ${e.message}"
+                val errorMsg = "An unexpected error occurred during report generation. Please try again."
+                _errorMessage.value = errorMsg
+                android.util.Log.e("AIAnalysisViewModel", "Unexpected error during monthly report generation", e)
             } finally {
                 _isLoading.value = false
             }
@@ -129,13 +171,20 @@ class AIAnalysisViewModel(
                 _isLoading.value = true
                 _errorMessage.value = null
                 
+                android.util.Log.d("AIAnalysisViewModel", "Starting personalized advice generation...")
+                
                 val allTransactions = repository.getAllTransactions().first()
                 val categories = repository.getAllCategories().first()
                 
+                android.util.Log.d("AIAnalysisViewModel", "Loaded ${allTransactions.size} transactions and ${categories.size} categories for advice")
+                
                 if (allTransactions.isEmpty()) {
-                    _errorMessage.value = "暂无交易数据，无法提供建议"
+                    _errorMessage.value = "No transaction data available to provide advice. Please add some transactions first."
+                    android.util.Log.w("AIAnalysisViewModel", "No transactions found for personalized advice")
                     return@launch
                 }
+                
+                android.util.Log.d("AIAnalysisViewModel", "Calling AI personalized advice service...")
                 
                 val result = aiAnalysisService.getPersonalizedAdvice(
                     allTransactions,
@@ -145,12 +194,26 @@ class AIAnalysisViewModel(
                 
                 result.onSuccess { advice ->
                     _consumptionAdvice.value = advice
+                    android.util.Log.d("AIAnalysisViewModel", "Personalized advice generated successfully, count: ${advice.size}")
                 }.onFailure { exception ->
-                    _errorMessage.value = "建议生成失败: ${exception.message}"
+                    val errorMsg = when {
+                        exception.message?.contains("timeout") == true -> 
+                            "Advice generation is taking longer than expected. Please check your network connection and try again."
+                        exception.message?.contains("network") == true -> 
+                            "Network connection issue. Please check your internet connection and try again."
+                        exception.message?.contains("failed") == true -> 
+                            "AI service is temporarily unavailable. Please try again in a few minutes."
+                        else -> 
+                            "Advice generation failed: ${exception.message}. Please try again."
+                    }
+                    _errorMessage.value = errorMsg
+                    android.util.Log.e("AIAnalysisViewModel", "Personalized advice generation failed", exception)
                 }
                 
             } catch (e: Exception) {
-                _errorMessage.value = "建议生成过程中发生错误: ${e.message}"
+                val errorMsg = "An unexpected error occurred during advice generation. Please try again."
+                _errorMessage.value = errorMsg
+                android.util.Log.e("AIAnalysisViewModel", "Unexpected error during personalized advice generation", e)
             } finally {
                 _isLoading.value = false
             }
@@ -176,9 +239,48 @@ class AIAnalysisViewModel(
      */
     fun performFullAnalysis() {
         viewModelScope.launch {
-            analyzeRecentExpenses()
-            generateMonthlyReport()
-            getPersonalizedAdvice()
+            try {
+                android.util.Log.d("AIAnalysisViewModel", "Starting full analysis...")
+                
+                // 检查数据是否可用
+                val allTransactions = repository.getAllTransactions().first()
+                if (allTransactions.isEmpty()) {
+                    _errorMessage.value = "No transaction data available for analysis. Please add some transactions first."
+                    android.util.Log.w("AIAnalysisViewModel", "No transactions found for full analysis")
+                    return@launch
+                }
+                
+                android.util.Log.d("AIAnalysisViewModel", "Running all analysis components...")
+                
+                // 并行执行所有分析，但错误处理独立
+                launch { 
+                    try {
+                        analyzeRecentExpenses() 
+                    } catch (e: Exception) {
+                        android.util.Log.e("AIAnalysisViewModel", "Error in expense analysis", e)
+                    }
+                }
+                launch { 
+                    try {
+                        generateMonthlyReport() 
+                    } catch (e: Exception) {
+                        android.util.Log.e("AIAnalysisViewModel", "Error in monthly report", e)
+                    }
+                }
+                launch { 
+                    try {
+                        getPersonalizedAdvice() 
+                    } catch (e: Exception) {
+                        android.util.Log.e("AIAnalysisViewModel", "Error in personalized advice", e)
+                    }
+                }
+                
+                android.util.Log.d("AIAnalysisViewModel", "Full analysis components launched")
+                
+            } catch (e: Exception) {
+                android.util.Log.e("AIAnalysisViewModel", "Error during full analysis setup", e)
+                _errorMessage.value = "Failed to start comprehensive analysis. Please try again."
+            }
         }
     }
 } 

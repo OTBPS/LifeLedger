@@ -128,22 +128,29 @@ abstract class AppDatabase : RoomDatabase() {
                 // 插入默认分类
                 val categoryDao = database.categoryDao()
                 
-                // 检查是否已经有数据
-                val existingCategories = categoryDao.getAll()
-                android.util.Log.d("AppDatabase", "Existing categories count: ${existingCategories.size}")
+                // 强制清理所有现有数据以确保使用新的英文类别
+                try {
+                    categoryDao.deleteAll()
+                    android.util.Log.d("AppDatabase", "Cleared all existing categories")
+                } catch (e: Exception) {
+                    android.util.Log.w("AppDatabase", "Failed to clear categories, continuing anyway", e)
+                }
                 
-                if (existingCategories.isEmpty()) {
-                    // 插入默认财务分类
-                    val financialCategories = Category.createDefaultFinancialCategories()
-                    categoryDao.insertAll(financialCategories)
-                    android.util.Log.d("AppDatabase", "Inserted ${financialCategories.size} financial categories")
-                    
-                    // 插入默认待办分类
-                    val todoCategories = Category.createDefaultTodoCategories()
-                    categoryDao.insertAll(todoCategories)
-                    android.util.Log.d("AppDatabase", "Inserted ${todoCategories.size} todo categories")
-                } else {
-                    android.util.Log.d("AppDatabase", "Categories already exist, skipping insertion")
+                // 插入默认财务分类（英文版）
+                val financialCategories = Category.createDefaultFinancialCategories()
+                categoryDao.insertAll(financialCategories)
+                android.util.Log.d("AppDatabase", "Inserted ${financialCategories.size} English financial categories")
+                
+                // 插入默认待办分类（英文版）
+                val todoCategories = Category.createDefaultTodoCategories()
+                categoryDao.insertAll(todoCategories)
+                android.util.Log.d("AppDatabase", "Inserted ${todoCategories.size} English todo categories")
+                
+                // 验证插入的数据
+                val totalCategories = categoryDao.getAll()
+                android.util.Log.d("AppDatabase", "Total categories after insertion: ${totalCategories.size}")
+                totalCategories.forEach { category ->
+                    android.util.Log.d("AppDatabase", "Category: ${category.name} (${category.type})")
                 }
                 
                 // 创建默认用户设置

@@ -12,90 +12,99 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.animation.Easing
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import android.graphics.Color
 
 /**
- * 统计页面ViewModel
- * 负责处理统计数据的获取和计算
+ * Statistics page ViewModel
+ * Handles statistical data retrieval and calculation
  */
 class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewModel() {
 
-    // 时间范围枚举
+    // Time range enumeration
     enum class TimeRange {
-        THIS_WEEK,    // 本周
-        THIS_MONTH,   // 本月  
-        THIS_YEAR     // 今年
+        THIS_WEEK,    // This week
+        THIS_MONTH,   // This month  
+        THIS_YEAR     // This year
     }
 
-    // 月度统计时间范围枚举
+    // Monthly statistics time range enumeration
     enum class MonthlyTimeRange {
-        LAST_7_DAYS,       // 近7天
-        THIS_YEAR,         // 今年
-        LAST_YEAR,         // 去年
-        LAST_24_MONTHS     // 最近24个月
+        LAST_7_DAYS,       // Last 7 days
+        THIS_YEAR,         // This year
+        LAST_YEAR,         // Last year
+        LAST_24_MONTHS     // Last 24 months
     }
 
-    // 当前选择的时间范围
+    // Currently selected time range
     private val _currentTimeRange = MutableStateFlow(TimeRange.THIS_MONTH)
     val currentTimeRange: StateFlow<TimeRange> = _currentTimeRange.asStateFlow()
 
-    // 当前选择的月度统计时间范围
+    // Currently selected monthly statistics time range
     private var currentMonthlyTimeRange = MonthlyTimeRange.LAST_7_DAYS
 
-    // 财务统计数据
+    // Financial statistics data
     private val _financialSummary = MutableStateFlow(FinancialSummaryData())
     val financialSummary: StateFlow<FinancialSummaryData> = _financialSummary.asStateFlow()
 
-    // 支出趋势数据（日期 -> 金额）
+    // Expense trend data (date -> amount)
     private val _expenseTrendData = MutableStateFlow<List<DailyExpenseData>>(emptyList())
     val expenseTrendData: StateFlow<List<DailyExpenseData>> = _expenseTrendData.asStateFlow()
 
-    // 收入趋势数据（日期 -> 金额）
+    // Income trend data (date -> amount)
     private val _incomeTrendData = MutableStateFlow<List<DailyExpenseData>>(emptyList())
     val incomeTrendData: StateFlow<List<DailyExpenseData>> = _incomeTrendData.asStateFlow()
 
-    // 分类统计数据
+    // Category statistics data
     private val _categoryData = MutableStateFlow<List<CategoryExpenseData>>(emptyList())
     val categoryData: StateFlow<List<CategoryExpenseData>> = _categoryData.asStateFlow()
 
-    // 月度收支数据
+    // Monthly income and expense data
     private val _monthlyData = MutableStateFlow<List<MonthlyStatistic>>(emptyList())
     val monthlyData: StateFlow<List<MonthlyStatistic>> = _monthlyData.asStateFlow()
 
-    // 加载状态
+    // Loading state
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    // 操作结果
+    // Operation result
     private val _operationResult = MutableSharedFlow<OperationResult>()
     val operationResult: SharedFlow<OperationResult> = _operationResult.asSharedFlow()
 
-    // 是否为空状态
+    // Whether in empty state
     private val _isEmpty = MutableStateFlow(false)
     val isEmpty: StateFlow<Boolean> = _isEmpty.asStateFlow()
 
-    // ==================== 数据分析相关数据流 ====================
+    // ==================== Data analysis related data flows ====================
 
-    // 月度收支统计
+    // Monthly income and expense statistics
     private val _monthlyFinancialSummary = MutableStateFlow<List<MonthlyFinancialSummary>>(emptyList())
     val monthlyFinancialSummary: StateFlow<List<MonthlyFinancialSummary>> = _monthlyFinancialSummary.asStateFlow()
 
-    // 年度收支统计
+    // Annual income and expense statistics
     private val _yearlyFinancialSummary = MutableStateFlow<List<YearlyFinancialSummary>>(emptyList())
     val yearlyFinancialSummary: StateFlow<List<YearlyFinancialSummary>> = _yearlyFinancialSummary.asStateFlow()
 
-    // 支出模式分析
+    // Expense pattern analysis
     private val _expensePatternAnalysis = MutableStateFlow<ExpensePatternAnalysis?>(null)
     val expensePatternAnalysis: StateFlow<ExpensePatternAnalysis?> = _expensePatternAnalysis.asStateFlow()
 
-    // 预算跟踪状态
+    // Budget tracking status
     private val _budgetTrackingStatus = MutableStateFlow<BudgetTrackingStatus?>(null)
     val budgetTrackingStatus: StateFlow<BudgetTrackingStatus?> = _budgetTrackingStatus.asStateFlow()
 
-    // 财务健康度评估
+    // Financial health assessment
     private val _financialHealthAssessment = MutableStateFlow<FinancialHealthAssessment?>(null)
     val financialHealthAssessment: StateFlow<FinancialHealthAssessment?> = _financialHealthAssessment.asStateFlow()
 
-    // 趋势类型
+    // Trend type
     enum class TrendType {
         EXPENSE, INCOME
     }
@@ -105,12 +114,12 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     init {
         loadStatistics()
         calculateMonthlyStatistics()
-        // 启动数据分析
+        // Start data analysis
         startDataAnalysis()
     }
 
     /**
-     * 设置时间范围
+     * Set time range
      */
     fun setTimeRange(timeRange: TimeRange) {
         _currentTimeRange.value = timeRange
@@ -118,7 +127,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 设置月度统计时间范围
+     * Set monthly statistics time range
      */
     fun setMonthlyTimeRange(timeRange: MonthlyTimeRange) {
         currentMonthlyTimeRange = timeRange
@@ -126,15 +135,15 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 刷新所有统计数据
+     * Refresh all statistical data
      */
     fun refresh() {
-        android.util.Log.d("StatisticsViewModel", "手动刷新统计数据")
+        android.util.Log.d("StatisticsViewModel", "Manual refresh of statistical data")
         loadStatistics()
     }
 
     /**
-     * 加载统计数据
+     * Load statistical data
      */
     private fun loadStatistics() {
         viewModelScope.launch {
@@ -143,10 +152,10 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                 
                 val (startTime, endTime) = getTimeRangeMillis(_currentTimeRange.value)
                 
-                // 获取时间范围内的所有交易
+                // Get all transactions within the time range
                 val transactions = repository.getTransactionsByDateRange(startTime, endTime).first()
                 
-                android.util.Log.d("StatisticsViewModel", "加载统计数据：时间范围内获取到 ${transactions.size} 笔交易")
+                android.util.Log.d("StatisticsViewModel", "Load statistics: obtained ${transactions.size} transactions within time range")
                 
                 if (transactions.isEmpty()) {
                     _isEmpty.value = true
@@ -154,30 +163,30 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                     _expenseTrendData.value = emptyList()
                     _incomeTrendData.value = emptyList()
                     _categoryData.value = emptyList()
-                    // 月度统计仍然计算，因为它使用固定的12个月范围
+                    // Monthly statistics still calculated as it uses a fixed 12-month range
                     calculateMonthlyStatistics()
                 } else {
                     _isEmpty.value = false
                     
-                    // 计算财务概览
+                    // Calculate financial overview
                     calculateFinancialSummary(transactions)
                     
-                    // 计算支出趋势
+                    // Calculate expense trend
                     calculateExpenseTrend(transactions, startTime, endTime)
                     
-                    // 计算收入趋势
+                    // Calculate income trend
                     calculateIncomeTrend(transactions, startTime, endTime)
                     
-                    // 计算分类统计
+                    // Calculate category statistics
                     calculateCategoryStatistics(transactions)
                     
-                    // 计算月度统计（独立的时间范围）
+                    // Calculate monthly statistics (independent time range)
                     calculateMonthlyStatistics()
                 }
                 
             } catch (e: Exception) {
-                android.util.Log.e("StatisticsViewModel", "加载统计数据失败", e)
-                _operationResult.emit(OperationResult(false, "加载统计数据失败: ${e.message}"))
+                android.util.Log.e("StatisticsViewModel", "Failed to load statistical data", e)
+                _operationResult.emit(OperationResult(false, "Failed to load statistical data: ${e.message}"))
             } finally {
                 _isLoading.value = false
             }
@@ -185,7 +194,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 计算财务概览
+     * Calculate financial overview
      */
     private fun calculateFinancialSummary(transactions: List<Transaction>) {
         val income = transactions
@@ -205,16 +214,16 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 计算支出趋势
+     * Calculate expense trend
      */
     private fun calculateExpenseTrend(transactions: List<Transaction>, startTime: Long, endTime: Long) {
         val expenses = transactions.filter { it.type == Transaction.TransactionType.EXPENSE }
         
-        // 按日期分组计算每日支出
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        // Group by date to calculate daily expenses
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val dailyExpenses = mutableMapOf<String, Double>()
         
-        // 生成日期范围内的所有日期
+        // Generate all dates within the date range
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = startTime
         
@@ -224,13 +233,13 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
         
-        // 填入实际支出数据
+        // Fill in actual expense data
         expenses.forEach { transaction ->
             val dateKey = dateFormat.format(Date(transaction.date))
             dailyExpenses[dateKey] = dailyExpenses.getOrDefault(dateKey, 0.0) + transaction.amount
         }
         
-        // 转换为图表数据
+        // Convert to chart data
         val trendData = dailyExpenses.entries
             .sortedBy { it.key }
             .map { (date, amount) ->
@@ -241,16 +250,16 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 计算收入趋势
+     * Calculate income trend
      */
     private fun calculateIncomeTrend(transactions: List<Transaction>, startTime: Long, endTime: Long) {
         val incomes = transactions.filter { it.type == Transaction.TransactionType.INCOME }
         
-        // 按日期分组计算每日收入
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        // Group by date to calculate daily income
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val dailyIncomes = mutableMapOf<String, Double>()
         
-        // 生成日期范围内的所有日期
+        // Generate all dates within the date range
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = startTime
         
@@ -260,13 +269,13 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
         
-        // 填入实际收入数据
+        // Fill in actual income data
         incomes.forEach { transaction ->
             val dateKey = dateFormat.format(Date(transaction.date))
             dailyIncomes[dateKey] = dailyIncomes.getOrDefault(dateKey, 0.0) + transaction.amount
         }
         
-        // 转换为图表数据
+        // Convert to chart data
         val trendData = dailyIncomes.entries
             .sortedBy { it.key }
             .map { (date, amount) ->
@@ -277,16 +286,16 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 计算分类统计
+     * Calculate category statistics
      */
     private fun calculateCategoryStatistics(transactions: List<Transaction>) {
         viewModelScope.launch {
             try {
-                // 获取所有分类
+                // Get all categories
                 val categories = repository.getFinancialCategories().first()
                 val categoryMap = categories.associateBy { it.id }
                 
-                // 按分类分组统计支出
+                // Group expenses by category for statistics
                 val expenseByCategory = transactions
                     .filter { it.type == Transaction.TransactionType.EXPENSE }
                     .groupBy { it.categoryId }
@@ -301,7 +310,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                             )
                         } else {
                             CategoryExpenseData(
-                                categoryName = "未分类",
+                                categoryName = "Uncategorized",
                                 amount = transactions.sumOf { it.amount },
                                 color = "#607D8B",
                                 transactionCount = transactions.size
@@ -313,13 +322,13 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                 _categoryData.value = expenseByCategory
                 
             } catch (e: Exception) {
-                _operationResult.emit(OperationResult(false, "计算分类统计失败: ${e.message}"))
+                _operationResult.emit(OperationResult(false, "Failed to calculate category statistics: ${e.message}"))
             }
         }
     }
 
     /**
-     * 计算月度统计
+     * Calculate monthly statistics
      */
     private fun calculateMonthlyStatistics() {
         viewModelScope.launch {
@@ -327,22 +336,22 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                 val timeRange = currentMonthlyTimeRange
                 val (startTime, endTime, monthCount, monthsList) = getMonthlyTimeRangeData(timeRange)
                 
-                android.util.Log.d("StatisticsViewModel", "月度统计：时间范围 $timeRange")
-                android.util.Log.d("StatisticsViewModel", "月度统计：查询时间范围 ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(startTime))} 到 ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(endTime))}")
-                android.util.Log.d("StatisticsViewModel", "月度统计：月份列表 $monthsList")
+                android.util.Log.d("StatisticsViewModel", "Monthly statistics: time range $timeRange")
+                android.util.Log.d("StatisticsViewModel", "Monthly statistics: query time range ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(startTime))} to ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(endTime))}")
+                android.util.Log.d("StatisticsViewModel", "Monthly statistics: month list $monthsList")
                 
                 val transactions = repository.getTransactionsByDateRange(startTime, endTime).first()
-                android.util.Log.d("StatisticsViewModel", "月度统计：获取到 ${transactions.size} 笔交易")
+                android.util.Log.d("StatisticsViewModel", "Monthly statistics: obtained ${transactions.size} transactions")
                 
-                // 如果有交易数据，打印一些示例
+                // If there's transaction data, print some examples
                 if (transactions.isNotEmpty()) {
-                    android.util.Log.d("StatisticsViewModel", "交易示例：")
+                    android.util.Log.d("StatisticsViewModel", "Transaction examples:")
                     transactions.take(5).forEach { transaction ->
-                        android.util.Log.d("StatisticsViewModel", "  日期: ${SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(transaction.date))}, 金额: ${transaction.amount}, 类型: ${transaction.type}")
+                        android.util.Log.d("StatisticsViewModel", "  Date: ${SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(transaction.date))}, Amount: ${transaction.amount}, Type: ${transaction.type}")
                     }
                 }
                 
-                // 重构后的月度统计逻辑（支持日期和月份两种模式）
+                // Refactored monthly statistics logic (supports both date and month modes)
                 val isDaily = timeRange == MonthlyTimeRange.LAST_7_DAYS
                 val keyFormat = if (isDaily) SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) 
                                else SimpleDateFormat("yyyy-MM", Locale.getDefault())
@@ -350,11 +359,11 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                 val keyToLabelMap = mutableMapOf<String, String>()
                 val monthlyMap = mutableMapOf<String, Pair<Double, Double>>()
                 
-                // 初始化时间段数据
+                // Initialize time period data
                 for (key in monthsList) {
                     monthlyMap[key] = Pair(0.0, 0.0)
                     
-                    // 为日期生成友好显示标签
+                    // Generate friendly display labels for dates
                     if (isDaily) {
                         try {
                             val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(key)
@@ -370,7 +379,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                     }
                 }
                 
-                // 统计交易数据
+                // Process transaction data
                 for (transaction in transactions) {
                     val transactionKey = keyFormat.format(Date(transaction.date))
                     
@@ -388,7 +397,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                     }
                 }
                 
-                // 构建结果列表
+                // Build result list
                 val result = monthsList.map { key ->
                     val (income, expense) = monthlyMap[key] ?: Pair(0.0, 0.0)
                     val label = keyToLabelMap[key] ?: key
@@ -396,19 +405,19 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                 }
                 
                 val dataMonthsCount = result.count { it.expense > 0 || it.income > 0 }
-                android.util.Log.d("StatisticsViewModel", "月度统计完成：生成 ${result.size} 个月的数据，有数据的月份：$dataMonthsCount")
+                android.util.Log.d("StatisticsViewModel", "Monthly statistics completed: generated ${result.size} months of data, months with data: $dataMonthsCount")
                 
                 _monthlyData.value = result
                 
             } catch (e: Exception) {
-                android.util.Log.e("StatisticsViewModel", "计算月度统计失败", e)
-                _operationResult.emit(OperationResult(false, "计算月度统计失败: ${e.message}"))
+                android.util.Log.e("StatisticsViewModel", "Failed to calculate monthly statistics", e)
+                _operationResult.emit(OperationResult(false, "Failed to calculate monthly statistics: ${e.message}"))
             }
         }
     }
 
     /**
-     * 获取月度统计时间范围数据
+     * Get monthly statistics time range data
      */
     private fun getMonthlyTimeRangeData(timeRange: MonthlyTimeRange): MonthlyTimeRangeData {
         val now = Calendar.getInstance()
@@ -417,7 +426,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
         
         return when (timeRange) {
             MonthlyTimeRange.LAST_7_DAYS -> {
-                // 近7天
+                // Last 7 days
                 val endCalendar = Calendar.getInstance()
                 endCalendar.set(Calendar.HOUR_OF_DAY, 23)
                 endCalendar.set(Calendar.MINUTE, 59)
@@ -438,7 +447,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
             }
             
             MonthlyTimeRange.THIS_YEAR -> {
-                // 今年1月到当前月
+                // Current year from January to current month
                 val startCalendar = Calendar.getInstance()
                 startCalendar.set(Calendar.YEAR, currentYear)
                 startCalendar.set(Calendar.MONTH, Calendar.JANUARY)
@@ -450,13 +459,13 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                 val startTime = startCalendar.timeInMillis
                 
                 val endTime = System.currentTimeMillis()
-                val monthCount = currentMonth + 1 // +1因为Calendar.MONTH是0-based
+                val monthCount = currentMonth + 1 // +1 because Calendar.MONTH is 0-based
                 val monthsList = generateMonthsList(startCalendar, monthCount)
                 MonthlyTimeRangeData(startTime, endTime, monthCount, monthsList)
             }
             
             MonthlyTimeRange.LAST_YEAR -> {
-                // 去年全年
+                // Full last year
                 val startCalendar = Calendar.getInstance()
                 startCalendar.set(Calendar.YEAR, currentYear - 1)
                 startCalendar.set(Calendar.MONTH, Calendar.JANUARY)
@@ -482,7 +491,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
             }
             
             MonthlyTimeRange.LAST_24_MONTHS -> {
-                // 最近24个月
+                // Last 24 months
                 val endTime = System.currentTimeMillis()
                 val startCalendar = Calendar.getInstance()
                 startCalendar.set(Calendar.YEAR, currentYear)
@@ -502,10 +511,10 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 生成月份列表
+     * Generate month list
      */
     private fun generateMonthsList(startCalendar: Calendar, monthCount: Int): List<String> {
-        val monthFormat = SimpleDateFormat("yyyy-MM", Locale.getDefault())
+        val monthFormat = SimpleDateFormat("yyyy-MM", Locale.ENGLISH)
         val monthsList = mutableListOf<String>()
         val tempCalendar = Calendar.getInstance()
         tempCalendar.timeInMillis = startCalendar.timeInMillis
@@ -520,10 +529,10 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 生成日期列表
+     * Generate day list
      */
     private fun generateDaysList(startCalendar: Calendar, dayCount: Int): List<String> {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         val daysList = mutableListOf<String>()
         val tempCalendar = Calendar.getInstance()
         tempCalendar.timeInMillis = startCalendar.timeInMillis
@@ -538,7 +547,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 获取时间范围的毫秒值
+     * Get time range in milliseconds
      */
     private fun getTimeRangeMillis(timeRange: TimeRange): Pair<Long, Long> {
         val calendar = Calendar.getInstance()
@@ -574,7 +583,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 获取分类收入数据
+     * Get category income data
      */
     fun getCategoryIncomeData(): Flow<List<CategoryExpenseData>> = flow {
         try {
@@ -597,7 +606,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                         )
                     } else {
                         CategoryExpenseData(
-                            categoryName = "未分类",
+                            categoryName = "Uncategorized",
                             amount = transactions.sumOf { it.amount },
                             color = "#607D8B",
                             transactionCount = transactions.size
@@ -613,32 +622,32 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 强制刷新月度统计
+     * Force refresh monthly data
      */
     fun forceRefreshMonthlyData() {
-        android.util.Log.d("StatisticsViewModel", "=== 强制刷新月度统计 ===")
+        android.util.Log.d("StatisticsViewModel", "=== Force refresh monthly statistics ===")
         calculateMonthlyStatistics()
     }
 
     /**
-     * 测试月度统计计算（调试用）
+     * Test monthly statistics calculation (for debugging)
      */
     fun testMonthlyStatistics() {
-        android.util.Log.d("StatisticsViewModel", "=== 开始测试月度统计计算 ===")
+        android.util.Log.d("StatisticsViewModel", "=== Start testing monthly statistics calculation ===")
         calculateMonthlyStatistics()
     }
 
-    // ==================== 数据分析功能 ====================
+    // ==================== Data Analysis Functions ====================
 
     /**
-     * 启动数据分析
+     * Start data analysis
      */
     private fun startDataAnalysis() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
                 
-                // 并行执行各种分析
+                // Execute various analyses in parallel
                 launch { calculateMonthlyFinancialSummary() }
                 launch { calculateYearlyFinancialSummary() }
                 launch { analyzeExpensePatterns() }
@@ -646,8 +655,8 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                 launch { assessFinancialHealth() }
                 
             } catch (e: Exception) {
-                android.util.Log.e("StatisticsViewModel", "数据分析启动失败", e)
-                _operationResult.emit(OperationResult(false, "数据分析启动失败: ${e.message}"))
+                android.util.Log.e("StatisticsViewModel", "Failed to start data analysis", e)
+                _operationResult.emit(OperationResult(false, "Failed to start data analysis: ${e.message}"))
             } finally {
                 _isLoading.value = false
             }
@@ -655,7 +664,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 计算月度收支统计
+     * Calculate monthly financial summary
      */
     private suspend fun calculateMonthlyFinancialSummary() {
         try {
@@ -665,12 +674,12 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
             
             val monthlyList = mutableListOf<MonthlyFinancialSummary>()
             
-            // 计算最近12个月的统计
+            // Calculate statistics for the last 12 months
             for (i in 0 until 12) {
                 val year = calendar.get(Calendar.YEAR)
                 val month = calendar.get(Calendar.MONTH) + 1 // Calendar.MONTH is 0-based
                 
-                // 获取该月的开始和结束时间
+                // Get start and end time for this month
                 val monthStart = Calendar.getInstance().apply {
                     set(Calendar.YEAR, year)
                     set(Calendar.MONTH, month - 1)
@@ -691,7 +700,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                     set(Calendar.MILLISECOND, 999)
                 }.timeInMillis
                 
-                // 获取该月的交易数据
+                // Get transaction data for this month
                 val transactions = repository.getTransactionsByDateRange(monthStart, monthEnd).first()
                 
                 val income = transactions.filter { it.type == Transaction.TransactionType.INCOME }.sumOf { it.amount }
@@ -717,30 +726,30 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                 
                 monthlyList.add(monthlyFinancial)
                 
-                // 移动到上一个月
+                // Move to previous month
                 calendar.add(Calendar.MONTH, -1)
             }
             
-            _monthlyFinancialSummary.value = monthlyList.reversed() // 按时间正序
+            _monthlyFinancialSummary.value = monthlyList.reversed() // Sort by time in ascending order
             
         } catch (e: Exception) {
-            android.util.Log.e("StatisticsViewModel", "计算月度统计失败", e)
+            android.util.Log.e("StatisticsViewModel", "Failed to calculate monthly statistics", e)
         }
     }
 
     /**
-     * 计算年度收支统计
+     * Calculate yearly financial summary
      */
     private suspend fun calculateYearlyFinancialSummary() {
         try {
             val currentYear = Calendar.getInstance().get(Calendar.YEAR)
             val yearlyList = mutableListOf<YearlyFinancialSummary>()
             
-            // 计算最近3年的数据
+            // Calculate data for the last 3 years
             for (i in 0 until 3) {
                 val year = currentYear - i
                 
-                // 获取该年的开始和结束时间
+                // Get start and end time for this year
                 val yearStart = Calendar.getInstance().apply {
                     set(Calendar.YEAR, year)
                     set(Calendar.MONTH, Calendar.JANUARY)
@@ -761,13 +770,13 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                     set(Calendar.MILLISECOND, 999)
                 }.timeInMillis
                 
-                // 获取该年的交易数据
+                // Get transaction data for this year
                 val transactions = repository.getTransactionsByDateRange(yearStart, yearEnd).first()
                 
                 val income = transactions.filter { it.type == Transaction.TransactionType.INCOME }.sumOf { it.amount }
                 val expense = transactions.filter { it.type == Transaction.TransactionType.EXPENSE }.sumOf { it.amount }
                 
-                // 计算各月份数据，找出峰值月份
+                // Calculate monthly data to find peak months
                 val monthlyData = mutableMapOf<Int, Pair<Double, Double>>() // month -> (income, expense)
                 for (month in 1..12) {
                     val monthStart = Calendar.getInstance().apply {
@@ -800,7 +809,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                 val peakExpenseMonth = monthlyData.maxByOrNull { it.value.second }?.key ?: 1
                 val peakIncomeMonth = monthlyData.maxByOrNull { it.value.first }?.key ?: 1
                 
-                // 生成该年的月度统计
+                // Generate monthly summaries for this year
                 val monthlySummaries = monthlyData.map { (month, data) ->
                     val daysInMonth = Calendar.getInstance().apply {
                         set(Calendar.YEAR, year)
@@ -851,16 +860,16 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
             _yearlyFinancialSummary.value = yearlyList.sortedByDescending { it.year }
             
         } catch (e: Exception) {
-            android.util.Log.e("StatisticsViewModel", "计算年度统计失败", e)
+            android.util.Log.e("StatisticsViewModel", "Failed to calculate yearly statistics", e)
         }
     }
 
     /**
-     * 分析支出模式
+     * Analyze expense patterns
      */
     private suspend fun analyzeExpensePatterns() {
         try {
-            // 获取最近6个月的数据进行分析
+            // Get data from the last 6 months for analysis
             val sixMonthsAgo = Calendar.getInstance().apply {
                 add(Calendar.MONTH, -6)
             }.timeInMillis
@@ -870,19 +879,19 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
             val categories = repository.getFinancialCategories().first()
             val categoryMap = categories.associateBy { it.id }
             
-            // 分析各分类支出模式
+            // Analyze expense patterns by category
             val topCategories = analyzeTopCategories(transactions, categoryMap)
             
-            // 分析支出趋势
+            // Analyze spending trends
             val spendingTrends = analyzeSpendingTrends(transactions)
             
-            // 检测异常交易
+            // Detect unusual transactions
             val unusualTransactions = detectUnusualTransactions(transactions, categoryMap)
             
-            // 分析定期支出
+            // Analyze regular expenses
             val regularExpenses = analyzeRegularExpenses(transactions, categoryMap)
             
-            // 分析工作日vs周末支出
+            // Analyze weekday vs weekend spending
             val weekdayWeekendSpending = analyzeWeekdayWeekendSpending(transactions)
             
             val patternAnalysis = ExpensePatternAnalysis(
@@ -896,12 +905,12 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
             _expensePatternAnalysis.value = patternAnalysis
             
         } catch (e: Exception) {
-            android.util.Log.e("StatisticsViewModel", "支出模式分析失败", e)
+            android.util.Log.e("StatisticsViewModel", "Failed to analyze expense patterns", e)
         }
     }
 
     /**
-     * 分析各分类支出模式
+     * Analyze expense patterns by category
      */
     private fun analyzeTopCategories(transactions: List<Transaction>, categoryMap: Map<String, Category>): List<CategorySpendingPattern> {
         val expenseTransactions = transactions.filter { it.type == Transaction.TransactionType.EXPENSE }
@@ -915,7 +924,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
             val avgAmount = totalAmount / categoryTransactions.size
             val percentage = if (totalExpense > 0) (totalAmount / totalExpense) * 100 else 0.0
             
-            // 分析最近12个月的趋势
+            // Analyze trends for the last 12 months
             val monthlyAmounts = mutableListOf<Double>()
             val currentCalendar = Calendar.getInstance()
             
@@ -946,12 +955,12 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                 currentCalendar.add(Calendar.MONTH, -1)
             }
             
-            // 计算趋势
+            // Calculate trend
             val trend = calculateSpendingTrend(monthlyAmounts.reversed())
             
             CategorySpendingPattern(
                 categoryId = categoryId ?: "",
-                categoryName = category?.name ?: "未分类",
+                categoryName = category?.name ?: "Uncategorized",
                 totalAmount = totalAmount,
                 transactionCount = categoryTransactions.size,
                 avgAmount = avgAmount,
@@ -963,7 +972,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 计算支出趋势类型
+     * Calculate spending trend type
      */
     private fun calculateSpendingTrend(monthlyAmounts: List<Double>): SpendingTrendType {
         if (monthlyAmounts.size < 3) return SpendingTrendType.STABLE
@@ -980,7 +989,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
             ((recentAvg - previousAvg) / previousAvg) * 100
         } else 0.0
         
-        // 计算波动性
+        // Calculate volatility
         val variance = monthlyAmounts.map { (it - monthlyAmounts.average()).let { diff -> diff * diff } }.average()
         val stdDev = kotlin.math.sqrt(variance)
         val coefficientOfVariation = if (monthlyAmounts.average() > 0) stdDev / monthlyAmounts.average() else 0.0
@@ -994,7 +1003,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 分析支出趋势
+     * Analyze spending trends
      */
     private fun analyzeSpendingTrends(transactions: List<Transaction>): List<SpendingTrend> {
         val expenseTransactions = transactions.filter { it.type == Transaction.TransactionType.EXPENSE }
@@ -1003,7 +1012,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
         val currentCalendar = Calendar.getInstance()
         var previousAmount = 0.0
         
-        for (i in 0 until 6) { // 最近6个月
+        for (i in 0 until 6) { // Last 6 months
             val monthStart = Calendar.getInstance().apply {
                 timeInMillis = currentCalendar.timeInMillis
                 set(Calendar.DAY_OF_MONTH, 1)
@@ -1046,13 +1055,13 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 检测异常交易
+     * Detect unusual transactions
      */
     private fun detectUnusualTransactions(transactions: List<Transaction>, categoryMap: Map<String, Category>): List<UnusualTransaction> {
         val expenseTransactions = transactions.filter { it.type == Transaction.TransactionType.EXPENSE }
         val unusualList = mutableListOf<UnusualTransaction>()
         
-        // 按分类分组
+        // Group transactions by category
         val categoryGroups = expenseTransactions.groupBy { it.categoryId }
         
         categoryGroups.forEach { (categoryId, categoryTransactions) ->
@@ -1062,16 +1071,16 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                 val variance = amounts.map { (it - mean) * (it - mean) }.average()
                 val stdDev = kotlin.math.sqrt(variance)
                 
-                // 找出超过2个标准差的异常交易
+                // Find transactions that exceed 2 standard deviations
                 categoryTransactions.forEach { transaction ->
                     if (kotlin.math.abs(transaction.amount - mean) > 2 * stdDev && transaction.amount > mean * 1.5) {
                         val category = categoryMap[categoryId]
                         unusualList.add(UnusualTransaction(
                             transactionId = transaction.id,
                             amount = transaction.amount,
-                            categoryName = category?.name ?: "未分类",
+                            categoryName = category?.name ?: "Uncategorized",
                             date = transaction.date,
-                            reason = "金额异常大",
+                            reason = "Amount unusually high",
                             normalRange = Pair(mean - stdDev, mean + stdDev)
                         ))
                     }
@@ -1083,35 +1092,35 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 分析定期支出
+     * Analyze regular expenses
      */
     private fun analyzeRegularExpenses(transactions: List<Transaction>, categoryMap: Map<String, Category>): List<RegularExpense> {
         val expenseTransactions = transactions.filter { it.type == Transaction.TransactionType.EXPENSE }
         val regularList = mutableListOf<RegularExpense>()
         
-        // 按分类分组并分析频率
+        // Group transactions by category and analyze frequency
         val categoryGroups = expenseTransactions.groupBy { it.categoryId }
         
         categoryGroups.forEach { (categoryId, categoryTransactions) ->
-            if (categoryTransactions.size >= 3) { // 至少3笔交易才算定期
+            if (categoryTransactions.size >= 3) { // At least 3 transactions are required for regular
                 val category = categoryMap[categoryId]
                 val amounts = categoryTransactions.map { it.amount }
                 val avgAmount = amounts.average()
                 val lastAmount = amounts.lastOrNull() ?: 0.0
                 
-                // 计算方差来衡量规律性
+                // Calculate variance to measure regularity
                 val variance = amounts.map { (it - avgAmount) * (it - avgAmount) }.average()
                 val coefficientOfVariation = if (avgAmount > 0) kotlin.math.sqrt(variance) / avgAmount else 1.0
                 
-                // 只有变异系数较小的才算定期支出
+                // Only those with a smaller coefficient of variation are considered regular expenses
                 if (coefficientOfVariation < 0.3) {
-                    // 计算月频率
+                    // Calculate monthly frequency
                     val sixMonthsAgo = Calendar.getInstance().apply { add(Calendar.MONTH, -6) }.timeInMillis
                     val recentTransactions = categoryTransactions.filter { it.date >= sixMonthsAgo }
-                    val frequency = (recentTransactions.size * 6.0 / 6).toInt() // 每月频率
+                    val frequency = (recentTransactions.size * 6.0 / 6).toInt() // Monthly frequency
                     
                     regularList.add(RegularExpense(
-                        categoryName = category?.name ?: "未分类",
+                        categoryName = category?.name ?: "Uncategorized",
                         avgAmount = avgAmount,
                         frequency = frequency,
                         lastAmount = lastAmount,
@@ -1125,7 +1134,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 分析工作日vs周末支出
+     * Analyze weekday vs weekend spending
      */
     private fun analyzeWeekdayWeekendSpending(transactions: List<Transaction>): WeekdayWeekendSpending {
         val expenseTransactions = transactions.filter { it.type == Transaction.TransactionType.EXPENSE }
@@ -1153,9 +1162,9 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
         val weekendAvgDaily = if (weekendCount > 0) weekendTotal / weekendCount else 0.0
         
         val preference = when {
-            weekendAvgDaily > weekdayAvgDaily * 1.2 -> "周末"
-            weekdayAvgDaily > weekendAvgDaily * 1.2 -> "工作日"
-            else -> "平均"
+            weekendAvgDaily > weekdayAvgDaily * 1.2 -> "weekend"
+            weekdayAvgDaily > weekendAvgDaily * 1.2 -> "weekday"
+            else -> "balanced"
         }
         
         return WeekdayWeekendSpending(
@@ -1168,7 +1177,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 分析预算跟踪
+     * Analyze budget tracking
      */
     private suspend fun analyzeBudgetTracking() {
         try {
@@ -1186,20 +1195,20 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
             val budgetDetailsList = mutableListOf<BudgetAnalysis>()
             
             budgets.forEach { budget ->
-                // 计算该预算期间的实际支出
+                // Calculate actual spending for the budget period
                 val actualSpent = calculateBudgetSpent(budget)
                 val status = when {
                     actualSpent > budget.amount -> {
                         overBudgets++
-                        "超支"
+                        "Over Budget"
                     }
                     actualSpent > budget.amount * budget.alertThreshold -> {
                         warningBudgets++
-                        "警告"
+                        "Warning"
                     }
                     else -> {
                         safeBudgets++
-                        "安全"
+                        "Normal"
                     }
                 }
                 
@@ -1210,7 +1219,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                 val spentPercentage = if (budget.amount > 0) (actualSpent / budget.amount) * 100 else 0.0
                 val daysRemaining = budget.getRemainingDays()
                 val dailyBudgetRemaining = if (daysRemaining > 0) remainingAmount / daysRemaining else 0.0
-                val onTrack = actualSpent <= budget.amount * (1.0 - (daysRemaining.toDouble() / 30.0)) // 假设30天周期
+                val onTrack = actualSpent <= budget.amount * (1.0 - (daysRemaining.toDouble() / 30.0)) // Assuming 30-day cycle
                 
                 budgetDetailsList.add(BudgetAnalysis(
                     budgetId = budget.id,
@@ -1244,23 +1253,23 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
             _budgetTrackingStatus.value = budgetTracking
             
         } catch (e: Exception) {
-            android.util.Log.e("StatisticsViewModel", "预算跟踪分析失败", e)
+            android.util.Log.e("StatisticsViewModel", "Failed to analyze budget tracking", e)
         }
     }
 
     /**
-     * 计算预算实际支出
+     * Calculate budget actual spending
      */
     private suspend fun calculateBudgetSpent(budget: Budget): Double {
         val transactions = repository.getTransactionsByDateRange(budget.startDate, budget.endDate).first()
         
         return if (budget.categoryId != null) {
-            // 特定分类预算
+            // Specific category budget
             transactions.filter { 
                 it.type == Transaction.TransactionType.EXPENSE && it.categoryId == budget.categoryId 
             }.sumOf { it.amount }
         } else {
-            // 总预算
+            // Total budget
             transactions.filter { 
                 it.type == Transaction.TransactionType.EXPENSE 
             }.sumOf { it.amount }
@@ -1268,11 +1277,11 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 评估财务健康度
+     * Assess financial health
      */
     private suspend fun assessFinancialHealth() {
         try {
-            // 获取最近3个月的数据进行评估
+            // Get data from the last 3 months for assessment
             val threeMonthsAgo = Calendar.getInstance().apply {
                 add(Calendar.MONTH, -3)
             }.timeInMillis
@@ -1285,40 +1294,40 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
             var totalScore = 0.0
             var totalWeight = 0.0
             
-            // 1. 收支平衡评估 (权重: 30%)
+            // 1. Income-expense balance assessment (weight: 30%)
             val incomeExpenseBalance = assessIncomeExpenseBalance(transactions)
             factors.add(incomeExpenseBalance)
             totalScore += incomeExpenseBalance.score * incomeExpenseBalance.weight
             totalWeight += incomeExpenseBalance.weight
             
-            // 2. 预算执行评估 (权重: 25%)
+            // 2. Budget compliance assessment (weight: 25%)
             val budgetCompliance = assessBudgetCompliance(budgets)
             factors.add(budgetCompliance)
             totalScore += budgetCompliance.score * budgetCompliance.weight
             totalWeight += budgetCompliance.weight
             
-            // 3. 支出稳定性评估 (权重: 20%)
+            // 3. Spending stability assessment (weight: 20%)
             val spendingStability = assessSpendingStability(transactions)
             factors.add(spendingStability)
             totalScore += spendingStability.score * spendingStability.weight
             totalWeight += spendingStability.weight
             
-            // 4. 储蓄率评估 (权重: 15%)
+            // 4. Savings rate assessment (weight: 15%)
             val savingsRate = assessSavingsRate(transactions)
             factors.add(savingsRate)
             totalScore += savingsRate.score * savingsRate.weight
             totalWeight += savingsRate.weight
             
-            // 5. 支出多样性评估 (权重: 10%)
+            // 5. Expense diversity assessment (weight: 10%)
             val expenseDiversity = assessExpenseDiversity(transactions)
             factors.add(expenseDiversity)
             totalScore += expenseDiversity.score * expenseDiversity.weight
             totalWeight += expenseDiversity.weight
             
-            // 计算总分
+            // Calculate total score
             val overallScore = if (totalWeight > 0) (totalScore / totalWeight).toInt().coerceIn(0, 100) else 0
             
-            // 确定健康度等级
+            // Determine health level
             val level = when (overallScore) {
                 in 90..100 -> FinancialHealthLevel.EXCELLENT
                 in 75..89 -> FinancialHealthLevel.GOOD
@@ -1327,7 +1336,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
                 else -> FinancialHealthLevel.CRITICAL
             }
             
-            // 生成建议和评价
+            // Generate recommendations and assessments
             val recommendations = generateRecommendations(factors, level)
             val strengths = generateStrengths(factors)
             val concerns = generateConcerns(factors)
@@ -1344,12 +1353,12 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
             _financialHealthAssessment.value = assessment
             
         } catch (e: Exception) {
-            android.util.Log.e("StatisticsViewModel", "财务健康度评估失败", e)
+            android.util.Log.e("StatisticsViewModel", "Failed to assess financial health", e)
         }
     }
 
     /**
-     * 评估收支平衡
+     * Assess income-expense balance
      */
     private fun assessIncomeExpenseBalance(transactions: List<Transaction>): HealthFactor {
         val income = transactions.filter { it.type == Transaction.TransactionType.INCOME }.sumOf { it.amount }
@@ -1358,24 +1367,24 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
         val balanceRatio = if (income > 0) expense / income else 1.0
         
         val score = when {
-            balanceRatio <= 0.7 -> 100  // 支出占收入70%以下，优秀
-            balanceRatio <= 0.8 -> 85   // 支出占收入80%以下，良好
-            balanceRatio <= 0.9 -> 70   // 支出占收入90%以下，一般
-            balanceRatio < 1.0 -> 55    // 支出接近收入，较差
-            else -> 20                  // 支出超过收入，危险
+            balanceRatio <= 0.7 -> 100  // Expenses under 70% of income, excellent
+            balanceRatio <= 0.8 -> 85   // Expenses under 80% of income, good
+            balanceRatio <= 0.9 -> 70   // Expenses under 90% of income, fair
+            balanceRatio < 1.0 -> 55    // Expenses close to income, poor
+            else -> 20                  // Expenses exceed income, critical
         }
         
-        val impact = if (score >= 70) "正面" else if (score >= 55) "中性" else "负面"
+        val impact = if (score >= 70) "Positive" else if (score >= 55) "Neutral" else "Negative"
         val description = when {
-            balanceRatio <= 0.7 -> "支出控制良好，有充足结余"
-            balanceRatio <= 0.8 -> "支出管理较好，有适度结余"
-            balanceRatio <= 0.9 -> "支出偏高，结余较少"
-            balanceRatio < 1.0 -> "支出接近收入，财务紧张"
-            else -> "支出超过收入，财务状况危险"
+            balanceRatio <= 0.7 -> "Good expense control with sufficient surplus"
+            balanceRatio <= 0.8 -> "Good expense management with moderate surplus"
+            balanceRatio <= 0.9 -> "High expenses with limited surplus"
+            balanceRatio < 1.0 -> "Expenses close to income, financial stress"
+            else -> "Expenses exceed income, dangerous financial situation"
         }
         
         return HealthFactor(
-            name = "收支平衡",
+            name = "Income-Expense Balance",
             score = score,
             weight = 0.3,
             description = description,
@@ -1384,16 +1393,16 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 评估预算执行
+     * Assess budget compliance
      */
     private suspend fun assessBudgetCompliance(budgets: List<Budget>): HealthFactor {
         if (budgets.isEmpty()) {
             return HealthFactor(
-                name = "预算执行",
+                name = "Budget Execution",
                 score = 50,
                 weight = 0.25,
-                description = "未设置预算，建议制定预算计划",
-                impact = "中性"
+                description = "No budget set, suggest creating a budget plan",
+                impact = "Neutral"
             )
         }
         
@@ -1413,16 +1422,16 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
         val complianceRate = if (totalBudgets > 0) compliantCount.toDouble() / totalBudgets else 0.0
         
         val score = (complianceRate * 100).toInt()
-        val impact = if (score >= 75) "正面" else if (score >= 50) "中性" else "负面"
+        val impact = if (score >= 75) "Positive" else if (score >= 50) "Neutral" else "Negative"
         val description = when {
-            complianceRate >= 0.9 -> "预算执行优秀，支出控制良好"
-            complianceRate >= 0.7 -> "预算执行良好，大部分支出在控制范围内"
-            complianceRate >= 0.5 -> "预算执行一般，部分预算超支"
-            else -> "预算执行较差，多项预算超支"
+            complianceRate >= 0.9 -> "Excellent budget execution, good expense control"
+            complianceRate >= 0.7 -> "Good budget execution, most expenses under control"
+            complianceRate >= 0.5 -> "Average budget execution, some expenses exceeded"
+            else -> "Poor budget execution, multiple budget overspending"
         }
         
         return HealthFactor(
-            name = "预算执行",
+            name = "Budget Execution",
             score = score,
             weight = 0.25,
             description = description,
@@ -1431,27 +1440,27 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 评估支出稳定性
+     * Assess spending stability
      */
     private fun assessSpendingStability(transactions: List<Transaction>): HealthFactor {
         val expenseTransactions = transactions.filter { it.type == Transaction.TransactionType.EXPENSE }
         
         if (expenseTransactions.size < 10) {
             return HealthFactor(
-                name = "支出稳定性",
+                name = "Spending Stability",
                 score = 60,
                 weight = 0.2,
-                description = "交易数据较少，难以评估稳定性",
-                impact = "中性"
+                description = "Few transaction data, difficult to assess stability",
+                impact = "Neutral"
             )
         }
         
-        // 按周分组计算支出变异性
+        // Calculate weekly variability by week
         val weeklyExpenses = mutableListOf<Double>()
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = System.currentTimeMillis()
         
-        for (i in 0 until 12) { // 最近12周
+        for (i in 0 until 12) { // Last 12 weeks
             val weekStart = Calendar.getInstance().apply {
                 timeInMillis = calendar.timeInMillis
                 set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
@@ -1471,31 +1480,31 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
             calendar.add(Calendar.WEEK_OF_YEAR, -1)
         }
         
-        // 计算变异系数
+        // Calculate coefficient of variation
         val mean = weeklyExpenses.average()
         val variance = weeklyExpenses.map { (it - mean) * (it - mean) }.average()
         val stdDev = kotlin.math.sqrt(variance)
         val coefficientOfVariation = if (mean > 0) stdDev / mean else 0.0
         
         val score = when {
-            coefficientOfVariation <= 0.2 -> 100  // 变异系数20%以下，非常稳定
-            coefficientOfVariation <= 0.3 -> 85   // 变异系数30%以下，比较稳定
-            coefficientOfVariation <= 0.4 -> 70   // 变异系数40%以下，一般稳定
-            coefficientOfVariation <= 0.5 -> 55   // 变异系数50%以下，不够稳定
-            else -> 30                             // 变异系数50%以上，很不稳定
+            coefficientOfVariation <= 0.2 -> 100  // Variability below 20%, very stable
+            coefficientOfVariation <= 0.3 -> 85   // Variability below 30%, relatively stable
+            coefficientOfVariation <= 0.4 -> 70   // Variability below 40%, average stability
+            coefficientOfVariation <= 0.5 -> 55   // Variability below 50%, not stable enough
+            else -> 30                             // Variability above 50%, very unstable
         }
         
-        val impact = if (score >= 70) "正面" else if (score >= 55) "中性" else "负面"
+        val impact = if (score >= 70) "Positive" else if (score >= 55) "Neutral" else "Negative"
         val description = when {
-            coefficientOfVariation <= 0.2 -> "支出非常稳定，财务管理良好"
-            coefficientOfVariation <= 0.3 -> "支出比较稳定，财务可控"
-            coefficientOfVariation <= 0.4 -> "支出稳定性一般，存在波动"
-            coefficientOfVariation <= 0.5 -> "支出不够稳定，波动较大"
-            else -> "支出很不稳定，建议加强预算管理"
+            coefficientOfVariation <= 0.2 -> "Spending very stable, good financial management"
+            coefficientOfVariation <= 0.3 -> "Spending relatively stable, financial control"
+            coefficientOfVariation <= 0.4 -> "Spending stability average, some fluctuation"
+            coefficientOfVariation <= 0.5 -> "Spending not stable enough, significant fluctuation"
+            else -> "Spending very unstable, suggest strengthening budget management"
         }
         
         return HealthFactor(
-            name = "支出稳定性",
+            name = "Spending Stability",
             score = score,
             weight = 0.2,
             description = description,
@@ -1504,7 +1513,7 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 评估储蓄率
+     * Assess savings rate
      */
     private fun assessSavingsRate(transactions: List<Transaction>): HealthFactor {
         val income = transactions.filter { it.type == Transaction.TransactionType.INCOME }.sumOf { it.amount }
@@ -1513,24 +1522,24 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
         val savingsRate = if (income > 0) ((income - expense) / income) else 0.0
         
         val score = when {
-            savingsRate >= 0.3 -> 100     // 储蓄率30%以上，优秀
-            savingsRate >= 0.2 -> 85      // 储蓄率20%以上，良好
-            savingsRate >= 0.1 -> 70      // 储蓄率10%以上，一般
-            savingsRate >= 0.0 -> 50      // 储蓄率0%以上，较差
-            else -> 20                    // 负储蓄，危险
+            savingsRate >= 0.3 -> 100     // Savings rate above 30%, excellent
+            savingsRate >= 0.2 -> 85      // Savings rate above 20%, good
+            savingsRate >= 0.1 -> 70      // Savings rate above 10%, average
+            savingsRate >= 0.0 -> 50      // Savings rate above 0%, poor
+            else -> 20                    // Negative savings, dangerous
         }
         
-        val impact = if (score >= 70) "正面" else if (score >= 50) "中性" else "负面"
+        val impact = if (score >= 70) "Positive" else if (score >= 50) "Neutral" else "Negative"
         val description = when {
-            savingsRate >= 0.3 -> "储蓄率优秀，财务状况健康"
-            savingsRate >= 0.2 -> "储蓄率良好，有一定积累"
-            savingsRate >= 0.1 -> "储蓄率一般，建议增加储蓄"
-            savingsRate >= 0.0 -> "储蓄率较低，财务紧张"
-            else -> "支出超过收入，无法储蓄"
+            savingsRate >= 0.3 -> "Excellent savings rate, healthy financial situation"
+            savingsRate >= 0.2 -> "Good savings rate, some accumulation"
+            savingsRate >= 0.1 -> "Average savings rate, suggest increasing savings"
+            savingsRate >= 0.0 -> "Low savings rate, financial stress"
+            else -> "Expenses exceed income, unable to save"
         }
         
         return HealthFactor(
-            name = "储蓄率",
+            name = "Savings Rate",
             score = score,
             weight = 0.15,
             description = description,
@@ -1539,18 +1548,18 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 评估支出多样性
+     * Assess expense diversity
      */
     private fun assessExpenseDiversity(transactions: List<Transaction>): HealthFactor {
         val expenseTransactions = transactions.filter { it.type == Transaction.TransactionType.EXPENSE }
         
         if (expenseTransactions.isEmpty()) {
             return HealthFactor(
-                name = "支出多样性",
+                name = "Expense Diversity",
                 score = 50,
                 weight = 0.1,
-                description = "无支出数据",
-                impact = "中性"
+                description = "No expense data",
+                impact = "Neutral"
             )
         }
         
@@ -1558,31 +1567,31 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
         val categoryCount = categoryGroups.size
         val totalExpense = expenseTransactions.sumOf { it.amount }
         
-        // 计算支出分布的均匀性（基尼系数的简化版本）
+        // Calculate evenness of expense distribution (simplified version of Gini coefficient)
         val categoryAmounts = categoryGroups.values.map { it.sumOf { transaction -> transaction.amount } }
         val sortedAmounts = categoryAmounts.sortedDescending()
         
-        // 计算最大分类占总支出的比例
+        // Calculate proportion of largest category in total expenses
         val maxCategoryRatio = if (totalExpense > 0) sortedAmounts.firstOrNull()?.div(totalExpense) ?: 0.0 else 0.0
         
         val score = when {
-            categoryCount >= 8 && maxCategoryRatio <= 0.3 -> 100  // 8个以上分类，最大占比30%以下
-            categoryCount >= 6 && maxCategoryRatio <= 0.4 -> 85   // 6个以上分类，最大占比40%以下
-            categoryCount >= 4 && maxCategoryRatio <= 0.5 -> 70   // 4个以上分类，最大占比50%以下
-            categoryCount >= 3 && maxCategoryRatio <= 0.6 -> 55   // 3个以上分类，最大占比60%以下
-            else -> 30                                            // 分类较少或分布不均
+            categoryCount >= 8 && maxCategoryRatio <= 0.3 -> 100  // 8 or more categories, max ratio 30% or less
+            categoryCount >= 6 && maxCategoryRatio <= 0.4 -> 85   // 6 or more categories, max ratio 40% or less
+            categoryCount >= 4 && maxCategoryRatio <= 0.5 -> 70   // 4 or more categories, max ratio 50% or less
+            categoryCount >= 3 && maxCategoryRatio <= 0.6 -> 55   // 3 or more categories, max ratio 60% or less
+            else -> 30                                            // Fewer categories or uneven distribution
         }
         
-        val impact = if (score >= 70) "正面" else if (score >= 55) "中性" else "负面"
+        val impact = if (score >= 70) "Positive" else if (score >= 55) "Neutral" else "Negative"
         val description = when {
-            score >= 85 -> "支出分类多样，分布均匀"
-            score >= 70 -> "支出分类较多，分布相对均匀"
-            score >= 55 -> "支出分类一般，分布不够均匀"
-            else -> "支出分类较少，建议平衡各类支出"
+            score >= 85 -> "Expense categories diverse, evenly distributed"
+            score >= 70 -> "Expense categories more, relatively evenly distributed"
+            score >= 55 -> "Expense categories average, not evenly distributed"
+            else -> "Expense categories less, suggest balancing various expenses"
         }
         
         return HealthFactor(
-            name = "支出多样性",
+            name = "Expense Diversity",
             score = score,
             weight = 0.1,
             description = description,
@@ -1591,47 +1600,47 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 生成建议
+     * Generate recommendations
      */
     private fun generateRecommendations(factors: List<HealthFactor>, level: FinancialHealthLevel): List<String> {
         val recommendations = mutableListOf<String>()
         
         factors.forEach { factor ->
             when {
-                factor.impact == "负面" && factor.name == "收支平衡" -> {
-                    recommendations.add("建议减少不必要的支出，增加收入来源")
+                factor.impact == "Negative" && factor.name == "Income-Expense Balance" -> {
+                    recommendations.add("Suggest reducing unnecessary expenses and increasing income sources")
                 }
-                factor.impact == "负面" && factor.name == "预算执行" -> {
-                    recommendations.add("制定更合理的预算计划，严格控制支出")
+                factor.impact == "Negative" && factor.name == "Budget Execution" -> {
+                    recommendations.add("Create a more reasonable budget plan and strictly control expenses")
                 }
-                factor.impact == "负面" && factor.name == "支出稳定性" -> {
-                    recommendations.add("建立支出规律，避免大额突发消费")
+                factor.impact == "Negative" && factor.name == "Spending Stability" -> {
+                    recommendations.add("Establish spending patterns and avoid large unexpected purchases")
                 }
-                factor.impact == "负面" && factor.name == "储蓄率" -> {
-                    recommendations.add("设定储蓄目标，优先支付自己（强制储蓄）")
+                factor.impact == "Negative" && factor.name == "Savings Rate" -> {
+                    recommendations.add("Set savings goals and pay yourself first (forced savings)")
                 }
-                factor.impact == "负面" && factor.name == "支出多样性" -> {
-                    recommendations.add("平衡各类支出，避免过度集中在某一类别")
+                factor.impact == "Negative" && factor.name == "Expense Diversity" -> {
+                    recommendations.add("Balance various types of expenses, avoid over-concentration in one category")
                 }
             }
         }
         
-        // 根据整体健康度等级添加通用建议
+        // Add general recommendations based on overall health level
         when (level) {
             FinancialHealthLevel.CRITICAL -> {
-                recommendations.add("财务状况需要紧急改善，建议寻求专业理财建议")
+                recommendations.add("Financial condition needs urgent improvement, suggest seeking professional financial advice")
             }
             FinancialHealthLevel.POOR -> {
-                recommendations.add("制定详细的财务改善计划，逐步提升财务健康度")
+                recommendations.add("Create a detailed financial improvement plan to gradually enhance financial health")
             }
             FinancialHealthLevel.FAIR -> {
-                recommendations.add("继续优化支出结构，提高储蓄比例")
+                recommendations.add("Continue optimizing expense structure and increase savings ratio")
             }
             FinancialHealthLevel.GOOD -> {
-                recommendations.add("保持当前良好状态，可考虑投资增值")
+                recommendations.add("Maintain current good condition, consider investment opportunities")
             }
             FinancialHealthLevel.EXCELLENT -> {
-                recommendations.add("财务管理优秀，可探索更多投资机会")
+                recommendations.add("Excellent financial management, explore more investment opportunities")
             }
         }
         
@@ -1639,78 +1648,78 @@ class StatisticsViewModel(private val repository: LifeLedgerRepository) : ViewMo
     }
 
     /**
-     * 生成优势
+     * Generate strengths
      */
     private fun generateStrengths(factors: List<HealthFactor>): List<String> {
-        return factors.filter { it.impact == "正面" }
-            .map { "${it.name}：${it.description}" }
+        return factors.filter { it.impact == "Positive" }
+            .map { "${it.name}: ${it.description}" }
     }
 
     /**
-     * 生成关注点
+     * Generate concerns
      */
     private fun generateConcerns(factors: List<HealthFactor>): List<String> {
-        return factors.filter { it.impact == "负面" }
-            .map { "${it.name}：${it.description}" }
+        return factors.filter { it.impact == "Negative" }
+            .map { "${it.name}: ${it.description}" }
     }
 
     /**
-     * 刷新所有数据分析
+     * Refresh all data analysis
      */
     fun refreshDataAnalysis() {
         startDataAnalysis()
     }
 
     /**
-     * 打印调试信息
+     * Print debugging information
      */
     fun debugInfo() {
         viewModelScope.launch {
-            android.util.Log.d("StatisticsViewModel", "=== StatisticsViewModel 调试信息 ===")
+            android.util.Log.d("StatisticsViewModel", "=== StatisticsViewModel debugging information ===")
             
-            // 查看原始数据状态
+            // Check original data state
             val allTransactions = repository.getAllTransactions().first()
-            android.util.Log.d("StatisticsViewModel", "数据库中总交易数：${allTransactions.size}")
+            android.util.Log.d("StatisticsViewModel", "Total number of transactions in database: ${allTransactions.size}")
             
             val incomeTransactions = allTransactions.filter { it.type == Transaction.TransactionType.INCOME }
             val expenseTransactions = allTransactions.filter { it.type == Transaction.TransactionType.EXPENSE }
             
-            android.util.Log.d("StatisticsViewModel", "收入交易数：${incomeTransactions.size}")
-            android.util.Log.d("StatisticsViewModel", "支出交易数：${expenseTransactions.size}")
+            android.util.Log.d("StatisticsViewModel", "Number of income transactions: ${incomeTransactions.size}")
+            android.util.Log.d("StatisticsViewModel", "Number of expense transactions: ${expenseTransactions.size}")
             
-            // 查看最近的几条交易
+            // Check recent transactions
             val recentTransactions = allTransactions.sortedByDescending { it.date }.take(5)
-            android.util.Log.d("StatisticsViewModel", "最近5条交易：")
+            android.util.Log.d("StatisticsViewModel", "Recent 5 transactions:")
             recentTransactions.forEach { transaction ->
-                val dateStr = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(transaction.date))
-                android.util.Log.d("StatisticsViewModel", "  ${transaction.type}: ${transaction.amount}元, 日期: $dateStr, 分类: ${transaction.title}")
+                val dateStr = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).format(Date(transaction.date))
+                android.util.Log.d("StatisticsViewModel", "  ${transaction.type}: ${transaction.amount}元, Date: $dateStr, Category: ${transaction.title}")
             }
             
-            // 查看当前选择的时间范围
+            // Check current time range selection
             val (startTime, endTime) = getTimeRangeMillis(_currentTimeRange.value)
-            android.util.Log.d("StatisticsViewModel", "当前选择的时间范围: ${_currentTimeRange.value}")
-            android.util.Log.d("StatisticsViewModel", "  开始时间: ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(startTime))}")
-            android.util.Log.d("StatisticsViewModel", "  结束时间: ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(endTime))}")
+            android.util.Log.d("StatisticsViewModel", "Current selected time range: ${_currentTimeRange.value}")
+            android.util.Log.d("StatisticsViewModel", "  Start time: ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).format(Date(startTime))}")
+            android.util.Log.d("StatisticsViewModel", "  End time: ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).format(Date(endTime))}")
             
-            // 查看当前月度数据状态
-            android.util.Log.d("StatisticsViewModel", "当前月度数据：${_monthlyData.value.size} 个月")
+            // Check current monthly data state
+            android.util.Log.d("StatisticsViewModel", "Current monthly data: ${_monthlyData.value.size} months")
             _monthlyData.value.forEach { monthData ->
                 if (monthData.expense > 0 || monthData.income > 0) {
-                    android.util.Log.d("StatisticsViewModel", "  ${monthData.period}: 支出=${monthData.expense}, 收入=${monthData.income}")
+                    android.util.Log.d("StatisticsViewModel", "  ${monthData.period}: Expense=${monthData.expense}, Income=${monthData.income}")
                 }
             }
             
-            // 查看当前分类数据状态
-            android.util.Log.d("StatisticsViewModel", "当前分类数据：${_categoryData.value.size} 个分类")
+            // Check current category data state
+            android.util.Log.d("StatisticsViewModel", "Current category data: ${_categoryData.value.size} categories")
             _categoryData.value.forEach { categoryData ->
-                android.util.Log.d("StatisticsViewModel", "  ${categoryData.categoryName}: ${categoryData.amount}元 (${categoryData.transactionCount}笔)")
+                android.util.Log.d("StatisticsViewModel", "  ${categoryData.categoryName}: ${categoryData.amount}元 (${categoryData.transactionCount} transactions)")
             }
         }
     }
 }
 
 /**
- * 财务概览数据
+ * Financial overview data
  */
 data class FinancialSummaryData(
     val totalIncome: Double = 0.0,
@@ -1720,7 +1729,7 @@ data class FinancialSummaryData(
 )
 
 /**
- * 每日支出数据
+ * Daily expense data
  */
 data class DailyExpenseData(
     val date: String,
@@ -1728,7 +1737,7 @@ data class DailyExpenseData(
 )
 
 /**
- * 分类支出数据
+ * Category expense data
  */
 data class CategoryExpenseData(
     val categoryName: String,
@@ -1738,7 +1747,7 @@ data class CategoryExpenseData(
 )
 
 /**
- * 月度统计数据
+ * Monthly statistics data
  */
 data class MonthlyStatistic(
     val period: String,
@@ -1747,7 +1756,7 @@ data class MonthlyStatistic(
 )
 
 /**
- * 月度时间范围数据
+ * Monthly time range data
  */
 data class MonthlyTimeRangeData(
     val startTime: Long,
@@ -1757,7 +1766,7 @@ data class MonthlyTimeRangeData(
 )
 
 /**
- * ViewModel工厂
+ * ViewModel factory
  */
 class StatisticsViewModelFactory(private val repository: LifeLedgerRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -1769,10 +1778,10 @@ class StatisticsViewModelFactory(private val repository: LifeLedgerRepository) :
     }
 }
 
-// ==================== 数据分析相关数据类 ====================
+// ==================== Data analysis related data classes ====================
 
 /**
- * 月度收支统计
+ * Monthly income and expense statistics
  */
 data class MonthlyFinancialSummary(
     val year: Int,
@@ -1787,7 +1796,7 @@ data class MonthlyFinancialSummary(
 )
 
 /**
- * 年度收支统计
+ * Annual income and expense statistics
  */
 data class YearlyFinancialSummary(
     val year: Int,
@@ -1803,7 +1812,7 @@ data class YearlyFinancialSummary(
 )
 
 /**
- * 支出模式分析
+ * Expense pattern analysis
  */
 data class ExpensePatternAnalysis(
     val topCategories: List<CategorySpendingPattern>,
@@ -1814,7 +1823,7 @@ data class ExpensePatternAnalysis(
 )
 
 /**
- * 分类支出模式
+ * Category expense pattern
  */
 data class CategorySpendingPattern(
     val categoryId: String,
@@ -1824,11 +1833,11 @@ data class CategorySpendingPattern(
     val avgAmount: Double,
     val percentage: Double,
     val trend: SpendingTrendType,
-    val monthlyAmounts: List<Double> // 最近12个月的支出
+    val monthlyAmounts: List<Double> // Expenses for the last 12 months
 )
 
 /**
- * 支出趋势
+ * Spending trend
  */
 data class SpendingTrend(
     val period: String, // "2024-01", "2024-02"
@@ -1838,51 +1847,51 @@ data class SpendingTrend(
 )
 
 /**
- * 异常交易
+ * Unusual transaction
  */
 data class UnusualTransaction(
     val transactionId: String,
     val amount: Double,
     val categoryName: String,
     val date: Long,
-    val reason: String, // "金额异常大", "频率异常高"
-    val normalRange: Pair<Double, Double> // 正常范围
+    val reason: String, // "Amount unusually high", "Frequency unusually high"
+    val normalRange: Pair<Double, Double> // Normal range
 )
 
 /**
- * 定期支出
+ * Regular expense
  */
 data class RegularExpense(
     val categoryName: String,
     val avgAmount: Double,
-    val frequency: Int, // 每月频率
+    val frequency: Int, // Monthly frequency
     val lastAmount: Double,
-    val variance: Double // 变异度
+    val variance: Double // Variability
 )
 
 /**
- * 工作日vs周末支出
+ * Weekday vs weekend spending
  */
 data class WeekdayWeekendSpending(
     val weekdayAvgDaily: Double,
     val weekendAvgDaily: Double,
     val weekdayTotal: Double,
     val weekendTotal: Double,
-    val preference: String // "工作日", "周末", "平均"
+    val preference: String // "Weekday", "Weekend", "Average"
 )
 
 /**
- * 支出趋势类型
+ * Spending trend type
  */
 enum class SpendingTrendType {
-    INCREASING,  // 递增
-    DECREASING,  // 递减
-    STABLE,      // 稳定
-    VOLATILE     // 波动
+    INCREASING,  // Increasing
+    DECREASING,  // Decreasing
+    STABLE,      // Stable
+    VOLATILE     // Volatile
 }
 
 /**
- * 预算跟踪状态
+ * Budget tracking status
  */
 data class BudgetTrackingStatus(
     val totalBudgets: Int,
@@ -1897,7 +1906,7 @@ data class BudgetTrackingStatus(
 )
 
 /**
- * 预算分析
+ * Budget analysis
  */
 data class BudgetAnalysis(
     val budgetId: String,
@@ -1914,10 +1923,10 @@ data class BudgetAnalysis(
 )
 
 /**
- * 财务健康度评估
+ * Financial health assessment
  */
 data class FinancialHealthAssessment(
-    val overallScore: Int, // 0-100分
+    val overallScore: Int, // 0-100 points
     val level: FinancialHealthLevel,
     val factors: List<HealthFactor>,
     val recommendations: List<String>,
@@ -1926,23 +1935,23 @@ data class FinancialHealthAssessment(
 )
 
 /**
- * 财务健康度等级
+ * Financial health level
  */
 enum class FinancialHealthLevel(val displayName: String, val color: String) {
-    EXCELLENT("优秀", "#4CAF50"),
-    GOOD("良好", "#8BC34A"),
-    FAIR("一般", "#FF9800"),
-    POOR("较差", "#FF5722"),
-    CRITICAL("危险", "#F44336")
+    EXCELLENT("Excellent", "#4CAF50"),
+    GOOD("Good", "#8BC34A"),
+    FAIR("Fair", "#FF9800"),
+    POOR("Poor", "#FF5722"),
+    CRITICAL("Critical", "#F44336")
 }
 
 /**
- * 健康度因素
+ * Health factor
  */
 data class HealthFactor(
     val name: String,
     val score: Int, // 0-100
-    val weight: Double, // 权重
+    val weight: Double, // Weight
     val description: String,
-    val impact: String // "正面", "负面", "中性"
+    val impact: String // "Positive", "Negative", "Neutral"
 ) 

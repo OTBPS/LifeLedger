@@ -400,11 +400,11 @@ class LifeLedgerRepository(
      */
     private fun getRandomExpenseTitle(categoryName: String): String {
         return when (categoryName) {
-            "餐饮" -> listOf("早餐", "午餐", "晚餐", "下午茶", "宵夜", "聚餐", "外卖").random()
-            "交通" -> listOf("打车", "地铁", "公交", "加油", "停车费", "高速费", "机票").random()
-            "购物" -> listOf("衣服", "鞋子", "化妆品", "电子产品", "书籍", "日用品", "礼物").random()
-            "娱乐" -> listOf("电影", "KTV", "游戏", "演唱会", "旅游", "运动", "酒吧").random()
-            "医疗" -> listOf("挂号费", "药费", "检查费", "治疗费", "体检", "保险", "康复").random()
+            "Food & Dining" -> listOf("Breakfast", "Lunch", "Dinner", "Afternoon Tea", "Snack", "Dining Out", "Takeout").random()
+            "Transportation" -> listOf("Taxi", "Subway", "Bus", "Gas", "Parking", "Highway Fee", "Flight").random()
+            "Shopping" -> listOf("Clothes", "Shoes", "Cosmetics", "Electronics", "Books", "Daily Items", "Gifts").random()
+            "Entertainment" -> listOf("Movie", "KTV", "Games", "Concert", "Travel", "Sports", "Bar").random()
+            "Healthcare" -> listOf("Registration", "Medicine", "Check-up", "Treatment", "Physical Exam", "Insurance", "Rehabilitation").random()
             else -> categoryName
         }
     }

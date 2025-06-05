@@ -50,7 +50,7 @@ class BudgetFragment : Fragment() {
     
     private fun setupUI() {
         // 设置工具栏
-        binding.toolbar.title = "预算管理"
+        binding.toolbar.title = getString(R.string.budget_management)
         
         // 设置刷新
         binding.swipeRefreshLayout.setOnRefreshListener {
@@ -180,18 +180,18 @@ class BudgetFragment : Fragment() {
     
     private fun showDeleteConfirmation(budget: Budget) {
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("删除预算")
-            .setMessage("确定要删除预算 \"${budget.name}\" 吗？")
-            .setPositiveButton("删除") { _, _ ->
+            .setTitle(getString(R.string.delete_budget))
+            .setMessage(getString(R.string.delete_budget_confirm, budget.name))
+            .setPositiveButton(getString(R.string.delete)) { _, _ ->
                 viewModel.deleteBudget(budget)
             }
-            .setNegativeButton("取消", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
     
     private fun navigateToBudgetDetail(budget: Budget) {
-        // TODO: 实现预算详情导航
-        // 暂时显示预算信息
+        // TODO: Implement budget detail navigation
+        // Show budget info temporarily
         showBudgetInfo(budget)
     }
     
@@ -199,48 +199,52 @@ class BudgetFragment : Fragment() {
         try {
             findNavController().navigate(R.id.action_budgetFragment_to_budgetAnalysisFragment)
         } catch (e: Exception) {
-            showError("导航到预算分析失败")
+            showError(getString(R.string.navigation_to_budget_failed))
         }
     }
     
     private fun navigateToBudgetSettings() {
         try {
-            // 导航到预算设置页面
+            // Navigate to budget settings page
             findNavController().navigate(R.id.action_budgetFragment_to_budgetSettingsFragment)
         } catch (e: Exception) {
-            showError("跳转到预算设置失败")
+            showError(getString(R.string.navigation_to_budget_failed))
         }
     }
     
     private fun showBudgetInfo(budget: Budget) {
         val message = buildString {
-            appendLine("预算名称: ${budget.name}")
-            appendLine("预算金额: ¥${String.format("%.2f", budget.amount)}")
-            appendLine("已花费: ¥${String.format("%.2f", budget.spent)}")
-            appendLine("剩余金额: ¥${String.format("%.2f", budget.getRemainingAmount())}")
-            appendLine("使用率: ${String.format("%.1f", budget.getSpentPercentage())}%")
-            appendLine("预算周期: ${budget.period.displayName}")
-            appendLine("状态: ${budget.getStatusText()}")
+            appendLine("${getString(R.string.budget_name)}: ${budget.name}")
+            appendLine("${getString(R.string.budget_amount)}: ¥${String.format("%.2f", budget.amount)}")
+            appendLine("${getString(R.string.spent)}: ¥${String.format("%.2f", budget.spent)}")
+            appendLine("${getString(R.string.remaining)}: ¥${String.format("%.2f", budget.getRemainingAmount())}")
+            appendLine("${getString(R.string.budget_usage_rate)}: ${String.format("%.1f", budget.getSpentPercentage())}%")
+            appendLine("${getString(R.string.budget_period)}: ${budget.period.displayName}")
+            appendLine("${getString(R.string.budget_status)}: ${budget.getStatusText()}")
             if (!budget.description.isNullOrBlank()) {
-                appendLine("描述: ${budget.description}")
+                appendLine("${getString(R.string.budget_description)}: ${budget.description}")
             }
         }
         
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("预算详情")
+            .setTitle(getString(R.string.budget_execution))
             .setMessage(message)
-            .setPositiveButton("编辑") { _, _ ->
+            .setPositiveButton(getString(R.string.edit)) { _, _ ->
                 showEditBudgetDialog(budget)
             }
-            .setNegativeButton("关闭", null)
+            .setNegativeButton(getString(R.string.close), null)
             .show()
     }
     
     private fun showBudgetSettingsDialog() {
-        val options = arrayOf("筛选预算", "预算提醒设置", "预算统计偏好")
+        val options = arrayOf(
+            getString(R.string.filter_categories),
+            getString(R.string.financial_reminders),
+            getString(R.string.data_visualization)
+        )
         
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("预算设置")
+            .setTitle(getString(R.string.settings))
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> showFilterOptions()
@@ -248,7 +252,7 @@ class BudgetFragment : Fragment() {
                     2 -> showStatisticsPreferences()
                 }
             }
-            .setNegativeButton("取消", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
     
@@ -257,23 +261,23 @@ class BudgetFragment : Fragment() {
         val periodNames = periods.map { it.displayName }.toTypedArray()
         
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("按周期筛选")
+            .setTitle(getString(R.string.filter))
             .setItems(periodNames) { _, which ->
                 viewModel.setFilterPeriod(periods[which])
             }
-            .setNeutralButton("清除筛选") { _, _ ->
+            .setNeutralButton(getString(R.string.all)) { _, _ ->
                 viewModel.clearFilters()
             }
-            .setNegativeButton("取消", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
     
     private fun showNotificationSettings() {
-        showError("预算提醒设置功能开发中")
+        showError(getString(R.string.financial_reminders))
     }
     
     private fun showStatisticsPreferences() {
-        showError("统计偏好设置功能开发中")
+        showError(getString(R.string.data_visualization))
     }
     
     private fun updateEmptyState(isEmpty: Boolean) {

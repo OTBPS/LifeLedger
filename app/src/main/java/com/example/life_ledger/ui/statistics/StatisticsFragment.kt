@@ -349,7 +349,7 @@ class StatisticsFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.expenseTrendData.collect { trendData ->
                 if (currentTrendType == TrendType.EXPENSE) {
-                    updateTrendChart(trendData, "支出")
+                    updateTrendChart(trendData, "Expense")
                 }
             }
         }
@@ -358,7 +358,7 @@ class StatisticsFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.incomeTrendData.collect { trendData ->
                 if (currentTrendType == TrendType.INCOME) {
-                    updateTrendChart(trendData, "收入")
+                    updateTrendChart(trendData, "Income")
                 }
             }
         }
@@ -454,8 +454,8 @@ class StatisticsFragment : Fragment() {
             Entry(index.toFloat(), data.amount.toFloat())
         }
 
-        val color = if (type == "收入") Color.GREEN else Color.BLUE
-        val dataSet = LineDataSet(entries, "日${type}金额").apply {
+        val color = if (type == "Income") Color.GREEN else Color.BLUE
+        val dataSet = LineDataSet(entries, "Daily ${type} Amount").apply {
             this.color = color
             setCircleColor(color)
             lineWidth = 2f
@@ -483,8 +483,8 @@ class StatisticsFragment : Fragment() {
             // 设置X轴标签
             val dateLabels = trendData.map { data ->
                 try {
-                    val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                    val outputFormat = SimpleDateFormat("MM/dd", Locale.getDefault())
+                    val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+                    val outputFormat = SimpleDateFormat("MM/dd", Locale.ENGLISH)
                     val date = inputFormat.parse(data.date)
                     outputFormat.format(date!!)
                 } catch (e: Exception) {
@@ -506,14 +506,14 @@ class StatisticsFragment : Fragment() {
             TrendType.EXPENSE -> {
                 lifecycleScope.launch {
                     viewModel.expenseTrendData.value.let { trendData ->
-                        updateTrendChart(trendData, "支出")
+                        updateTrendChart(trendData, "Expense")
                     }
                 }
             }
             TrendType.INCOME -> {
                 lifecycleScope.launch {
                     viewModel.incomeTrendData.value.let { trendData ->
-                        updateTrendChart(trendData, "收入")
+                        updateTrendChart(trendData, "Income")
                     }
                 }
             }
@@ -527,11 +527,11 @@ class StatisticsFragment : Fragment() {
         when (currentTrendType) {
             TrendType.EXPENSE -> {
                 val trendData = viewModel.expenseTrendData.value
-                updateTrendChart(trendData, "支出")
+                updateTrendChart(trendData, "Expense")
             }
             TrendType.INCOME -> {
                 val trendData = viewModel.incomeTrendData.value
-                updateTrendChart(trendData, "收入")
+                updateTrendChart(trendData, "Income")
             }
         }
     }
@@ -631,7 +631,7 @@ class StatisticsFragment : Fragment() {
             incomeEntries.add(BarEntry(index.toFloat(), data.income.toFloat()))
         }
 
-        val expenseDataSet = BarDataSet(expenseEntries, "支出").apply {
+        val expenseDataSet = BarDataSet(expenseEntries, "Expense").apply {
             color = Color.parseColor("#E91E63")
             valueTextColor = Color.WHITE
             valueTextSize = 10f
@@ -646,7 +646,7 @@ class StatisticsFragment : Fragment() {
             }
         }
 
-        val incomeDataSet = BarDataSet(incomeEntries, "收入").apply {
+        val incomeDataSet = BarDataSet(incomeEntries, "Income").apply {
             color = Color.parseColor("#4CAF50")
             valueTextColor = Color.WHITE
             valueTextSize = 10f
@@ -830,15 +830,15 @@ class StatisticsFragment : Fragment() {
     private fun updateFinancialHealthDisplay(assessment: FinancialHealthAssessment?) {
         binding.apply {
             if (assessment != null) {
-                tvHealthScore.text = "${assessment.overallScore}分"
+                tvHealthScore.text = "${assessment.overallScore} points"
                 tvHealthLevel.text = assessment.level.displayName
                 
                 // 设置健康度颜色
                 val color = Color.parseColor(assessment.level.color)
                 tvHealthScore.setTextColor(color)
             } else {
-                tvHealthScore.text = "--分"
-                tvHealthLevel.text = "评估中..."
+                tvHealthScore.text = getString(R.string.score_placeholder)
+                tvHealthLevel.text = getString(R.string.evaluating)
             }
         }
     }
@@ -868,24 +868,24 @@ class StatisticsFragment : Fragment() {
             if (patternAnalysis != null) {
                 val topCategory = patternAnalysis.topCategories.firstOrNull()
                 if (topCategory != null) {
-                    tvTopSpendingCategory.text = "主要支出类别：${topCategory.categoryName} (${String.format("%.1f", topCategory.percentage)}%)"
+                    tvTopSpendingCategory.text = getString(R.string.main_expense_category_format, topCategory.categoryName, topCategory.percentage)
                 } else {
-                    tvTopSpendingCategory.text = "主要支出类别：暂无数据"
+                    tvTopSpendingCategory.text = getString(R.string.main_expense_category_no_data)
                 }
                 
                 val preference = patternAnalysis.weekdayVsWeekendSpending.preference
                 val recentTrend = patternAnalysis.spendingTrends.lastOrNull()
                 val trendText = if (recentTrend != null && recentTrend.changePercentage != 0.0) {
-                    val direction = if (recentTrend.changePercentage > 0) "上升" else "下降"
+                    val direction = if (recentTrend.changePercentage > 0) getString(R.string.trend_up) else getString(R.string.trend_down)
                     "$direction ${String.format("%.1f", kotlin.math.abs(recentTrend.changePercentage))}%"
                 } else {
-                    "稳定"
+                    getString(R.string.expense_trend_stable)
                 }
                 
-                tvSpendingTrend.text = "支出趋势：$trendText，偏好${preference}消费"
+                tvSpendingTrend.text = getString(R.string.expense_trend_format, trendText, preference)
             } else {
-                tvTopSpendingCategory.text = "主要支出类别：计算中..."
-                tvSpendingTrend.text = "支出趋势：计算中..."
+                tvTopSpendingCategory.text = getString(R.string.main_expense_category_calculating)
+                tvSpendingTrend.text = getString(R.string.expense_trend_calculating)
             }
         }
     }
@@ -897,31 +897,31 @@ class StatisticsFragment : Fragment() {
         val assessment = viewModel.financialHealthAssessment.value ?: return
         
         val message = buildString {
-            appendLine("财务健康度评估：${assessment.overallScore}分 (${assessment.level.displayName})")
+            appendLine(getString(R.string.financial_health_assessment_format, assessment.overallScore, assessment.level.displayName))
             appendLine()
             
             if (assessment.strengths.isNotEmpty()) {
-                appendLine("优势方面：")
+                appendLine(getString(R.string.financial_strengths))
                 assessment.strengths.forEach { appendLine("• $it") }
                 appendLine()
             }
             
             if (assessment.concerns.isNotEmpty()) {
-                appendLine("需要关注：")
+                appendLine(getString(R.string.areas_of_concern))
                 assessment.concerns.forEach { appendLine("• $it") }
                 appendLine()
             }
             
             if (assessment.recommendations.isNotEmpty()) {
-                appendLine("改善建议：")
+                appendLine(getString(R.string.improvement_recommendations))
                 assessment.recommendations.forEach { appendLine("• $it") }
             }
         }
         
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("财务健康度详情")
+            .setTitle(getString(R.string.financial_health_details_title))
             .setMessage(message)
-            .setPositiveButton("确定", null)
+            .setPositiveButton(getString(R.string.ok), null)
             .show()
     }
 
@@ -932,38 +932,38 @@ class StatisticsFragment : Fragment() {
         val budgetStatus = viewModel.budgetTrackingStatus.value ?: return
         
         val message = buildString {
-            appendLine("预算总览：")
-            appendLine("• 总预算数：${budgetStatus.totalBudgets}")
-            appendLine("• 活跃预算：${budgetStatus.activeBudgets}")
-            appendLine("• 总预算金额：¥${String.format("%.2f", budgetStatus.totalBudgetAmount)}")
-            appendLine("• 已支出金额：¥${String.format("%.2f", budgetStatus.totalSpentAmount)}")
-            appendLine("• 整体进度：${String.format("%.1f", budgetStatus.overallProgress)}%")
+            appendLine(getString(R.string.budget_overview_title))
+            appendLine("• ${getString(R.string.total_budgets_count, budgetStatus.totalBudgets)}")
+            appendLine("• ${getString(R.string.active_budgets_count, budgetStatus.activeBudgets)}")
+            appendLine("• ${getString(R.string.total_budget_amount, budgetStatus.totalBudgetAmount)}")
+            appendLine("• ${getString(R.string.total_spent_amount, budgetStatus.totalSpentAmount)}")
+            appendLine("• ${getString(R.string.overall_progress, budgetStatus.overallProgress)}")
             appendLine()
             
             if (budgetStatus.budgetDetails.isNotEmpty()) {
-                appendLine("预算详情：")
+                appendLine(getString(R.string.budget_details_header))
                 budgetStatus.budgetDetails.take(5).forEach { budget ->
                     appendLine("• ${budget.budgetName}: ${String.format("%.1f", budget.spentPercentage)}% (${budget.status})")
                 }
                 
                 if (budgetStatus.budgetDetails.size > 5) {
-                    appendLine("... 还有${budgetStatus.budgetDetails.size - 5}项预算")
+                    appendLine(getString(R.string.more_budgets_remaining, budgetStatus.budgetDetails.size - 5))
                 }
             }
         }
         
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("预算跟踪详情")
+            .setTitle(getString(R.string.budget_tracking_details_title))
             .setMessage(message)
-            .setPositiveButton("管理预算") { _, _ ->
+            .setPositiveButton(getString(R.string.manage_budgets)) { _, _ ->
                 try {
                     // 导航到预算管理页面
                     findNavController().navigate(R.id.budgetFragment)
                 } catch (e: Exception) {
-                    Snackbar.make(binding.root, "跳转到预算页面失败", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, getString(R.string.navigation_to_budget_failed), Snackbar.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("关闭", null)
+            .setNegativeButton(getString(R.string.close), null)
             .show()
     }
 
@@ -974,17 +974,17 @@ class StatisticsFragment : Fragment() {
         val patternAnalysis = viewModel.expensePatternAnalysis.value ?: return
         
         val message = buildString {
-            appendLine("支出模式分析：")
+            appendLine(getString(R.string.expense_pattern_analysis_header))
             appendLine()
             
             // 前3大支出类别
-            appendLine("主要支出类别：")
+            appendLine(getString(R.string.main_spending_categories))
             patternAnalysis.topCategories.take(3).forEach { category ->
                 val trendText = when (category.trend) {
-                    SpendingTrendType.INCREASING -> "↗️ 上升"
-                    SpendingTrendType.DECREASING -> "↘️ 下降"
-                    SpendingTrendType.STABLE -> "→ 稳定"
-                    SpendingTrendType.VOLATILE -> "🔄 波动"
+                    SpendingTrendType.INCREASING -> getString(R.string.trend_increasing)
+                    SpendingTrendType.DECREASING -> getString(R.string.trend_decreasing) 
+                    SpendingTrendType.STABLE -> getString(R.string.trend_stable_icon)
+                    SpendingTrendType.VOLATILE -> getString(R.string.trend_volatile)
                 }
                 appendLine("• ${category.categoryName}: ${String.format("%.1f", category.percentage)}% $trendText")
             }
@@ -992,29 +992,34 @@ class StatisticsFragment : Fragment() {
             
             // 消费习惯
             val weekdayWeekend = patternAnalysis.weekdayVsWeekendSpending
-            appendLine("消费习惯：")
-            appendLine("• 工作日日均：¥${String.format("%.2f", weekdayWeekend.weekdayAvgDaily)}")
-            appendLine("• 周末日均：¥${String.format("%.2f", weekdayWeekend.weekendAvgDaily)}")
-            appendLine("• 偏好：${weekdayWeekend.preference}消费")
+            appendLine(getString(R.string.spending_habits))
+            appendLine("• ${getString(R.string.weekday_daily_avg, weekdayWeekend.weekdayAvgDaily)}")
+            appendLine("• ${getString(R.string.weekend_daily_avg, weekdayWeekend.weekendAvgDaily)}")
+            val preferenceText = when (weekdayWeekend.preference) {
+                "weekday" -> getString(R.string.weekday_spending)
+                "weekend" -> getString(R.string.weekend_spending)
+                else -> weekdayWeekend.preference
+            }
+            appendLine("• ${getString(R.string.preference_format, preferenceText)}")
             appendLine()
             
             // 异常交易
             if (patternAnalysis.unusualTransactions.isNotEmpty()) {
-                appendLine("异常交易检测：")
+                appendLine(getString(R.string.unusual_transactions_detected_header))
                 patternAnalysis.unusualTransactions.take(3).forEach { unusual ->
                     val date = java.text.SimpleDateFormat("MM-dd", Locale.getDefault()).format(Date(unusual.date))
                     appendLine("• $date ${unusual.categoryName}: ¥${String.format("%.2f", unusual.amount)} (${unusual.reason})")
                 }
                 if (patternAnalysis.unusualTransactions.size > 3) {
-                    appendLine("... 还有${patternAnalysis.unusualTransactions.size - 3}笔异常交易")
+                    appendLine(getString(R.string.more_unusual_transactions, patternAnalysis.unusualTransactions.size - 3))
                 }
             }
         }
         
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("支出模式详情")
+            .setTitle(getString(R.string.expense_pattern_details_title))
             .setMessage(message)
-            .setPositiveButton("确定", null)
+            .setPositiveButton(getString(R.string.ok), null)
             .show()
     }
 
@@ -1026,7 +1031,7 @@ class StatisticsFragment : Fragment() {
             findNavController().navigate(R.id.action_statisticsFragment_to_aiAnalysisFragment)
         } catch (e: Exception) {
             android.util.Log.e("StatisticsFragment", "Navigation to AI analysis failed", e)
-            Snackbar.make(binding.root, "暂时无法打开AI分析功能", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, getString(R.string.ai_analysis_temporarily_unavailable), Snackbar.LENGTH_SHORT).show()
         }
     }
 

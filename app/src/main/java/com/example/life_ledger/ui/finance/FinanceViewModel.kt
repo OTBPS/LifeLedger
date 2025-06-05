@@ -81,21 +81,21 @@ class FinanceViewModel(
     fun addTransaction(transaction: Transaction) {
         viewModelScope.launch {
             try {
-                android.util.Log.d("FinanceViewModel", "开始添加交易记录：类型=${transaction.type}, 金额=${transaction.amount}, 分类ID=${transaction.categoryId}")
+                android.util.Log.d("FinanceViewModel", "Start adding transaction records：Types=${transaction.type}, Amount=${transaction.amount}, 分类ID=${transaction.categoryId}")
                 
                 val result = transactionRepository.insertTransaction(transaction)
-                android.util.Log.d("FinanceViewModel", "交易记录插入成功，ID=$result")
+                android.util.Log.d("FinanceViewModel", "Transaction record inserted successfully，ID=$result")
                 
                 _operationResult.value = OperationResult(
                     isSuccess = true,
-                    message = "记录添加成功"
+                    message = "Record successful addition"
                 )
                 
                 loadTransactions() // 重新加载数据
-                android.util.Log.d("FinanceViewModel", "数据重新加载完成")
+                android.util.Log.d("FinanceViewModel", "Data reload completed")
                 
             } catch (e: Exception) {
-                android.util.Log.e("FinanceViewModel", "添加交易记录失败", e)
+                android.util.Log.e("FinanceViewModel", "Failed to add transaction record", e)
                 _operationResult.value = OperationResult(
                     isSuccess = false,
                     message = "添加失败: ${e.message}"
@@ -113,13 +113,13 @@ class FinanceViewModel(
                 transactionRepository.updateTransaction(transaction)
                 _operationResult.value = OperationResult(
                     isSuccess = true,
-                    message = "记录更新成功"
+                    message = "Record update successful"
                 )
                 loadTransactions() // 重新加载数据
             } catch (e: Exception) {
                 _operationResult.value = OperationResult(
                     isSuccess = false,
-                    message = "更新失败: ${e.message}"
+                    message = "Update failed: ${e.message}"
                 )
             }
         }
@@ -134,13 +134,13 @@ class FinanceViewModel(
                 transactionRepository.deleteTransaction(transaction)
                 _operationResult.value = OperationResult(
                     isSuccess = true,
-                    message = "记录删除成功"
+                    message = "Record deletion successful"
                 )
                 loadTransactions() // 重新加载数据
             } catch (e: Exception) {
                 _operationResult.value = OperationResult(
                     isSuccess = false,
-                    message = "删除失败: ${e.message}"
+                    message = "Delete failed: ${e.message}"
                 )
             }
         }
@@ -179,7 +179,7 @@ class FinanceViewModel(
     private fun applyFilter() {
         val allTransactions = _transactions.value ?: return
         
-        android.util.Log.d("FinanceViewModel", "开始应用筛选：总交易数=${allTransactions.size}, 筛选器=$currentFilter, 日期范围=$currentDateRange")
+        android.util.Log.d("FinanceViewModel", "Start filtering: Total number of transactions=${allTransactions.size}, filter=$currentFilter, 日期范围=$currentDateRange")
         
         var filtered = when (currentFilter) {
             FilterOption.ALL -> allTransactions
@@ -187,21 +187,21 @@ class FinanceViewModel(
             FilterOption.EXPENSE -> allTransactions.filter { it.type == Transaction.TransactionType.EXPENSE }
         }
         
-        android.util.Log.d("FinanceViewModel", "类型筛选后：交易数=${filtered.size}")
+        android.util.Log.d("FinanceViewModel", "After type filtering: number of transactions=${filtered.size}")
 
         // 应用日期范围筛选
         val (startDate, endDate) = getDateRangeMillis(currentDateRange)
-        android.util.Log.d("FinanceViewModel", "时间范围：${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(startDate))} 到 ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(endDate))}")
+        android.util.Log.d("FinanceViewModel", "time frame：${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(startDate))} To ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(endDate))}")
         
         filtered = filtered.filter { transaction ->
             val inRange = transaction.date >= startDate && transaction.date <= endDate
             if (!inRange) {
-                android.util.Log.d("FinanceViewModel", "过滤掉交易：日期=${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(transaction.date))}, 类型=${transaction.type}, 金额=${transaction.amount}")
+                android.util.Log.d("FinanceViewModel", "Filter out transactions: date=${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(transaction.date))}, Types=${transaction.type}, Amount=${transaction.amount}")
             }
             inRange
         }
         
-        android.util.Log.d("FinanceViewModel", "日期筛选后：交易数=${filtered.size}")
+        android.util.Log.d("FinanceViewModel", "After date filtering: transaction数=${filtered.size}")
 
         // 按日期降序排列
         filtered = filtered.sortedByDescending { it.date }
@@ -209,7 +209,7 @@ class FinanceViewModel(
         // 统计收入和支出数量
         val incomeCount = filtered.count { it.type == Transaction.TransactionType.INCOME }
         val expenseCount = filtered.count { it.type == Transaction.TransactionType.EXPENSE }
-        android.util.Log.d("FinanceViewModel", "最终结果：总数=${filtered.size}, 收入=${incomeCount}笔, 支出=${expenseCount}笔")
+        android.util.Log.d("FinanceViewModel", "Final result: Total number=${filtered.size}, income=${incomeCount}笔, expenditure=${expenseCount}")
 
         _filteredTransactions.value = filtered
         calculateSummary(filtered)

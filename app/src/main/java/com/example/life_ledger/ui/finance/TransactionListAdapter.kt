@@ -23,7 +23,7 @@ class TransactionListAdapter(
     private val onItemLongClick: (Transaction) -> Unit = {}
 ) : ListAdapter<Transaction, TransactionListAdapter.TransactionViewHolder>(TransactionDiffCallback()) {
 
-    private val dateFormat = SimpleDateFormat("MM-dd", Locale.getDefault())
+    private val dateFormat = SimpleDateFormat("MM-dd", Locale.ENGLISH)
     private val numberFormat = NumberFormat.getCurrencyInstance(Locale.CHINA)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {

@@ -52,14 +52,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="用户"
+                            android:text="@string/user"
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="点击编辑个人信息"
+                            android:text="@string/click_to_edit_profile"
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -69,12 +69,12 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- 外观设置 -->
+            <!-- Appearance Settings -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="外观设置"
+                android:text="@string/appearance_settings"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                 android:textColor="?attr/colorPrimary" />
 
@@ -91,7 +91,7 @@
                     android:orientation="vertical"
                     android:padding="4dp">
 
-                    <!-- 深色模式 -->
+                    <!-- Dark Mode -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -117,14 +117,14 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="深色模式"
+                                android:text="@string/dark_mode"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                                 android:textColor="?attr/colorOnSurface" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="启用深色主题"
+                                android:text="@string/enable_dark_theme"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -137,7 +137,7 @@
 
                     </LinearLayout>
 
-                    <!-- 主题选择 -->
+                    <!-- Theme Selection -->
                     <LinearLayout
                         android:id="@+id/layoutTheme"
                         android:layout_width="match_parent"
@@ -166,14 +166,14 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="主题颜色"
+                                android:text="@string/theme_color"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                                 android:textColor="?attr/colorOnSurface" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="选择主题配色方案"
+                                android:text="@string/select_theme_color_scheme"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -191,12 +191,12 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- 通知设置 -->
+            <!-- Notification Settings -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="通知设置"
+                android:text="@string/notification_settings"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                 android:textColor="?attr/colorPrimary" />
 
@@ -213,7 +213,7 @@
                     android:orientation="vertical"
                     android:padding="4dp">
 
-                    <!-- 推送通知 -->
+                    <!-- Push Notifications -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -239,14 +239,14 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="推送通知"
+                                android:text="@string/push_notifications"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                                 android:textColor="?attr/colorOnSurface" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="接收应用通知"
+                                android:text="@string/receive_app_notifications"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -260,7 +260,7 @@
 
                     </LinearLayout>
 
-                    <!-- 财务提醒 -->
+                    <!-- Financial Reminders -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -286,14 +286,14 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="财务提醒"
+                                android:text="@string/financial_reminders"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                                 android:textColor="?attr/colorOnSurface" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="提醒记账和预算"
+                                android:text="@string/remind_recording_and_budget"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -311,12 +311,12 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- 数据管理 -->
+            <!-- Data Management -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="数据管理"
+                android:text="@string/data_management"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                 android:textColor="?attr/colorPrimary" />
 
@@ -333,7 +333,7 @@
                     android:orientation="vertical"
                     android:padding="4dp">
 
-                    <!-- 数据备份 -->
+                    <!-- Data Backup -->
                     <LinearLayout
                         android:id="@+id/layoutBackup"
                         android:layout_width="match_parent"
@@ -362,14 +362,14 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="数据备份"
+                                android:text="@string/data_backup"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                                 android:textColor="?attr/colorOnSurface" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="备份所有数据到云端"
+                                android:text="@string/backup_all_data_to_cloud"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -383,7 +383,7 @@
 
                     </LinearLayout>
 
-                    <!-- 数据导出 -->
+                    <!-- Data Export -->
                     <LinearLayout
                         android:id="@+id/layoutExport"
                         android:layout_width="match_parent"
@@ -412,14 +412,14 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="数据导出"
+                                android:text="@string/data_export"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                                 android:textColor="?attr/colorOnSurface" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="导出为Excel或CSV文件"
+                                android:text="@string/export_to_excel_or_csv"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -433,7 +433,7 @@
 
                     </LinearLayout>
 
-                    <!-- 数据恢复 -->
+                    <!-- Data Recovery -->
                     <LinearLayout
                         android:id="@+id/layoutRestore"
                         android:layout_width="match_parent"
@@ -462,14 +462,14 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="数据恢复"
+                                android:text="@string/data_recovery"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                                 android:textColor="?attr/colorOnSurface" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="从备份恢复数据"
+                                android:text="@string/restore_from_backup"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -487,12 +487,12 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- 其他设置 -->
+            <!-- Other Settings -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="其他"
+                android:text="@string/other"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                 android:textColor="?attr/colorPrimary" />
 
@@ -509,7 +509,7 @@
                     android:orientation="vertical"
                     android:padding="4dp">
 
-                    <!-- 关于 -->
+                    <!-- About -->
                     <LinearLayout
                         android:id="@+id/layoutAbout"
                         android:layout_width="match_parent"
@@ -538,14 +538,14 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="关于应用"
+                                android:text="@string/about_app"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                                 android:textColor="?attr/colorOnSurface" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="版本信息和开发者"
+                                android:text="@string/version_info_and_developer"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -559,7 +559,7 @@
 
                     </LinearLayout>
 
-                    <!-- 隐私政策 -->
+                    <!-- Privacy Policy -->
                     <LinearLayout
                         android:id="@+id/layoutPrivacy"
                         android:layout_width="match_parent"
@@ -588,14 +588,14 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="隐私政策"
+                                android:text="@string/privacy_policy"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                                 android:textColor="?attr/colorOnSurface" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="查看隐私政策和条款"
+                                android:text="@string/view_privacy_policy_and_terms"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                 android:textColor="?attr/colorOnSurfaceVariant" />
 

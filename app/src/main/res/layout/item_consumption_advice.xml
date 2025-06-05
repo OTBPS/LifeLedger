@@ -37,7 +37,7 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="?attr/colorOnSurface"
-                    tools:text="控制娱乐支出" />
+                    tools:text="Control Entertainment Expenses" />
 
                 <TextView
                     android:id="@+id/textAdvicePriority"
@@ -48,7 +48,7 @@
                     android:background="@drawable/bg_rounded_corner"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="2dp"
-                    tools:text="优先级：1" />
+                    tools:text="Priority: 1" />
 
             </LinearLayout>
 
@@ -61,7 +61,7 @@
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:lineSpacingExtra="2dp"
                 android:layout_marginBottom="8dp"
-                tools:text="建议减少每月在娱乐方面的支出，可以选择更经济的娱乐方式，如在家看电影、户外运动等。" />
+                tools:text="Suggest reducing monthly entertainment expenses by choosing more economical entertainment options, such as watching movies at home or outdoor activities." />
 
             <!-- 预期效果 -->
             <TextView
@@ -74,7 +74,7 @@
                 android:drawablePadding="4dp"
                 app:drawableStartCompat="@drawable/ic_target"
                 app:drawableTint="?attr/colorPrimary"
-                tools:text="预期效果：每月可节省500-800元" />
+                tools:text="Expected Effect: Save 500-800 yuan per month" />
 
             <!-- 难度 -->
             <LinearLayout
@@ -94,7 +94,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="执行难度："
+                    android:text="@string/execution_difficulty"
                     android:textSize="12sp"
                     android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -107,7 +107,7 @@
                     android:background="@drawable/bg_rounded_corner"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="2dp"
-                    tools:text="中等" />
+                    tools:text="Medium" />
 
             </LinearLayout>
 

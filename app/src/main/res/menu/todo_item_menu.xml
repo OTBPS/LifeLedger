@@ -4,21 +4,21 @@
     <item
         android:id="@+id/action_edit"
         android:icon="@drawable/ic_edit"
-        android:title="编辑" />
+        android:title="@string/edit_task_menu" />
     
     <item
         android:id="@+id/action_toggle_completion"
         android:icon="@drawable/ic_check_circle"
-        android:title="切换完成状态" />
+        android:title="@string/toggle_completion_status" />
     
     <item
         android:id="@+id/action_duplicate"
         android:icon="@drawable/ic_copy"
-        android:title="复制" />
+        android:title="@string/copy_task" />
     
     <item
         android:id="@+id/action_delete"
         android:icon="@drawable/ic_delete"
-        android:title="删除" />
+        android:title="@string/delete_task" />
     
 </menu> 

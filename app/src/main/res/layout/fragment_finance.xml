@@ -47,7 +47,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="16dp"
-                                android:text="财务概览"
+                                android:text="@string/finance_overview"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                                 android:textColor="?attr/colorOnSurface" />
 
@@ -66,7 +66,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="余额"
+                                        android:text="@string/balance"
                                         android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                         android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -91,7 +91,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="收入"
+                                        android:text="@string/income"
                                         android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                         android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -115,7 +115,7 @@
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="支出"
+                                        android:text="@string/expense"
                                         android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                         android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -137,7 +137,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:text="共0笔交易"
+                                android:text="@string/no_transactions_count"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -160,7 +160,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
                             android:layout_weight="1"
-                            android:text="添加收入"
+                            android:text="@string/add_income"
                             android:textColor="@color/md_theme_success"
                             app:icon="@drawable/ic_add_circle"
                             app:iconTint="@color/md_theme_success"
@@ -174,7 +174,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:layout_weight="1"
-                            android:text="添加支出"
+                            android:text="@string/add_expense"
                             android:textColor="@color/md_theme_error"
                             app:icon="@drawable/ic_remove_circle"
                             app:iconTint="@color/md_theme_error"
@@ -197,7 +197,7 @@
                             android:layout_marginBottom="8dp"
                             android:background="?attr/colorSurface"
                             app:iconifiedByDefault="false"
-                            app:queryHint="搜索交易记录..." />
+                            app:queryHint="@string/search_transactions_hint" />
 
                         <!-- 筛选标签和日期范围 -->
                         <LinearLayout
@@ -220,25 +220,25 @@
                                     style="@style/Widget.MaterialComponents.Chip.Filter"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="全部" />
+                                    android:text="@string/all" />
 
                                 <com.google.android.material.chip.Chip
                                     android:id="@+id/chipIncome"
                                     style="@style/Widget.MaterialComponents.Chip.Filter"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="收入" />
+                                    android:text="@string/income" />
 
                                 <com.google.android.material.chip.Chip
                                     android:id="@+id/chipExpense"
                                     style="@style/Widget.MaterialComponents.Chip.Filter"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="支出" />
+                                    android:text="@string/expense" />
 
                             </com.google.android.material.chip.ChipGroup>
 
-                            <!-- 日期范围选择 -->
+                            <!-- Date range selection -->
                             <TextView
                                 android:id="@+id/textViewDateRange"
                                 android:layout_width="wrap_content"
@@ -249,7 +249,7 @@
                                 android:clickable="true"
                                 android:focusable="true"
                                 android:padding="8dp"
-                                android:text="本月"
+                                android:text="@string/this_month"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
                                 android:textColor="?attr/colorPrimary"
                                 app:drawableEndCompat="@drawable/ic_chevron_right" />
@@ -258,16 +258,16 @@
 
                     </LinearLayout>
 
-                    <!-- 交易记录列表标题 -->
+                    <!-- Transaction record list title -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
-                        android:text="交易记录"
+                        android:text="@string/transaction_records"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                         android:textColor="?attr/colorOnSurface" />
 
-                    <!-- 交易记录列表 -->
+                    <!-- Transaction record list -->
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recyclerViewTransactions"
                         android:layout_width="match_parent"
@@ -276,7 +276,7 @@
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         tools:listitem="@layout/item_transaction" />
 
-                    <!-- 空状态视图 -->
+                    <!-- Empty state view -->
                     <LinearLayout
                         android:id="@+id/layoutEmpty"
                         android:layout_width="match_parent"
@@ -298,7 +298,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="暂无交易记录"
+                            android:text="@string/no_transactions"
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -306,7 +306,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="点击下方按钮开始记账"
+                            android:text="@string/click_to_start_recording"
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -318,14 +318,14 @@
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-        <!-- 浮动操作按钮 -->
+        <!-- Floating action button -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabAdd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
-            android:contentDescription="添加交易记录"
+            android:contentDescription="@string/add_transaction_record"
             app:srcCompat="@drawable/ic_add"
             app:tint="?attr/colorOnPrimary" />
 

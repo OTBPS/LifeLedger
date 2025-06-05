@@ -33,7 +33,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="AI智能分析"
+                        android:text="@string/ai_smart_analysis"
                         android:textSize="24sp"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnSurface" />
@@ -43,7 +43,7 @@
                         style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="用户设置"
+                        android:text="@string/user_settings"
                         app:icon="@drawable/ic_person" />
 
                 </LinearLayout>
@@ -67,7 +67,7 @@
                         android:id="@+id/buttonFullAnalysis"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="一键智能分析"
+                        android:text="@string/one_click_smart_analysis"
                         android:textSize="16sp"
                         app:icon="@drawable/ic_analytics"
                         android:layout_marginBottom="8dp" />
@@ -83,7 +83,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="支出分析"
+                            android:text="@string/expense_analysis"
                             app:icon="@drawable/ic_analytics"
                             android:layout_marginEnd="4dp" />
 
@@ -93,7 +93,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="月度报告"
+                            android:text="@string/ai_analysis_report"
                             app:icon="@drawable/ic_report"
                             android:layout_marginStart="4dp"
                             android:layout_marginEnd="4dp" />
@@ -104,7 +104,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="个性建议"
+                            android:text="@string/smart_recommendations"
                             app:icon="@drawable/ic_lightbulb"
                             android:layout_marginStart="4dp" />
 
@@ -131,7 +131,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="💡 智能支出分析"
+                            android:text="💡 Smart Expense Analysis"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="?attr/colorPrimary"
@@ -144,7 +144,7 @@
                             android:textSize="14sp"
                             android:lineSpacingExtra="4dp"
                             android:layout_marginBottom="8dp"
-                            tools:text="分析总结..." />
+                            tools:text="Analysis Summary..." />
 
                         <View
                             android:layout_width="match_parent"
@@ -155,7 +155,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="📊 支出结构分析"
+                            android:text="📊 Expense Structure Analysis"
                             android:textStyle="bold"
                             android:layout_marginBottom="4dp" />
 
@@ -165,12 +165,12 @@
                             android:layout_height="wrap_content"
                             android:textSize="14sp"
                             android:layout_marginBottom="8dp"
-                            tools:text="结构分析..." />
+                            tools:text="Structure Analysis..." />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="🎯 消费习惯评估"
+                            android:text="🎯 Consumption Habit Assessment"
                             android:textStyle="bold"
                             android:layout_marginBottom="4dp" />
 
@@ -180,12 +180,12 @@
                             android:layout_height="wrap_content"
                             android:textSize="14sp"
                             android:layout_marginBottom="8dp"
-                            tools:text="习惯评估..." />
+                            tools:text="Habit Assessment..." />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="⚠️ 潜在问题识别"
+                            android:text="⚠️ Potential Problem Identification"
                             android:textStyle="bold"
                             android:layout_marginBottom="4dp" />
 
@@ -195,12 +195,12 @@
                             android:layout_height="wrap_content"
                             android:textSize="14sp"
                             android:layout_marginBottom="8dp"
-                            tools:text="问题识别..." />
+                            tools:text="Problem Identification..." />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="💡 优化建议"
+                            android:text="💡 Optimization Suggestions"
                             android:textStyle="bold"
                             android:layout_marginBottom="4dp" />
 
@@ -210,16 +210,17 @@
                             android:layout_height="wrap_content"
                             android:textSize="14sp"
                             android:layout_marginBottom="8dp"
-                            tools:text="优化建议..." />
+                            tools:text="Optimization Suggestions..." />
 
                         <TextView
                             android:id="@+id/textAnalysisTime"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
                             android:textSize="12sp"
-                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textColor="@color/text_secondary"
                             android:gravity="end"
-                            tools:text="分析时间：2024-01-01 12:00" />
+                            tools:text="Generated: 2024-01-01 12:00" />
 
                     </LinearLayout>
 
@@ -245,12 +246,12 @@
                             android:id="@+id/textReportTitle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="📊 月度财务报告"
+                            android:text="📊 Monthly Financial Report"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="?attr/colorPrimary"
                             android:layout_marginBottom="12dp"
-                            tools:text="2024年1月财务报告" />
+                            tools:text="2024 January Financial Report" />
 
                         <TextView
                             android:id="@+id/textReportSummary"
@@ -259,7 +260,7 @@
                             android:textSize="14sp"
                             android:textStyle="bold"
                             android:layout_marginBottom="8dp"
-                            tools:text="报告摘要..." />
+                            tools:text="Report Summary..." />
 
                         <TextView
                             android:id="@+id/textReportContent"
@@ -268,16 +269,17 @@
                             android:textSize="14sp"
                             android:lineSpacingExtra="4dp"
                             android:layout_marginBottom="8dp"
-                            tools:text="详细报告内容..." />
+                            tools:text="Detailed Report Content..." />
 
                         <TextView
                             android:id="@+id/textReportTime"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
                             android:textSize="12sp"
-                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textColor="@color/text_secondary"
                             android:gravity="end"
-                            tools:text="生成时间：2024-01-01 12:00" />
+                            tools:text="Generated: 2024-01-01 12:00" />
 
                     </LinearLayout>
 
@@ -294,7 +296,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="🎯 个性化消费建议"
+                        android:text="🎯 Personalized Consumption Advice"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="?attr/colorPrimary"
@@ -329,7 +331,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="点击上方按钮开始AI智能分析"
+                        android:text="@string/ai_analysis_description"
                         android:textSize="16sp"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:gravity="center" />
@@ -337,7 +339,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="基于您的财务数据，AI将为您提供专业的分析和建议"
+                        android:text="@string/ai_analysis_description"
                         android:textSize="14sp"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:gravity="center"

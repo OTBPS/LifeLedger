@@ -7,7 +7,7 @@ import com.example.life_ledger.data.model.Transaction
 import kotlinx.coroutines.flow.Flow
 
 /**
- * 财务交易数据仓库
+ * 财务数据仓库
  * 封装Transaction相关的数据访问逻辑
  */
 class TransactionRepository(

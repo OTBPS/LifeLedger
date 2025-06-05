@@ -46,25 +46,25 @@ data class Transaction(
     val description: String? = null,
     
     @ColumnInfo(name = "tags")
-    val tags: String? = null, // JSON格式存储标签列表
+    val tags: String? = null,
     
     @ColumnInfo(name = "date")
-    val date: Long, // 交易日期时间戳
+    val date: Long,
     
     @ColumnInfo(name = "location")
-    val location: String? = null, // 交易地点
+    val location: String? = null,
     
     @ColumnInfo(name = "paymentMethod")
     val paymentMethod: PaymentMethod = PaymentMethod.CASH,
     
     @ColumnInfo(name = "isRecurring")
-    val isRecurring: Boolean = false, // 是否为定期交易
+    val isRecurring: Boolean = false,
     
     @ColumnInfo(name = "recurringInterval")
-    val recurringInterval: String? = null, // 定期间隔 (MONTHLY, WEEKLY等)
+    val recurringInterval: String? = null,
     
     @ColumnInfo(name = "attachments")
-    val attachments: String? = null, // 附件路径，JSON格式
+    val attachments: String? = null,
     
     @ColumnInfo(name = "createdAt")
     val createdAt: Long = System.currentTimeMillis(),
@@ -73,7 +73,7 @@ data class Transaction(
     val updatedAt: Long = System.currentTimeMillis()
 ) {
     /**
-     * 交易类型枚举
+     * 交易类型
      */
     enum class TransactionType {
         INCOME,   // 收入
@@ -81,15 +81,11 @@ data class Transaction(
     }
     
     /**
-     * 支付方式枚举
+     * 支付方式
      */
     enum class PaymentMethod {
         CASH,           // 现金
-        CREDIT_CARD,    // 信用卡
-        DEBIT_CARD,     // 借记卡
-        BANK_TRANSFER,  // 银行转账
-        MOBILE_PAY,     // 移动支付
-        OTHER           // 其他
+
     }
     
     /**

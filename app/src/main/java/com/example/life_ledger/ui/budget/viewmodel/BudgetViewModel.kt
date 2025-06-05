@@ -258,13 +258,13 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
                 repository.updateBudgetSpent(budgetId, spentAmount)
                 
             } catch (e: Exception) {
-                _error.value = "更新预算花费失败: ${e.message}"
+                _error.value = "Update budget spending failed: ${e.message}"
             }
         }
     }
     
     /**
-     * 设置搜索查询
+     * Set search query
      */
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
@@ -272,7 +272,7 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
     }
     
     /**
-     * 设置周期筛选
+     * Set period filter
      */
     fun setFilterPeriod(period: Budget.BudgetPeriod?) {
         _filterPeriod.value = period
@@ -280,7 +280,7 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
     }
     
     /**
-     * 设置状态筛选
+     * Set status filter
      */
     fun setFilterStatus(status: BudgetFilterStatus?) {
         _filterStatus.value = status
@@ -288,7 +288,7 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
     }
     
     /**
-     * 清除所有筛选
+     * Clear all filters
      */
     fun clearFilters() {
         _filterPeriod.value = null
@@ -298,12 +298,12 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
     }
     
     /**
-     * 应用筛选条件
+     * Apply filter conditions
      */
     private fun applyFilters(budgets: List<Budget>): List<Budget> {
         var filtered = budgets
         
-        // 应用搜索查询
+        // Apply search query
         if (_searchQuery.value.isNotBlank()) {
             filtered = filtered.filter { budget ->
                 budget.name.contains(_searchQuery.value, ignoreCase = true) ||
@@ -311,12 +311,12 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
         
-        // 应用周期筛选
+        // Apply period filter
         _filterPeriod.value?.let { period ->
             filtered = filtered.filter { it.period == period }
         }
         
-        // 应用状态筛选
+        // Apply status filter
         _filterStatus.value?.let { status ->
             filtered = when (status) {
                 BudgetFilterStatus.ACTIVE -> filtered.filter { it.isActive && !it.isExpired() }
@@ -389,13 +389,13 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
                 _budgetOverview.value = overview
                 
             } catch (e: Exception) {
-                _error.value = "更新预算统计失败: ${e.message}"
+                _error.value = "Update budget statistics failed: ${e.message}"
             }
         }
     }
     
     /**
-     * 获取预算建议
+     * Get budget recommendations
      */
     fun getBudgetRecommendations(): List<String> {
         val recommendations = mutableListOf<String>()
@@ -406,18 +406,18 @@ class BudgetViewModel(application: Application) : AndroidViewModel(application) 
             
             when {
                 it.overspentCount > 0 -> {
-                    recommendations.add("您有${it.overspentCount}个预算超支，建议调整支出计划")
+                    recommendations.add("You have ${it.overspentCount} overspent budgets, consider adjusting spending plan")
                 }
                 usageRate > 80 -> {
-                    recommendations.add("预算使用率较高，请谨慎消费")
+                    recommendations.add("Budget usage rate is high, please spend carefully")
                 }
                 usageRate < 50 -> {
-                    recommendations.add("预算使用率较低，可以适当增加支出或调整预算")
+                    recommendations.add("Budget usage rate is low, consider increasing spending or adjusting budget")
                 }
             }
             
             if (it.totalCount == 0) {
-                recommendations.add("建议创建预算来管理您的支出")
+                recommendations.add("Consider creating budgets to manage your expenses")
             }
         }
         

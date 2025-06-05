@@ -140,7 +140,6 @@ abstract class BaseFragment<DB : ViewDataBinding, VM : ViewModel> : Fragment() {
      * 刷新数据
      */
     protected open fun refreshData() {
-        // 子类可以重写此方法实现数据刷新
     }
     
     /**

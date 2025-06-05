@@ -20,7 +20,7 @@ data class UserSettings(
     val id: String = UUID.randomUUID().toString(),
     
     @ColumnInfo(name = "userId")
-    val userId: String = "default_user", // 用户ID，支持多用户
+    val userId: String = "default_user",
     
     // 外观设置
     @ColumnInfo(name = "theme")
@@ -105,17 +105,17 @@ data class UserSettings(
     
     @ColumnInfo(name = "showCompletedTodos")
     val showCompletedTodos: Boolean = true, // 显示已完成待办
-    
+
     // 安全设置
     @ColumnInfo(name = "enableBiometric")
     val enableBiometric: Boolean = false, // 生物识别
-    
+
     @ColumnInfo(name = "enablePinLock")
     val enablePinLock: Boolean = false, // PIN码锁定
-    
+
     @ColumnInfo(name = "autoLockDuration")
     val autoLockDuration: Int = 300, // 自动锁定时间（秒）
-    
+
     @ColumnInfo(name = "enableDataBackup")
     val enableDataBackup: Boolean = true, // 数据备份
     

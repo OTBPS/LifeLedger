@@ -95,12 +95,12 @@ class CategoryManagementViewModel(
                 repository.insertCategory(category)
                 _operationResult.value = OperationResult(
                     isSuccess = true,
-                    message = "分类添加成功"
+                    message = "Category added successfully"
                 )
             } catch (e: Exception) {
                 _operationResult.value = OperationResult(
                     isSuccess = false,
-                    message = "添加失败: ${e.message}"
+                    message = "Add failed: ${e.message}"
                 )
             }
         }
@@ -115,12 +115,12 @@ class CategoryManagementViewModel(
                 repository.updateCategory(category)
                 _operationResult.value = OperationResult(
                     isSuccess = true,
-                    message = "分类更新成功"
+                    message = "Classification update successful"
                 )
             } catch (e: Exception) {
                 _operationResult.value = OperationResult(
                     isSuccess = false,
-                    message = "更新失败: ${e.message}"
+                    message = "Update failed: ${e.message}"
                 )
             }
         }
@@ -135,12 +135,12 @@ class CategoryManagementViewModel(
                 repository.deleteCategory(category)
                 _operationResult.value = OperationResult(
                     isSuccess = true,
-                    message = "分类删除成功"
+                    message = "Category deleted successfully"
                 )
             } catch (e: Exception) {
                 _operationResult.value = OperationResult(
                     isSuccess = false,
-                    message = "删除失败: ${e.message}"
+                    message = "Delete failed: ${e.message}"
                 )
             }
         }
@@ -156,12 +156,12 @@ class CategoryManagementViewModel(
                 repository.updateCategory(updatedCategory)
                 _operationResult.value = OperationResult(
                     isSuccess = true,
-                    message = if (updatedCategory.isActive) "分类已启用" else "分类已禁用"
+                    message = if (updatedCategory.isActive) "Classification enabled" else "Classification disabled"
                 )
             } catch (e: Exception) {
                 _operationResult.value = OperationResult(
                     isSuccess = false,
-                    message = "操作失败: ${e.message}"
+                    message = "operation failed: ${e.message}"
                 )
             }
         }

@@ -14,7 +14,7 @@ import com.google.android.material.textfield.TextInputEditText
 
 /**
  * 添加/编辑分类对话框
- * 简化版本，只包含基本的名称输入
+ * 包含基本的名称输入
  */
 class AddEditCategoryDialog : DialogFragment() {
 
@@ -44,14 +44,14 @@ class AddEditCategoryDialog : DialogFragment() {
         }
 
         return MaterialAlertDialogBuilder(requireContext())
-            .setTitle(if (editingCategory != null) "编辑分类" else "添加分类")
+            .setTitle(if (editingCategory != null) getString(R.string.edit_category_title) else getString(R.string.add_category_title))
             .setView(view)
-            .setPositiveButton("保存") { _, _ ->
+            .setPositiveButton(getString(R.string.save)) { _, _ ->
                 val name = editCategoryName.text.toString().trim()
                 val description = editCategoryDescription.text.toString().trim()
 
                 if (name.isEmpty()) {
-                    Snackbar.make(view, "请输入分类名称", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(view, getString(R.string.please_enter_category_name), Snackbar.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
 
@@ -76,7 +76,7 @@ class AddEditCategoryDialog : DialogFragment() {
                     onCategoryAddedListener?.invoke(newCategory)
                 }
             }
-            .setNegativeButton("取消", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .create()
     }
 

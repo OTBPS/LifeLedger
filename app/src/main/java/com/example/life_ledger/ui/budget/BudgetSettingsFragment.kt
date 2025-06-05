@@ -110,12 +110,12 @@ class BudgetSettingsFragment : Fragment() {
         
         // 导出预算数据
         binding.btnExportBudgets.setOnClickListener {
-            showMessage("导出功能开发中")
+            showMessage("Export function development in progress")
         }
         
         // 导入预算数据
         binding.btnImportBudgets.setOnClickListener {
-            showMessage("导入功能开发中")
+            showMessage("Importing functionality in development")
         }
         
         // 清理过期预算
@@ -134,34 +134,34 @@ class BudgetSettingsFragment : Fragment() {
     
     private fun showResetAllBudgetsConfirmation() {
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("重置所有预算")
-            .setMessage("确定要重置所有预算的花费金额吗？此操作不可撤销。")
-            .setPositiveButton("重置") { _, _ ->
+            .setTitle("Reset all budgets")
+            .setMessage("Are you sure you want to reset the spending amounts for all budgets?")
+            .setPositiveButton("Reset") { _, _ ->
                 resetAllBudgets()
             }
-            .setNegativeButton("取消", null)
+            .setNegativeButton("Cancel", null)
             .show()
     }
     
     private fun showCleanExpiredBudgetsConfirmation() {
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("清理过期预算")
-            .setMessage("确定要删除所有已过期的预算吗？此操作不可撤销。")
-            .setPositiveButton("删除") { _, _ ->
+            .setTitle("Clean up expired budgets")
+            .setMessage("Are you sure you want to delete all expired budgets?。")
+            .setPositiveButton("Delete") { _, _ ->
                 cleanExpiredBudgets()
             }
-            .setNegativeButton("取消", null)
+            .setNegativeButton("Cancel", null)
             .show()
     }
     
     private fun resetAllBudgets() {
         // TODO: 实现重置所有预算功能
-        showMessage("重置功能开发中")
+        showMessage("Reset function is under development")
     }
     
     private fun cleanExpiredBudgets() {
         // TODO: 实现清理过期预算功能
-        showMessage("清理功能开发中")
+        showMessage("Cleaning function development in progress")
     }
     
     private fun showMessage(message: String) {

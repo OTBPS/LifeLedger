@@ -86,51 +86,55 @@
     <color name="text_on_primary">@color/md_theme_on_primary</color>
     <color name="text_on_primary_container">@color/md_theme_on_primary_container</color>
     
-    <!-- AI功能相关颜色 -->
-    <!-- 优先级背景颜色 -->
+    <!-- AI feature related colors -->
+    <!-- Priority background colors -->
+    <color name="priority_high_bg">#FFEBEE</color>
     <color name="priority_high_background">#FFEBEE</color>
     <color name="priority_high_border">#F44336</color>
-    <color name="priority_medium_background">#FFF8E1</color>
+    <color name="priority_medium_bg">#FFF3E0</color>
+    <color name="priority_medium_background">#FFF3E0</color>
     <color name="priority_medium_border">#FF9800</color>
+    <color name="priority_low_bg">#E8F5E8</color>
     <color name="priority_low_background">#E8F5E8</color>
     <color name="priority_low_border">#4CAF50</color>
+    <color name="priority_urgent_bg">#FCE4EC</color>
     
-    <!-- 状态指示颜色 -->
+    <!-- Status indicator colors -->
+    <color name="status_completed">#4CAF50</color>
+    <color name="status_pending">#FF9800</color>
+    <color name="status_overdue">#F44336</color>
     <color name="success_color">#4CAF50</color>
     <color name="warning_color">#FF9800</color>
     <color name="error_color">#F44336</color>
     
-    <!-- 自定义主题颜色 - 蓝色主题 -->
-    <color name="theme_blue_primary">#1976D2</color>
-    <color name="theme_blue_on_primary">#FFFFFF</color>
-    <color name="theme_blue_primary_container">#BBDEFB</color>
-    <color name="theme_blue_on_primary_container">#0D47A1</color>
-    <color name="theme_blue_secondary">#1565C0</color>
-    <color name="theme_blue_on_secondary">#FFFFFF</color>
-    <color name="theme_blue_secondary_container">#E3F2FD</color>
-    <color name="theme_blue_on_secondary_container">#0D47A1</color>
+    <!-- Custom theme colors - Blue theme -->
+    <color name="blue_primary">#2196F3</color>
+    <color name="blue_primary_variant">#1976D2</color>
+    <color name="blue_secondary">#03DAC6</color>
+    <color name="blue_secondary_variant">#018786</color>
+    <color name="blue_surface">#FFFFFF</color>
+    <color name="blue_background">#FAFAFA</color>
+    <color name="blue_error">#B00020</color>
     
-    <!-- 自定义主题颜色 - 紫色主题 -->
-    <color name="theme_purple_primary">#7B1FA2</color>
-    <color name="theme_purple_on_primary">#FFFFFF</color>
-    <color name="theme_purple_primary_container">#E1BEE7</color>
-    <color name="theme_purple_on_primary_container">#4A148C</color>
-    <color name="theme_purple_secondary">#8E24AA</color>
-    <color name="theme_purple_on_secondary">#FFFFFF</color>
-    <color name="theme_purple_secondary_container">#F3E5F5</color>
-    <color name="theme_purple_on_secondary_container">#4A148C</color>
+    <!-- Custom theme colors - Purple theme -->
+    <color name="purple_primary">#9C27B0</color>
+    <color name="purple_primary_variant">#7B1FA2</color>
+    <color name="purple_secondary">#03DAC6</color>
+    <color name="purple_secondary_variant">#018786</color>
+    <color name="purple_surface">#FFFFFF</color>
+    <color name="purple_background">#FAFAFA</color>
+    <color name="purple_error">#B00020</color>
     
-    <!-- 自定义主题颜色 - 橙色主题 -->
-    <color name="theme_orange_primary">#F57C00</color>
-    <color name="theme_orange_on_primary">#FFFFFF</color>
-    <color name="theme_orange_primary_container">#FFE0B2</color>
-    <color name="theme_orange_on_primary_container">#E65100</color>
-    <color name="theme_orange_secondary">#FF9800</color>
-    <color name="theme_orange_on_secondary">#FFFFFF</color>
-    <color name="theme_orange_secondary_container">#FFF3E0</color>
-    <color name="theme_orange_on_secondary_container">#E65100</color>
+    <!-- Custom theme colors - Orange theme -->
+    <color name="orange_primary">#FF9800</color>
+    <color name="orange_primary_variant">#F57C00</color>
+    <color name="orange_secondary">#03DAC6</color>
+    <color name="orange_secondary_variant">#018786</color>
+    <color name="orange_surface">#FFFFFF</color>
+    <color name="orange_background">#FAFAFA</color>
+    <color name="orange_error">#B00020</color>
     
-    <!-- 自定义主题颜色 - 红色主题 -->
+    <!-- Custom theme colors - Red theme -->
     <color name="theme_red_primary">#D32F2F</color>
     <color name="theme_red_on_primary">#FFFFFF</color>
     <color name="theme_red_primary_container">#FFCDD2</color>
@@ -140,7 +144,7 @@
     <color name="theme_red_secondary_container">#FFEBEE</color>
     <color name="theme_red_on_secondary_container">#B71C1C</color>
     
-    <!-- 自定义主题颜色 - 青色主题 -->
+    <!-- Custom theme colors - Teal theme -->
     <color name="theme_teal_primary">#00796B</color>
     <color name="theme_teal_on_primary">#FFFFFF</color>
     <color name="theme_teal_primary_container">#B2DFDB</color>
@@ -150,7 +154,7 @@
     <color name="theme_teal_secondary_container">#E0F2F1</color>
     <color name="theme_teal_on_secondary_container">#004D40</color>
     
-    <!-- 自定义主题颜色 - 粉色主题 -->
+    <!-- Custom theme colors - Pink theme -->
     <color name="theme_pink_primary">#C2185B</color>
     <color name="theme_pink_on_primary">#FFFFFF</color>
     <color name="theme_pink_primary_container">#F8BBD9</color>

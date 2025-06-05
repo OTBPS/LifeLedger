@@ -8,7 +8,7 @@ object AppConstants {
     
     // 数据库相关常量
     object Database {
-        const val NAME = "life_ledger_db_v2"  // 修改数据库名称以创建全新数据库
+        const val NAME = "life_ledger_english_v3"  // 进一步修改数据库名称以确保完全重新创建
         const val VERSION = 1  // 重置版本号
         
         // 表名
@@ -26,10 +26,10 @@ object AppConstants {
     // 网络请求相关常量
     object Network {
         const val BASE_URL = "https://api.deepseek.com/"
-        const val API_KEY = "sk-7b6e2e43870740758764e747e76aae2d"
-        const val CONNECT_TIMEOUT = 30L
-        const val READ_TIMEOUT = 30L
-        const val WRITE_TIMEOUT = 30L
+        const val API_KEY = "sk-9768cad21634408e96417658f0d5a054"
+        const val CONNECT_TIMEOUT = 60L  // 增加连接超时到60秒
+        const val READ_TIMEOUT = 120L    // 增加读取超时到120秒（AI分析需要更长时间）
+        const val WRITE_TIMEOUT = 60L    // 增加写入超时到60秒
     }
     
     // SharedPreferences相关常量

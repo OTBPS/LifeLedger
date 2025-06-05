@@ -5,67 +5,69 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/financeFragment">
 
-    <!-- 财务管理页面 -->
+    <!-- Finance management page -->
     <fragment
         android:id="@+id/financeFragment"
         android:name="com.example.life_ledger.ui.finance.FinanceFragment"
-        android:label="@string/nav_finance"
+        android:label="@string/title_finance"
         tools:layout="@layout/fragment_finance">
         <action
             android:id="@+id/action_financeFragment_to_addEditTransactionFragment"
             app:destination="@id/addEditTransactionFragment" />
+        <action
+            android:id="@+id/action_financeFragment_to_categoryManagerFragment"
+            app:destination="@id/categoryManagerFragment" />
     </fragment>
 
-    <!-- 添加/编辑交易记录页面 -->
+    <!-- Add/Edit transaction record page -->
     <fragment
         android:id="@+id/addEditTransactionFragment"
         android:name="com.example.life_ledger.ui.finance.AddEditTransactionFragment"
-        android:label="添加记录"
+        android:label="Add Record"
         tools:layout="@layout/fragment_add_edit_transaction">
         <argument
             android:name="transactionId"
-            android:defaultValue=""
-            app:argType="string" />
-        <action
-            android:id="@+id/action_addEditTransactionFragment_to_categoryManagementFragment"
-            app:destination="@id/categoryManagementFragment" />
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
 
-    <!-- 分类管理页面 -->
+    <!-- Category management page -->
     <fragment
-        android:id="@+id/categoryManagementFragment"
-        android:name="com.example.life_ledger.ui.finance.CategoryManagementFragment"
-        android:label="分类管理"
-        tools:layout="@layout/fragment_category_management" />
+        android:id="@+id/categoryManagerFragment"
+        android:name="com.example.life_ledger.ui.category.CategoryManagerFragment"
+        android:label="Category Management"
+        tools:layout="@layout/fragment_category_manager" />
 
-    <!-- 待办事项页面 -->
+    <!-- Todo page -->
     <fragment
         android:id="@+id/todoFragment"
         android:name="com.example.life_ledger.ui.todo.TodoFragment"
-        android:label="@string/nav_todo"
+        android:label="@string/title_todo"
         tools:layout="@layout/fragment_todo">
         <action
             android:id="@+id/action_todoFragment_to_addEditTodoFragment"
             app:destination="@id/addEditTodoFragment" />
     </fragment>
 
-    <!-- 添加/编辑待办事项页面 -->
+    <!-- Add/Edit todo item page -->
     <fragment
         android:id="@+id/addEditTodoFragment"
         android:name="com.example.life_ledger.ui.todo.AddEditTodoFragment"
-        android:label="添加任务"
+        android:label="Add Task"
         tools:layout="@layout/fragment_add_edit_todo">
         <argument
             android:name="todoId"
-            android:defaultValue=""
-            app:argType="string" />
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
 
-    <!-- 预算管理页面 -->
+    <!-- Budget management page -->
     <fragment
         android:id="@+id/budgetFragment"
         android:name="com.example.life_ledger.ui.budget.BudgetFragment"
-        android:label="@string/nav_budget"
+        android:label="@string/title_budget"
         tools:layout="@layout/fragment_budget">
         <action
             android:id="@+id/action_budgetFragment_to_budgetAnalysisFragment"
@@ -75,21 +77,21 @@
             app:destination="@id/budgetSettingsFragment" />
     </fragment>
 
-    <!-- 预算分析页面 -->
+    <!-- Budget analysis page -->
     <fragment
         android:id="@+id/budgetAnalysisFragment"
         android:name="com.example.life_ledger.ui.budget.BudgetAnalysisFragment"
-        android:label="预算分析"
+        android:label="Budget Analysis"
         tools:layout="@layout/fragment_budget_analysis" />
 
-    <!-- 预算设置页面 -->
+    <!-- Budget settings page -->
     <fragment
         android:id="@+id/budgetSettingsFragment"
         android:name="com.example.life_ledger.ui.budget.BudgetSettingsFragment"
-        android:label="预算设置"
+        android:label="Budget Settings"
         tools:layout="@layout/fragment_budget_settings" />
 
-    <!-- 统计分析页面 -->
+    <!-- Statistics and analysis page -->
     <fragment
         android:id="@+id/statisticsFragment"
         android:name="com.example.life_ledger.ui.statistics.StatisticsFragment"
@@ -100,14 +102,14 @@
             app:destination="@id/aiAnalysisFragment" />
     </fragment>
 
-    <!-- AI分析页面 -->
+    <!-- AI analysis page -->
     <fragment
         android:id="@+id/aiAnalysisFragment"
         android:name="com.example.life_ledger.ui.ai.AIAnalysisFragment"
-        android:label="AI智能分析"
+        android:label="@string/ai_smart_analysis"
         tools:layout="@layout/fragment_ai_analysis" />
 
-    <!-- 设置页面 -->
+    <!-- Settings page -->
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.life_ledger.ui.settings.SettingsFragment"

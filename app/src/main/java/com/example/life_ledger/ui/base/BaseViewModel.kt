@@ -92,7 +92,7 @@ abstract class BaseViewModel : ViewModel() {
             is java.net.UnknownHostException -> "网络连接失败，请检查网络设置"
             is java.net.SocketTimeoutException -> "网络连接超时，请重试"
             is java.net.ConnectException -> "无法连接到服务器，请稍后重试"
-            is kotlinx.coroutines.CancellationException -> return // 协程被取消，不处理
+            is kotlinx.coroutines.CancellationException -> return
             else -> exception.message ?: "未知错误"
         }
         showError(errorMessage)

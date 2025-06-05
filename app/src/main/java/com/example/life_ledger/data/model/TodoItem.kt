@@ -92,10 +92,10 @@ data class TodoItem(
      * 优先级枚举
      */
     enum class Priority(val value: Int, val displayName: String) {
-        LOW(1, "低"),
-        MEDIUM(2, "中"),
-        HIGH(3, "高"),
-        URGENT(4, "紧急")
+        LOW(1, "Low"),
+        MEDIUM(2, "Medium"),
+        HIGH(3, "High"),
+        URGENT(4, "Urgent")
     }
     
     /**
@@ -164,11 +164,11 @@ data class TodoItem(
         
         val remaining = dueDate - System.currentTimeMillis()
         return when {
-            remaining < 0 -> "已过期"
-            remaining < 60 * 60 * 1000 -> "1小时内"
-            remaining < 24 * 60 * 60 * 1000 -> "${remaining / (60 * 60 * 1000)}小时后"
-            remaining < 7 * 24 * 60 * 60 * 1000 -> "${remaining / (24 * 60 * 60 * 1000)}天后"
-            else -> "超过1周"
+            remaining < 0 -> "Overdue"
+            remaining < 60 * 60 * 1000 -> "Within 1 hour"
+            remaining < 24 * 60 * 60 * 1000 -> "${remaining / (60 * 60 * 1000)} hours left"
+            remaining < 7 * 24 * 60 * 60 * 1000 -> "${remaining / (24 * 60 * 60 * 1000)} days left"
+            else -> "Over 1 week"
         }
     }
     
@@ -221,7 +221,7 @@ data class TodoItem(
         return this.copy(
             progress = validProgress,
             isCompleted = validProgress == 100,
-            completedAt = if (validProgress == 100) System.currentTimeMillis() else completedAt,
+            completedAt = if (validProgress == 100) System.currentTimeMillis() else null,
             updatedAt = System.currentTimeMillis()
         )
     }

@@ -23,8 +23,8 @@ import java.text.NumberFormat
 import java.util.*
 
 /**
- * 财务管理主页面
- * 显示财务概览、交易记录列表和快捷操作
+ * Finance Management Main Page
+ * Displays financial overview, transaction record list and quick actions
  */
 class FinanceFragment : Fragment() {
 
@@ -57,7 +57,7 @@ class FinanceFragment : Fragment() {
     }
 
     /**
-     * 初始化ViewModel
+     * Initialize ViewModel
      */
     private fun setupViewModel() {
         try {
@@ -66,32 +66,40 @@ class FinanceFragment : Fragment() {
             val factory = FinanceViewModelFactory(repository)
             viewModel = ViewModelProvider(this, factory)[FinanceViewModel::class.java]
         } catch (e: Exception) {
-            // 如果ViewModel初始化失败，显示错误消息
+            // If ViewModel initialization fails, show error message
             Snackbar.make(
                 binding.root,
-                "初始化失败: ${e.message}",
+                "Initialization failed: ${e.message}",
                 Snackbar.LENGTH_LONG
             ).show()
             
-            // 记录错误日志
+            // Log error
             android.util.Log.e("FinanceFragment", "ViewModel initialization failed", e)
         }
     }
 
     /**
-     * 设置RecyclerView
+     * Setup RecyclerView
      */
     private fun setupRecyclerView() {
         transactionAdapter = TransactionListAdapter(
             onItemClick = { transaction ->
-                // 导航到编辑页面
-                val action = FinanceFragmentDirections
-                    .actionFinanceFragmentToAddEditTransactionFragment(transaction.id)
-                findNavController().navigate(action)
+                // Navigate to edit page with lifecycle check
+                if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                    try {
+                        val action = FinanceFragmentDirections
+                            .actionFinanceFragmentToAddEditTransactionFragment(transaction.id)
+                        findNavController().navigate(action)
+                    } catch (e: Exception) {
+                        android.util.Log.e("FinanceFragment", "Error navigating to edit transaction", e)
+                    }
+                }
             },
             onItemLongClick = { transaction ->
-                // 显示删除确认对话框
-                showDeleteConfirmDialog(transaction)
+                // Show delete confirmation dialog with lifecycle check
+                if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                    showDeleteConfirmDialog(transaction)
+                }
             }
         )
         
@@ -102,41 +110,60 @@ class FinanceFragment : Fragment() {
     }
 
     /**
-     * 设置点击监听器
+     * Setup click listeners
      */
     private fun setupClickListeners() {
         binding.apply {
-            // 添加收入快捷按钮 - 使用快速记录对话框
+            // Add income quick button - use quick record dialog
             buttonQuickIncome.setOnClickListener {
-                showQuickTransactionDialog(Transaction.TransactionType.INCOME)
+                if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                    showQuickTransactionDialog(Transaction.TransactionType.INCOME)
+                }
             }
 
-            // 添加支出快捷按钮 - 使用快速记录对话框
+            // Add expense quick button - use quick record dialog
             buttonQuickExpense.setOnClickListener {
-                showQuickTransactionDialog(Transaction.TransactionType.EXPENSE)
+                if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                    showQuickTransactionDialog(Transaction.TransactionType.EXPENSE)
+                }
             }
 
-            // 浮动操作按钮 - 导航到完整的添加页面
+            // Floating action button - navigate to complete add page
             fabAdd.setOnClickListener {
-                val action = FinanceFragmentDirections
-                    .actionFinanceFragmentToAddEditTransactionFragment("")
-                findNavController().navigate(action)
+                if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                    try {
+                        val action = FinanceFragmentDirections
+                            .actionFinanceFragmentToAddEditTransactionFragment("")
+                        findNavController().navigate(action)
+                    } catch (e: Exception) {
+                        android.util.Log.e("FinanceFragment", "Error navigating to add transaction", e)
+                    }
+                }
             }
 
-            // 下拉刷新
+            // Pull to refresh
             swipeRefreshLayout.setOnRefreshListener {
-                viewModel.refresh()
+                if (isAdded && !isDetached && ::viewModel.isInitialized && activity != null && activity?.isFinishing != true) {
+                    try {
+                        viewModel.refresh()
+                    } catch (e: Exception) {
+                        android.util.Log.e("FinanceFragment", "Error refreshing data", e)
+                        swipeRefreshLayout.isRefreshing = false
+                    }
+                }
             }
 
-            // 日期范围选择
+            // Date range selection
             textViewDateRange.setOnClickListener {
-                showDateRangeDialog()
+                if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                    showDateRangeDialog()
+                }
             }
         }
     }
 
     /**
-     * 设置搜索功能
+     * Setup search functionality
      */
     private fun setupSearchView() {
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -145,54 +172,66 @@ class FinanceFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                viewModel.searchTransactions(newText ?: "")
+                if (isAdded && !isDetached && ::viewModel.isInitialized && activity != null && activity?.isFinishing != true) {
+                    try {
+                        viewModel.searchTransactions(newText ?: "")
+                    } catch (e: Exception) {
+                        android.util.Log.e("FinanceFragment", "Error searching transactions", e)
+                    }
+                }
                 return true
             }
         })
 
-        // 搜索提示
-        binding.searchView.queryHint = "搜索标题、备注或标签"
+        // Search hint
+        binding.searchView.queryHint = getString(R.string.search_transactions_hint)
     }
 
     /**
-     * 设置筛选标签
+     * Setup filter chips
      */
     private fun setupFilterChips() {
         binding.chipGroupFilter.setOnCheckedStateChangeListener { _, checkedIds ->
-            val filter = when (checkedIds.firstOrNull()) {
-                R.id.chipAll -> FilterOption.ALL
-                R.id.chipIncome -> FilterOption.INCOME
-                R.id.chipExpense -> FilterOption.EXPENSE
-                else -> FilterOption.ALL
+            if (isAdded && !isDetached && ::viewModel.isInitialized && activity != null && activity?.isFinishing != true) {
+                try {
+                    val filter = when (checkedIds.firstOrNull()) {
+                        R.id.chipAll -> FilterOption.ALL
+                        R.id.chipIncome -> FilterOption.INCOME
+                        R.id.chipExpense -> FilterOption.EXPENSE
+                        else -> FilterOption.ALL
+                    }
+                    viewModel.setFilter(filter)
+                } catch (e: Exception) {
+                    android.util.Log.e("FinanceFragment", "Error setting filter", e)
+                }
             }
-            viewModel.setFilter(filter)
         }
     }
 
     /**
-     * 设置数据观察者
+     * Setup data observers
      */
     private fun setupObservers() {
-        // 观察交易记录列表
+        // Observe transaction record list
         viewModel.filteredTransactions.observe(viewLifecycleOwner) { transactions ->
             transactionAdapter.submitList(transactions)
             updateEmptyState(transactions.isEmpty())
         }
 
-        // 观察财务统计数据
+        // Observe financial statistics data
         viewModel.financialSummary.observe(viewLifecycleOwner) { summary ->
             updateFinancialSummary(summary)
         }
 
-        // 观察加载状态
+        // Observe loading state
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.swipeRefreshLayout.isRefreshing = isLoading
         }
 
-        // 观察操作结果
+        // Observe operation results
         viewModel.operationResult.observe(viewLifecycleOwner) { result ->
             result?.let {
-                val message = if (it.isSuccess) it.message else "操作失败: ${it.message}"
+                val message = if (it.isSuccess) it.message else getString(R.string.operation_failed) + ": ${it.message}"
                 Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
                 viewModel.clearOperationResult()
             }
@@ -200,7 +239,7 @@ class FinanceFragment : Fragment() {
     }
 
     /**
-     * 更新财务统计显示
+     * Update financial statistics display
      */
     private fun updateFinancialSummary(summary: FinancialSummary) {
         binding.apply {
@@ -208,7 +247,7 @@ class FinanceFragment : Fragment() {
             textViewIncome.text = numberFormat.format(summary.totalIncome)
             textViewExpense.text = numberFormat.format(summary.totalExpense)
             
-            // 根据余额设置颜色
+            // Set color based on balance
             val balanceColor = if (summary.balance >= 0) {
                 requireContext().getColor(R.color.md_theme_success)
             } else {
@@ -216,13 +255,13 @@ class FinanceFragment : Fragment() {
             }
             textViewBalance.setTextColor(balanceColor)
             
-            // 更新交易数量
-            textViewTransactionCount.text = "共${summary.transactionCount}笔交易"
+            // Update transaction count
+            textViewTransactionCount.text = getString(R.string.no_transactions_count).format(summary.transactionCount)
         }
     }
 
     /**
-     * 更新空状态显示
+     * Update empty state display
      */
     private fun updateEmptyState(isEmpty: Boolean) {
         binding.apply {
@@ -237,63 +276,152 @@ class FinanceFragment : Fragment() {
     }
 
     /**
-     * 显示删除确认对话框
+     * Show delete confirmation dialog
      */
     private fun showDeleteConfirmDialog(transaction: Transaction) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("确认删除")
-            .setMessage("确定要删除这条${if (transaction.type == Transaction.TransactionType.INCOME) "收入" else "支出"}记录吗？")
-            .setPositiveButton("删除") { _, _ ->
-                viewModel.deleteTransaction(transaction)
+        // 检查Fragment生命周期状态
+        if (!isAdded || isDetached || activity == null || activity?.isFinishing == true) {
+            android.util.Log.w("FinanceFragment", "Fragment not active, cannot show delete confirmation dialog")
+            return
+        }
+
+        try {
+            val messageRes = if (transaction.type == Transaction.TransactionType.INCOME) {
+                R.string.delete_income_record
+            } else {
+                R.string.delete_expense_record
             }
-            .setNegativeButton("取消", null)
-            .show()
+            
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.confirm_delete)
+                .setMessage(messageRes)
+                .setPositiveButton(R.string.delete) { _, _ ->
+                    // 检查Fragment状态后再删除
+                    if (isAdded && !isDetached && ::viewModel.isInitialized && activity != null && activity?.isFinishing != true) {
+                        try {
+                            viewModel.deleteTransaction(transaction)
+                        } catch (e: Exception) {
+                            android.util.Log.e("FinanceFragment", "Error deleting transaction", e)
+                            if (isAdded && view != null) {
+                                Snackbar.make(binding.root, "Delete failed: ${e.message}", Snackbar.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
+        } catch (e: Exception) {
+            android.util.Log.e("FinanceFragment", "Error showing delete confirmation dialog", e)
+        }
     }
 
     /**
-     * 显示快速交易对话框
+     * Show quick transaction dialog
      */
     private fun showQuickTransactionDialog(type: Transaction.TransactionType) {
-        val dialog = QuickTransactionDialog.newInstance(type)
-        dialog.setOnTransactionAddedListener { transaction ->
-            viewModel.addTransaction(transaction)
+        // 检查Fragment生命周期状态，确保安全显示Dialog
+        if (!isAdded || isDetached || activity == null || activity?.isFinishing == true) {
+            android.util.Log.w("FinanceFragment", "Fragment not active, cannot show QuickTransactionDialog")
+            return
         }
-        dialog.show(parentFragmentManager, "QuickTransactionDialog")
+
+        try {
+            val dialog = QuickTransactionDialog.newInstance(type)
+            dialog.setOnTransactionAddedListener { transaction ->
+                // 再次检查Fragment状态，确保安全调用ViewModel
+                if (isAdded && !isDetached && ::viewModel.isInitialized && activity != null && activity?.isFinishing != true) {
+                    try {
+                        viewModel.addTransaction(transaction)
+                        android.util.Log.d("FinanceFragment", "Transaction added successfully via QuickRecord")
+                    } catch (e: Exception) {
+                        android.util.Log.e("FinanceFragment", "Error adding transaction", e)
+                        // 如果添加失败，显示错误信息
+                        if (isAdded && view != null) {
+                            Snackbar.make(binding.root, getString(R.string.save_failed_format, e.message), Snackbar.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    android.util.Log.w("FinanceFragment", "Fragment not active when transaction callback invoked")
+                }
+            }
+            
+            // 使用parentFragmentManager显示Dialog，并检查FragmentManager状态
+            if (!parentFragmentManager.isStateSaved && !parentFragmentManager.isDestroyed) {
+                dialog.show(parentFragmentManager, "QuickTransactionDialog")
+                android.util.Log.d("FinanceFragment", "QuickTransactionDialog shown successfully")
+            } else {
+                android.util.Log.w("FinanceFragment", "FragmentManager not ready, cannot show dialog")
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("FinanceFragment", "Error showing QuickTransactionDialog", e)
+            // 显示友好的错误信息
+            if (isAdded && view != null) {
+                Snackbar.make(binding.root, "Unable to open quick record dialog", Snackbar.LENGTH_SHORT).show()
+            }
+        }
     }
 
     /**
-     * 显示日期范围选择对话框
+     * Show date range selection dialog
      */
     private fun showDateRangeDialog() {
-        val options = arrayOf("今天", "本周", "本月", "今年", "全部")
-        val currentSelection = when (viewModel.getCurrentDateRange()) {
-            DateRange.TODAY -> 0
-            DateRange.THIS_WEEK -> 1
-            DateRange.THIS_MONTH -> 2
-            DateRange.THIS_YEAR -> 3
-            DateRange.ALL -> 4
+        // 检查Fragment生命周期状态
+        if (!isAdded || isDetached || activity == null || activity?.isFinishing == true || !::viewModel.isInitialized) {
+            android.util.Log.w("FinanceFragment", "Fragment not active, cannot show date range dialog")
+            return
         }
 
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("选择日期范围")
-            .setSingleChoiceItems(options, currentSelection) { dialog, which ->
-                val dateRange = when (which) {
-                    0 -> DateRange.TODAY
-                    1 -> DateRange.THIS_WEEK
-                    2 -> DateRange.THIS_MONTH
-                    3 -> DateRange.THIS_YEAR
-                    else -> DateRange.ALL
-                }
-                viewModel.setDateRange(dateRange)
-                binding.textViewDateRange.text = options[which]
-                dialog.dismiss()
+        try {
+            val options = arrayOf(
+                getString(R.string.today), 
+                getString(R.string.this_week), 
+                getString(R.string.this_month), 
+                getString(R.string.this_year), 
+                getString(R.string.all)
+            )
+            val currentSelection = when (viewModel.getCurrentDateRange()) {
+                DateRange.TODAY -> 0
+                DateRange.THIS_WEEK -> 1
+                DateRange.THIS_MONTH -> 2
+                DateRange.THIS_YEAR -> 3
+                DateRange.ALL -> 4
             }
-            .show()
+
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.select_date_range)
+                .setSingleChoiceItems(options, currentSelection) { dialog, which ->
+                    // 检查Fragment状态后再设置日期范围
+                    if (isAdded && !isDetached && ::viewModel.isInitialized && activity != null && activity?.isFinishing != true) {
+                        try {
+                            val dateRange = when (which) {
+                                0 -> DateRange.TODAY
+                                1 -> DateRange.THIS_WEEK
+                                2 -> DateRange.THIS_MONTH
+                                3 -> DateRange.THIS_YEAR
+                                else -> DateRange.ALL
+                            }
+                            viewModel.setDateRange(dateRange)
+                            if (view != null) {
+                                binding.textViewDateRange.text = options[which]
+                            }
+                            dialog.dismiss()
+                        } catch (e: Exception) {
+                            android.util.Log.e("FinanceFragment", "Error setting date range", e)
+                            dialog.dismiss()
+                        }
+                    } else {
+                        dialog.dismiss()
+                    }
+                }
+                .show()
+        } catch (e: Exception) {
+            android.util.Log.e("FinanceFragment", "Error showing date range dialog", e)
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        // 在Fragment可见时刷新数据，确保从AddEditTransactionFragment返回时能看到最新数据
+        // Refresh data when Fragment becomes visible, ensuring latest data is shown when returning from AddEditTransactionFragment
         if (::viewModel.isInitialized) {
             viewModel.refresh()
         }
@@ -306,7 +434,7 @@ class FinanceFragment : Fragment() {
 
     companion object {
         /**
-         * 创建FinanceFragment实例
+         * Create FinanceFragment instance
          */
         @JvmStatic
         fun newInstance() = FinanceFragment()
@@ -314,7 +442,7 @@ class FinanceFragment : Fragment() {
 }
 
 /**
- * FinanceViewModel工厂类
+ * FinanceViewModel Factory Class
  */
 class FinanceViewModelFactory(
     private val repository: TransactionRepository
@@ -329,11 +457,11 @@ class FinanceViewModelFactory(
 }
 
 /**
- * 排序选项枚举
+ * Sort option enumeration
  */
 enum class SortOrder {
-    AMOUNT_ASC,    // 金额升序
-    AMOUNT_DESC,   // 金额降序
-    DATE_ASC,      // 日期升序
-    DATE_DESC      // 日期降序
+    AMOUNT_ASC,    // Amount ascending
+    AMOUNT_DESC,   // Amount descending
+    DATE_ASC,      // Date ascending
+    DATE_DESC      // Date descending
 } 

@@ -48,7 +48,7 @@ class UserProfileDialog : DialogFragment() {
 
     private fun setupViews() {
         // 设置收入水平下拉框
-        val incomeLevels = arrayOf("较低", "中等", "较高", "很高")
+        val incomeLevels = arrayOf("Low", "Medium", "High", "Very High")
         val incomeAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
@@ -58,7 +58,7 @@ class UserProfileDialog : DialogFragment() {
         binding.spinnerIncomeLevel.adapter = incomeAdapter
         
         // 设置理财目标选项
-        val financialGoals = arrayOf("储蓄", "理财", "投资", "还贷", "购房", "购车", "教育", "养老")
+        val financialGoals = arrayOf("Savings", "Investment", "Financing", "Debt Repayment", "Home Purchase", "Car Purchase", "Education", "Retirement")
         
         financialGoals.forEach { goal ->
             val chip = Chip(requireContext())
@@ -85,7 +85,7 @@ class UserProfileDialog : DialogFragment() {
             editTextAge.setText(currentProfile.age.toString())
             
             // 设置收入水平
-            val incomeLevels = arrayOf("较低", "中等", "较高", "很高")
+            val incomeLevels = arrayOf("Low", "Medium", "High", "Very High")
             val incomeIndex = incomeLevels.indexOf(currentProfile.incomeLevel)
             if (incomeIndex >= 0) {
                 spinnerIncomeLevel.setSelection(incomeIndex)
@@ -120,7 +120,7 @@ class UserProfileDialog : DialogFragment() {
             val updatedProfile = UserProfile(
                 age = age.coerceIn(18, 100),
                 incomeLevel = incomeLevel,
-                financialGoals = selectedGoals.ifEmpty { listOf("储蓄") }
+                financialGoals = selectedGoals.ifEmpty { listOf("Savings") }
             )
             
             onProfileUpdated?.invoke(updatedProfile)
@@ -128,7 +128,7 @@ class UserProfileDialog : DialogFragment() {
             
         } catch (e: Exception) {
             // 处理异常，显示错误信息
-            binding.editTextAge.error = "请输入有效的年龄"
+            binding.editTextAge.error = "Please enter a valid age"
         }
     }
 

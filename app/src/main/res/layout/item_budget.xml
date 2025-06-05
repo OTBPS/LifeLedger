@@ -140,7 +140,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="预算金额"
+                    android:text="@string/budget_amount"
                     android:textSize="12sp"
                     android:textColor="@color/text_secondary" />
 
@@ -165,7 +165,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="已花费"
+                    android:text="@string/spent"
                     android:textSize="12sp"
                     android:textColor="@color/text_secondary" />
 
@@ -190,7 +190,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="剩余"
+                    android:text="@string/remaining"
                     android:textSize="12sp"
                     android:textColor="@color/text_secondary" />
 
@@ -265,7 +265,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:text="剩余:"
+                android:text="@string/remaining_colon"
                 android:textSize="12sp"
                 android:textColor="@color/text_secondary" />
 
@@ -290,17 +290,16 @@
                 android:layout_height="32dp"
                 android:src="@drawable/ic_edit"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="编辑预算"
+                android:contentDescription="@string/edit_budget"
                 app:tint="@color/primary" />
 
             <ImageButton
                 android:id="@+id/btnDelete"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:layout_marginStart="8dp"
                 android:src="@drawable/ic_delete"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="删除预算"
+                android:contentDescription="@string/delete_budget"
                 app:tint="@color/error" />
 
         </LinearLayout>

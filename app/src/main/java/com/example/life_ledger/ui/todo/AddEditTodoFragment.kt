@@ -70,7 +70,7 @@ class AddEditTodoFragment : Fragment() {
             setupObservers()
             loadTodoIfEditing()
         } catch (e: Exception) {
-            Snackbar.make(binding.root, "初始化失败: ${e.message}", Snackbar.LENGTH_LONG).show()
+            Snackbar.make(binding.root, getString(R.string.initialization_failed, e.message), Snackbar.LENGTH_LONG).show()
             parentFragmentManager.popBackStack()
         }
     }
@@ -112,7 +112,7 @@ class AddEditTodoFragment : Fragment() {
     private fun setupUI() {
         try {
             // 设置标题
-            binding.toolbar.title = if (todoId.isEmpty()) "添加任务" else "编辑任务"
+            binding.toolbar.title = if (todoId.isEmpty()) getString(R.string.add_task) else getString(R.string.edit_task)
             
             // 设置分类下拉列表
             setupCategorySpinner()
@@ -124,7 +124,7 @@ class AddEditTodoFragment : Fragment() {
             binding.sliderProgress.value = 0f
             updateProgressText(0)
         } catch (e: Exception) {
-            Snackbar.make(binding.root, "UI初始化失败: ${e.message}", Snackbar.LENGTH_LONG).show()
+            Snackbar.make(binding.root, getString(R.string.ui_initialization_failed, e.message), Snackbar.LENGTH_LONG).show()
         }
     }
 
@@ -133,7 +133,15 @@ class AddEditTodoFragment : Fragment() {
      */
     private fun setupCategorySpinner() {
         try {
-            val categories = listOf("工作", "学习", "生活", "娱乐", "运动", "购物", "其他")
+            val categories = listOf(
+                getString(R.string.category_work), 
+                getString(R.string.category_study), 
+                getString(R.string.category_life), 
+                getString(R.string.category_entertainment_todo), 
+                getString(R.string.category_sports), 
+                getString(R.string.category_shopping_todo), 
+                getString(R.string.category_other_todo)
+            )
             val adapter = ArrayAdapter(
                 requireContext(),
                 android.R.layout.simple_spinner_item,
@@ -193,11 +201,16 @@ class AddEditTodoFragment : Fragment() {
 
                 // 保存按钮
                 buttonSave.setOnClickListener {
+                    // 检查Fragment是否还活跃
+                    if (!isAdded || isDetached || activity == null || activity?.isFinishing == true || _binding == null) {
+                        android.util.Log.w("AddEditTodoFragment", "Fragment not active, cannot save")
+                        return@setOnClickListener
+                    }
                     saveTodo()
                 }
             }
         } catch (e: Exception) {
-            Snackbar.make(binding.root, "设置监听器失败: ${e.message}", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, getString(R.string.setup_listeners_failed, e.message), Snackbar.LENGTH_SHORT).show()
         }
     }
 
@@ -209,16 +222,30 @@ class AddEditTodoFragment : Fragment() {
             // 观察操作结果
             lifecycleScope.launch {
                 viewModel.operationResult.collect { result ->
+                    if (!isAdded || _binding == null) {
+                        return@collect
+                    }
+                    
                     if (result.isSuccess) {
                         Snackbar.make(binding.root, result.message, Snackbar.LENGTH_SHORT).show()
-                        parentFragmentManager.popBackStack()
+                        // 安全返回
+                        try {
+                            if (isAdded && !isDetached) {
+                                parentFragmentManager.popBackStack()
+                            }
+                        } catch (e: Exception) {
+                            android.util.Log.e("AddEditTodoFragment", "Navigation failed", e)
+                            activity?.finish()
+                        }
                     } else {
-                        Snackbar.make(binding.root, "操作失败: ${result.message}", Snackbar.LENGTH_LONG).show()
+                        Snackbar.make(binding.root, "Operation failed: ${result.message}", Snackbar.LENGTH_LONG).show()
                     }
                 }
             }
         } catch (e: Exception) {
-            Snackbar.make(binding.root, "设置观察者失败: ${e.message}", Snackbar.LENGTH_SHORT).show()
+            if (isAdded && _binding != null) {
+                Snackbar.make(binding.root, "Setup observers failed: ${e.message}", Snackbar.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -253,7 +280,7 @@ class AddEditTodoFragment : Fragment() {
             try {
                 val categoryAdapter = spinnerCategory.adapter as? ArrayAdapter<String>
                 if (categoryAdapter != null) {
-                    val categoryPosition = categoryAdapter.getPosition(todo.categoryId ?: "其他")
+                    val categoryPosition = categoryAdapter.getPosition(todo.categoryId ?: getString(R.string.category_other_todo))
                     if (categoryPosition >= 0) {
                         spinnerCategory.setSelection(categoryPosition)
                     }
@@ -295,28 +322,52 @@ class AddEditTodoFragment : Fragment() {
      * 显示日期时间选择器
      */
     private fun showDateTimePicker(onDateTimeSelected: (Calendar) -> Unit) {
-        val calendar = Calendar.getInstance()
-        
-        DatePickerDialog(
-            requireContext(),
-            { _, year, month, dayOfMonth ->
-                TimePickerDialog(
-                    requireContext(),
-                    { _, hourOfDay, minute ->
-                        val selectedDate = Calendar.getInstance().apply {
-                            set(year, month, dayOfMonth, hourOfDay, minute, 0)
-                        }
-                        onDateTimeSelected(selectedDate)
-                    },
-                    calendar.get(Calendar.HOUR_OF_DAY),
-                    calendar.get(Calendar.MINUTE),
-                    true
-                ).show()
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
+        // 检查Fragment是否还活跃
+        if (!isAdded || isDetached || activity == null || activity?.isFinishing == true) {
+            android.util.Log.w("AddEditTodoFragment", "Fragment not active, cannot show date picker")
+            return
+        }
+
+        try {
+            val calendar = Calendar.getInstance()
+            val context = requireContext()
+            
+            val datePickerDialog = DatePickerDialog(
+                context,
+                { _, year, month, dayOfMonth ->
+                    // 再次检查Fragment状态
+                    if (!isAdded || isDetached || activity == null || activity?.isFinishing == true) {
+                        return@DatePickerDialog
+                    }
+                    
+                    TimePickerDialog(
+                        context,
+                        { _, hourOfDay, minute ->
+                            val selectedDate = Calendar.getInstance().apply {
+                                set(year, month, dayOfMonth, hourOfDay, minute, 0)
+                            }
+                            onDateTimeSelected(selectedDate)
+                        },
+                        calendar.get(Calendar.HOUR_OF_DAY),
+                        calendar.get(Calendar.MINUTE),
+                        true
+                    ).show()
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
+            
+            // 再次检查Fragment状态，然后显示
+            if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                datePickerDialog.show()
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("AddEditTodoFragment", "Error showing date picker", e)
+            if (isAdded && _binding != null) {
+                Snackbar.make(binding.root, "Unable to show date picker", Snackbar.LENGTH_SHORT).show()
+            }
+        }
     }
 
     /**
@@ -362,19 +413,25 @@ class AddEditTodoFragment : Fragment() {
      * 保存待办事项
      */
     private fun saveTodo() {
+        // 检查Fragment是否还活跃
+        if (!isAdded || isDetached || activity == null || activity?.isFinishing == true || _binding == null) {
+            android.util.Log.w("AddEditTodoFragment", "Fragment not active, cannot save")
+            return
+        }
+        
         val title = binding.editTitle.text.toString().trim()
         if (title.isEmpty()) {
-            Snackbar.make(binding.root, "请输入任务标题", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, getString(R.string.please_enter_task_title), Snackbar.LENGTH_SHORT).show()
             return
         }
 
         val description = binding.editDescription.text.toString().trim()
         
         // 从Spinner获取分类，如果失败则使用默认值
-        val category = try {
-            binding.spinnerCategory.selectedItem?.toString() ?: "其他"
-        } catch (e: Exception) {
-            "其他"
+        val category = if (binding.spinnerCategory.adapter != null) {
+            binding.spinnerCategory.selectedItem?.toString() ?: getString(R.string.category_other_todo)
+        } else {
+            getString(R.string.category_other_todo)
         }
         
         // 从ChipGroup获取优先级
@@ -430,7 +487,7 @@ class AddEditTodoFragment : Fragment() {
                 viewModel.addTodo(todo)
             }
         } catch (e: Exception) {
-            Snackbar.make(binding.root, "保存失败: ${e.message}", Snackbar.LENGTH_LONG).show()
+            Snackbar.make(binding.root, getString(R.string.operation_failed_with_message, e.message), Snackbar.LENGTH_LONG).show()
         }
     }
 

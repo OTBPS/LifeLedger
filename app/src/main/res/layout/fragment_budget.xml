@@ -14,7 +14,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="预算管理"
+            app:title="@string/budget_management"
             app:titleTextColor="@color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -52,7 +52,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="预算概览"
+                            android:text="@string/budget_execution"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:layout_marginBottom="12dp" />
@@ -83,7 +83,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="总预算"
+                                    android:text="@string/budget_amount"
                                     android:textSize="12sp"
                                     android:textColor="@color/text_secondary" />
 
@@ -108,7 +108,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="活跃"
+                                    android:text="@string/normal"
                                     android:textSize="12sp"
                                     android:textColor="@color/text_secondary" />
 
@@ -133,7 +133,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="超支"
+                                    android:text="@string/overspent"
                                     android:textSize="12sp"
                                     android:textColor="@color/text_secondary" />
 
@@ -157,7 +157,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="使用率"
+                                    android:text="@string/budget_progress"
                                     android:textSize="12sp"
                                     android:textColor="@color/text_secondary" />
 
@@ -190,7 +190,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="总预算"
+                                    android:text="@string/budget_amount"
                                     android:textSize="12sp"
                                     android:textColor="@color/text_secondary" />
 
@@ -213,7 +213,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="已花费"
+                                    android:text="@string/spent"
                                     android:textSize="12sp"
                                     android:textColor="@color/text_secondary" />
 
@@ -237,7 +237,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="剩余"
+                                    android:text="@string/remaining"
                                     android:textSize="12sp"
                                     android:textColor="@color/text_secondary" />
 
@@ -271,7 +271,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
-                        android:text="预算分析"
+                        android:text="@string/smart_analysis_report"
                         app:icon="@drawable/ic_analytics"
                         style="@style/Widget.Material3.Button.OutlinedButton" />
 
@@ -281,7 +281,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="8dp"
-                        android:text="预算设置"
+                        android:text="@string/set_budget"
                         app:icon="@drawable/ic_settings"
                         style="@style/Widget.Material3.Button.OutlinedButton" />
 
@@ -316,7 +316,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="还没有预算"
+                        android:text="@string/no_budget_yet"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
@@ -324,7 +324,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="24dp"
-                        android:text="创建预算来管理您的支出"
+                        android:text="@string/create_budget_to_manage"
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
@@ -332,7 +332,7 @@
                         android:id="@+id/btnAddFirstBudget"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="创建第一个预算"
+                        android:text="@string/create_first_budget"
                         app:icon="@drawable/ic_add" />
 
                 </LinearLayout>
@@ -358,7 +358,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:contentDescription="添加预算"
+        android:contentDescription="@string/add_budget"
         app:srcCompat="@drawable/ic_add" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout> 

@@ -44,28 +44,28 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checked="true"
-                            android:text="全部" />
+                            android:text="@string/all_tasks" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chipPending"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="待完成" />
+                            android:text="@string/pending_tasks" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chipCompleted"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="已完成" />
+                            android:text="@string/completed_tasks" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chipHighPriority"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="高优先级" />
+                            android:text="@string/high_priority_tasks" />
 
                     </com.google.android.material.chip.ChipGroup>
 
@@ -96,7 +96,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="今日任务"
+                                android:text="@string/today_tasks"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -121,7 +121,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="待完成"
+                                android:text="@string/pending"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -145,7 +145,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="已完成"
+                                android:text="@string/completed"
                                 android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -195,7 +195,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="暂无待办事项"
+                        android:text="@string/no_todos"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                         android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -203,7 +203,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="点击下方按钮添加任务"
+                        android:text="@string/click_to_add_task"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                         android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -220,7 +220,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
-            android:contentDescription="添加待办事项"
+            android:contentDescription="@string/add_task"
             app:srcCompat="@drawable/ic_add"
             app:tint="?attr/colorOnPrimary" />
 

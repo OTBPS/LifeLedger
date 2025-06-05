@@ -40,7 +40,7 @@ class AddEditBudgetDialog : DialogFragment() {
     
     private var selectedPeriod: Budget.BudgetPeriod = Budget.BudgetPeriod.MONTHLY
     
-    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
     
     companion object {
         private const val ARG_BUDGET_ID = "budget_id"
@@ -134,7 +134,7 @@ class AddEditBudgetDialog : DialogFragment() {
     
     private fun setupViews() {
         // 设置标题
-        binding.tvTitle.text = if (currentBudget != null) "编辑预算" else "创建预算"
+        binding.tvTitle.text = if (currentBudget != null) getString(R.string.edit_budget_title) else getString(R.string.create_budget)
         
         // 设置周期选择器
         setupPeriodSpinner()
@@ -168,7 +168,7 @@ class AddEditBudgetDialog : DialogFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             budgetViewModel.successMessage.collect { message ->
                 message?.let {
-                    // 重置按钮状态
+                    // Reset button state
                     resetButtonState()
                     dismiss()
                 }
@@ -177,7 +177,7 @@ class AddEditBudgetDialog : DialogFragment() {
         
         budgetViewModel.error.observe(viewLifecycleOwner) { message ->
             message?.let {
-                // 重置按钮状态
+                // Reset button state
                 resetButtonState()
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
             }
@@ -187,45 +187,45 @@ class AddEditBudgetDialog : DialogFragment() {
     private fun resetButtonState() {
         binding.btnSave.apply {
             isEnabled = true
-            text = if (currentBudget != null) "更新" else "保存"
+            text = if (currentBudget != null) getString(R.string.update) else getString(R.string.save)
         }
         binding.btnCancel.isEnabled = true
     }
     
     private fun setupClickListeners() {
-        // 取消按钮 - 添加防重复点击
+        // Cancel button - add prevent double tap
         binding.btnCancel.setOnClickListener {
-            it.isEnabled = false  // 临时禁用按钮
+            it.isEnabled = false  // Temporarily disable button
             dismiss()
         }
         
-        // 保存按钮 - 添加防重复点击和加载状态
+        // Save button - add prevent double tap and loading state
         binding.btnSave.setOnClickListener {
             if (it.isEnabled && validateInput()) {
-                it.isEnabled = false  // 防止重复点击
-                binding.btnSave.text = "保存中..."
+                it.isEnabled = false  // Prevent double tap
+                binding.btnSave.text = getString(R.string.saving)
                 saveBudget()
             }
         }
         
-        // 警告阈值滑动条
+        // Alert threshold slider
         binding.sliderAlertThreshold.addOnChangeListener { _, value, _ ->
             binding.tvAlertThreshold.text = "${value.toInt()}%"
         }
         
-        // 周期选择监听
+        // Period selection listener
         binding.spinnerPeriod.setOnItemClickListener { _, _, position, _ ->
             selectedPeriod = Budget.BudgetPeriod.values()[position]
         }
         
-        // 分类选择监听
+        // Category selection listener
         binding.spinnerCategory.setOnItemClickListener { _, _, position, _ ->
             selectedCategoryId = if (position == 0) null else categories[position - 1].id
         }
     }
     
     private fun setupCategorySpinner() {
-        val categoryNames = mutableListOf("总预算(不限分类)")
+        val categoryNames = mutableListOf(getString(R.string.total_budget_unlimited_category))
         categoryNames.addAll(categories.map { it.name })
         
         categoryAdapter = ArrayAdapter(
@@ -258,7 +258,7 @@ class AddEditBudgetDialog : DialogFragment() {
                 if (categoryPosition >= 0) categoryPosition + 1 else 0
             }
             if (categoryIndex < categories.size + 1) {
-                val categoryName = if (categoryIndex == 0) "总预算(不限分类)" else categories[categoryIndex - 1].name
+                val categoryName = if (categoryIndex == 0) getString(R.string.total_budget_unlimited_category) else categories[categoryIndex - 1].name
                 spinnerCategory.setText(categoryName, false)
                 selectedCategoryId = budget.categoryId
             }
@@ -276,25 +276,25 @@ class AddEditBudgetDialog : DialogFragment() {
     
     private fun validateInput(): Boolean {
         with(binding) {
-            // 预算名称验证
+            // Budget name validation
             val name = etBudgetName.text.toString().trim()
             if (name.isEmpty()) {
-                tilBudgetName.error = "请输入预算名称"
+                tilBudgetName.error = getString(R.string.please_enter_budget_name)
                 return false
             } else {
                 tilBudgetName.error = null
             }
             
-            // 预算金额验证
+            // Budget amount validation
             val amountText = etBudgetAmount.text.toString().trim()
             if (amountText.isEmpty()) {
-                tilBudgetAmount.error = "请输入预算金额"
+                tilBudgetAmount.error = getString(R.string.please_enter_budget_amount)
                 return false
             }
             
             val amount = amountText.toDoubleOrNull()
             if (amount == null || amount <= 0) {
-                tilBudgetAmount.error = "请输入有效的预算金额"
+                tilBudgetAmount.error = getString(R.string.please_enter_valid_budget_amount)
                 return false
             } else {
                 tilBudgetAmount.error = null
@@ -314,7 +314,7 @@ class AddEditBudgetDialog : DialogFragment() {
             val isAlertEnabled = switchAlertEnabled.isChecked
             
             if (currentBudget != null) {
-                // 更新现有预算
+                // Update existing budget
                 val updatedBudget = currentBudget!!.copy(
                     name = name,
                     categoryId = selectedCategoryId,
@@ -327,7 +327,7 @@ class AddEditBudgetDialog : DialogFragment() {
                 )
                 budgetViewModel.updateBudget(updatedBudget)
             } else {
-                // 创建新预算
+                // Create new budget
                 budgetViewModel.createBudget(
                     name = name,
                     categoryId = selectedCategoryId,

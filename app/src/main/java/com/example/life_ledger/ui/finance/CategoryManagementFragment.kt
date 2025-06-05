@@ -148,19 +148,19 @@ class CategoryManagementFragment : Fragment() {
         if (!category.canBeDeleted()) {
             Snackbar.make(
                 binding.root,
-                "系统默认分类不能删除",
+                "The default classification of the system cannot be deleted",
                 Snackbar.LENGTH_SHORT
             ).show()
             return
         }
 
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("确认删除")
-            .setMessage("删除分类「${category.name}」后，相关记录将不再关联该分类。确定要删除吗？")
-            .setPositiveButton("删除") { _, _ ->
+            .setTitle("Confirm deletion")
+            .setMessage("Delete Category「${category.name}」，The relevant records will no longer be associated with this category. Are you sure you want to delete it?")
+            .setPositiveButton("Delete") { _, _ ->
                 viewModel.deleteCategory(category)
             }
-            .setNegativeButton("取消", null)
+            .setNegativeButton("Cancel", null)
             .show()
     }
 

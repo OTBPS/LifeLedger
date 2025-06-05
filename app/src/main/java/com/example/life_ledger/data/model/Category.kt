@@ -236,7 +236,7 @@ data class Category(
             return listOf(
                 // 收入分类
                 Category(
-                    name = "工资收入",
+                    name = "Salary",
                     type = CategoryType.FINANCIAL,
                     subType = FinancialSubType.INCOME,
                     icon = "work",
@@ -246,7 +246,7 @@ data class Category(
                     sortOrder = 1
                 ),
                 Category(
-                    name = "投资收益",
+                    name = "Investment",
                     type = CategoryType.FINANCIAL,
                     subType = FinancialSubType.INCOME,
                     icon = "trending_up",
@@ -256,7 +256,7 @@ data class Category(
                     sortOrder = 2
                 ),
                 Category(
-                    name = "其他收入",
+                    name = "Other Income",
                     type = CategoryType.FINANCIAL,
                     subType = FinancialSubType.INCOME,
                     icon = "attach_money",
@@ -268,7 +268,7 @@ data class Category(
                 
                 // 支出分类
                 Category(
-                    name = "餐饮",
+                    name = "Food & Dining",
                     type = CategoryType.FINANCIAL,
                     subType = FinancialSubType.EXPENSE,
                     icon = "restaurant",
@@ -278,7 +278,7 @@ data class Category(
                     sortOrder = 10
                 ),
                 Category(
-                    name = "交通",
+                    name = "Transportation",
                     type = CategoryType.FINANCIAL,
                     subType = FinancialSubType.EXPENSE,
                     icon = "directions_car",
@@ -288,7 +288,7 @@ data class Category(
                     sortOrder = 11
                 ),
                 Category(
-                    name = "购物",
+                    name = "Shopping",
                     type = CategoryType.FINANCIAL,
                     subType = FinancialSubType.EXPENSE,
                     icon = "shopping_cart",
@@ -298,7 +298,7 @@ data class Category(
                     sortOrder = 12
                 ),
                 Category(
-                    name = "娱乐",
+                    name = "Entertainment",
                     type = CategoryType.FINANCIAL,
                     subType = FinancialSubType.EXPENSE,
                     icon = "movie",
@@ -308,7 +308,7 @@ data class Category(
                     sortOrder = 13
                 ),
                 Category(
-                    name = "医疗",
+                    name = "Healthcare",
                     type = CategoryType.FINANCIAL,
                     subType = FinancialSubType.EXPENSE,
                     icon = "local_hospital",
@@ -318,7 +318,7 @@ data class Category(
                     sortOrder = 14
                 ),
                 Category(
-                    name = "教育",
+                    name = "Education",
                     type = CategoryType.FINANCIAL,
                     subType = FinancialSubType.EXPENSE,
                     icon = "school",
@@ -328,7 +328,7 @@ data class Category(
                     sortOrder = 15
                 ),
                 Category(
-                    name = "其他支出",
+                    name = "Other Expense",
                     type = CategoryType.FINANCIAL,
                     subType = FinancialSubType.EXPENSE,
                     icon = "more_horiz",
@@ -346,7 +346,7 @@ data class Category(
         fun createDefaultTodoCategories(): List<Category> {
             return listOf(
                 Category(
-                    name = "工作",
+                    name = "Work",
                     type = CategoryType.TODO,
                     subType = TodoSubType.WORK,
                     icon = "work",
@@ -356,7 +356,7 @@ data class Category(
                     sortOrder = 1
                 ),
                 Category(
-                    name = "个人",
+                    name = "Personal",
                     type = CategoryType.TODO,
                     subType = TodoSubType.PERSONAL,
                     icon = "person",
@@ -366,7 +366,7 @@ data class Category(
                     sortOrder = 2
                 ),
                 Category(
-                    name = "家庭",
+                    name = "Family",
                     type = CategoryType.TODO,
                     subType = TodoSubType.FAMILY,
                     icon = "home",
@@ -376,7 +376,7 @@ data class Category(
                     sortOrder = 3
                 ),
                 Category(
-                    name = "学习",
+                    name = "Study",
                     type = CategoryType.TODO,
                     subType = TodoSubType.LEARNING,
                     icon = "school",
@@ -386,7 +386,7 @@ data class Category(
                     sortOrder = 4
                 ),
                 Category(
-                    name = "健康",
+                    name = "Health",
                     type = CategoryType.TODO,
                     subType = TodoSubType.HEALTH,
                     icon = "favorite",
@@ -396,7 +396,7 @@ data class Category(
                     sortOrder = 5
                 ),
                 Category(
-                    name = "娱乐",
+                    name = "Entertainment",
                     type = CategoryType.TODO,
                     subType = TodoSubType.ENTERTAINMENT,
                     icon = "sports_esports",

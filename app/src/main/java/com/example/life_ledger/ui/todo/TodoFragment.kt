@@ -124,12 +124,12 @@ class TodoFragment : Fragment() {
             // 长按FAB创建示例数据
             fabAddTodo.setOnLongClickListener {
                 androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                    .setTitle("创建示例数据")
-                    .setMessage("是否创建一些示例待办事项用于演示？")
-                    .setPositiveButton("创建") { _, _ ->
+                    .setTitle(getString(R.string.create_sample_data))
+                    .setMessage(getString(R.string.create_sample_data_message))
+                    .setPositiveButton(getString(R.string.create)) { _, _ ->
                         viewModel.createSampleData()
                     }
-                    .setNegativeButton("取消", null)
+                    .setNegativeButton(getString(R.string.cancel), null)
                     .show()
                 true
             }
@@ -267,27 +267,32 @@ class TodoFragment : Fragment() {
         
         // 标题输入框
         val titleEditText = android.widget.EditText(requireContext()).apply {
-            hint = "请输入任务标题"
+            hint = getString(R.string.enter_task_title_hint)
             setPadding(16, 16, 16, 16)
         }
         
         // 描述输入框
         val descEditText = android.widget.EditText(requireContext()).apply {
-            hint = "任务描述（可选）"
+            hint = getString(R.string.task_description_optional_hint)
             setPadding(16, 16, 16, 16)
             maxLines = 3
         }
         
         // 优先级选择
         val priorityLabel = android.widget.TextView(requireContext()).apply {
-            text = "优先级"
+            text = getString(R.string.priority_label)
             textSize = 16f
             setTypeface(null, android.graphics.Typeface.BOLD)
             setPadding(0, 16, 0, 8)
         }
         
         val prioritySpinner = android.widget.Spinner(requireContext()).apply {
-            val priorities = arrayOf("低", "中", "高", "紧急")
+            val priorities = arrayOf(
+                getString(R.string.priority_low),
+                getString(R.string.priority_medium), 
+                getString(R.string.priority_high),
+                getString(R.string.priority_urgent)
+            )
             val adapter = android.widget.ArrayAdapter(
                 context,
                 android.R.layout.simple_spinner_item,
@@ -300,7 +305,7 @@ class TodoFragment : Fragment() {
         
         // 标签输入框
         val tagsEditText = android.widget.EditText(requireContext()).apply {
-            hint = "标签（用逗号分隔，可选）"
+            hint = getString(R.string.tags_hint_todo_short)
             setPadding(16, 16, 16, 16)
         }
         
@@ -311,9 +316,9 @@ class TodoFragment : Fragment() {
         dialogLayout.addView(tagsEditText)
         
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("添加任务")
+            .setTitle(getString(R.string.add_task))
             .setView(dialogLayout)
-            .setPositiveButton("保存") { _, _ ->
+            .setPositiveButton(getString(R.string.save)) { _, _ ->
                 val title = titleEditText.text.toString().trim()
                 val description = descEditText.text.toString().trim()
                 val tags = tagsEditText.text.toString().trim()
@@ -340,10 +345,10 @@ class TodoFragment : Fragment() {
                     )
                     viewModel.addTodo(todo)
                 } else {
-                    Snackbar.make(binding.root, "请输入任务标题", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, getString(R.string.please_enter_task_title), Snackbar.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("取消", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
 
@@ -360,28 +365,33 @@ class TodoFragment : Fragment() {
         // 标题输入框
         val titleEditText = android.widget.EditText(requireContext()).apply {
             setText(todo.title)
-            hint = "请输入任务标题"
+            hint = getString(R.string.enter_task_title_hint)
             setPadding(16, 16, 16, 16)
         }
         
         // 描述输入框
         val descEditText = android.widget.EditText(requireContext()).apply {
             setText(todo.description ?: "")
-            hint = "任务描述（可选）"
+            hint = getString(R.string.task_description_optional_hint)
             setPadding(16, 16, 16, 16)
             maxLines = 3
         }
         
         // 优先级选择
         val priorityLabel = android.widget.TextView(requireContext()).apply {
-            text = "优先级"
+            text = getString(R.string.priority_label)
             textSize = 16f
             setTypeface(null, android.graphics.Typeface.BOLD)
             setPadding(0, 16, 0, 8)
         }
         
         val prioritySpinner = android.widget.Spinner(requireContext()).apply {
-            val priorities = arrayOf("低", "中", "高", "紧急")
+            val priorities = arrayOf(
+                getString(R.string.priority_low),
+                getString(R.string.priority_medium), 
+                getString(R.string.priority_high),
+                getString(R.string.priority_urgent)
+            )
             val adapter = android.widget.ArrayAdapter(
                 context,
                 android.R.layout.simple_spinner_item,
@@ -400,7 +410,7 @@ class TodoFragment : Fragment() {
         
         // 进度滑块
         val progressLabel = android.widget.TextView(requireContext()).apply {
-            text = "进度: ${todo.progress}%"
+            text = getString(R.string.progress_colon_format, todo.progress)
             textSize = 16f
             setTypeface(null, android.graphics.Typeface.BOLD)
             setPadding(0, 16, 0, 8)
@@ -412,7 +422,7 @@ class TodoFragment : Fragment() {
             setPadding(0, 8, 0, 8)
             setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: android.widget.SeekBar?, progress: Int, fromUser: Boolean) {
-                    progressLabel.text = "进度: $progress%"
+                    progressLabel.text = getString(R.string.progress_colon_format, progress)
                 }
                 override fun onStartTrackingTouch(seekBar: android.widget.SeekBar?) {}
                 override fun onStopTrackingTouch(seekBar: android.widget.SeekBar?) {}
@@ -422,13 +432,13 @@ class TodoFragment : Fragment() {
         // 标签输入框
         val tagsEditText = android.widget.EditText(requireContext()).apply {
             setText(todo.tags ?: "")
-            hint = "标签（用逗号分隔，可选）"
+            hint = getString(R.string.tags_hint_todo_short)
             setPadding(16, 16, 16, 16)
         }
         
         // 完成状态复选框
         val completedCheckBox = android.widget.CheckBox(requireContext()).apply {
-            text = "已完成"
+            text = getString(R.string.completed)
             isChecked = todo.isCompleted
             setPadding(0, 16, 0, 8)
         }
@@ -443,9 +453,9 @@ class TodoFragment : Fragment() {
         dialogLayout.addView(completedCheckBox)
         
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("编辑任务")
+            .setTitle(getString(R.string.edit_task))
             .setView(dialogLayout)
-            .setPositiveButton("保存") { _, _ ->
+            .setPositiveButton(getString(R.string.save)) { _, _ ->
                 val title = titleEditText.text.toString().trim()
                 val description = descEditText.text.toString().trim()
                 val tags = tagsEditText.text.toString().trim()
@@ -480,11 +490,11 @@ class TodoFragment : Fragment() {
                     )
                     viewModel.updateTodo(updatedTodo)
                 } else {
-                    Snackbar.make(binding.root, "请输入任务标题", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, getString(R.string.please_enter_task_title), Snackbar.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("取消", null)
-            .setNeutralButton("删除") { _, _ ->
+            .setNegativeButton(getString(R.string.cancel), null)
+            .setNeutralButton(getString(R.string.delete)) { _, _ ->
                 showDeleteConfirmDialog(todo)
             }
             .show()
@@ -495,7 +505,7 @@ class TodoFragment : Fragment() {
      */
     private fun showTodoOptionsMenu(todo: TodoItem) {
         // 这里可以实现长按菜单，比如批量选择等
-        Snackbar.make(binding.root, "长按菜单功能开发中...", Snackbar.LENGTH_SHORT).show()
+        Snackbar.make(binding.root, getString(R.string.long_press_menu_in_development), Snackbar.LENGTH_SHORT).show()
     }
 
     /**
@@ -535,12 +545,12 @@ class TodoFragment : Fragment() {
      */
     private fun showDeleteConfirmDialog(todo: TodoItem) {
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("确认删除")
-            .setMessage("确定要删除任务「${todo.title}」吗？")
-            .setPositiveButton("删除") { _, _ ->
+            .setTitle(getString(R.string.confirm_delete))
+            .setMessage(getString(R.string.confirm_delete_task, todo.title))
+            .setPositiveButton(getString(R.string.delete)) { _, _ ->
                 viewModel.deleteTodo(todo)
             }
-            .setNegativeButton("取消", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
 
@@ -550,7 +560,7 @@ class TodoFragment : Fragment() {
     private fun duplicateTodo(todo: TodoItem) {
         val duplicatedTodo = todo.copy(
             id = java.util.UUID.randomUUID().toString(),
-            title = "${todo.title} (副本)",
+            title = "${todo.title}${getString(R.string.duplicate_suffix)}",
             isCompleted = false,
             completedAt = null,
             progress = 0,
@@ -567,7 +577,7 @@ class TodoFragment : Fragment() {
         try {
             findNavController().navigate(R.id.action_todoFragment_to_addEditTodoFragment)
         } catch (e: Exception) {
-            Snackbar.make(binding.root, "导航失败: ${e.message}", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, getString(R.string.navigation_failed, e.message), Snackbar.LENGTH_SHORT).show()
             // 回退到对话框方式
             showAddTodoDialog()
         }
@@ -583,7 +593,7 @@ class TodoFragment : Fragment() {
             }
             findNavController().navigate(R.id.action_todoFragment_to_addEditTodoFragment, bundle)
         } catch (e: Exception) {
-            Snackbar.make(binding.root, "导航失败: ${e.message}", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, getString(R.string.navigation_failed, e.message), Snackbar.LENGTH_SHORT).show()
             // 回退到对话框方式
             showEditTodoDialog(todo)
         }

@@ -13,7 +13,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="预算设置"
+            app:title="@string/budget_settings"
             app:navigationIcon="@drawable/ic_arrow_back"
             app:titleTextColor="@color/white" />
 
@@ -30,7 +30,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- 默认设置 -->
+            <!-- Default Settings -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -47,12 +47,12 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="默认设置"
+                        android:text="@string/default_settings"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:layout_marginBottom="16dp" />
 
-                    <!-- 默认警告阈值 -->
+                    <!-- Default warning threshold -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="默认警告阈值"
+                                android:text="@string/default_warning_threshold"
                                 android:textSize="16sp" />
 
                             <TextView
@@ -96,7 +96,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="新建预算时的默认警告阈值"
+                            android:text="@string/default_threshold_description"
                             android:textSize="12sp"
                             android:textColor="@color/text_secondary" />
 
@@ -123,12 +123,12 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="提醒设置"
+                        android:text="@string/reminder_settings"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:layout_marginBottom="16dp" />
 
-                    <!-- 自动提醒 -->
+                    <!-- Auto Reminder -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -145,13 +145,13 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="自动提醒"
+                                android:text="@string/auto_reminder"
                                 android:textSize="16sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="启用预算提醒通知"
+                                android:text="@string/enable_budget_notifications"
                                 android:textSize="12sp"
                                 android:textColor="@color/text_secondary" />
 
@@ -165,7 +165,7 @@
 
                     </LinearLayout>
 
-                    <!-- 超支提醒 -->
+                    <!-- Overspend Reminder -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -182,13 +182,13 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="超支提醒"
+                                android:text="@string/overspend_reminder"
                                 android:textSize="16sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="超出预算时立即提醒"
+                                android:text="@string/immediate_overspend_alert"
                                 android:textSize="12sp"
                                 android:textColor="@color/text_secondary" />
 
@@ -202,7 +202,7 @@
 
                     </LinearLayout>
 
-                    <!-- 即将到期提醒 -->
+                    <!-- Expiration Reminder -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -218,13 +218,13 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="即将到期提醒"
+                                android:text="@string/expiration_reminder"
                                 android:textSize="16sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="预算即将到期时提醒"
+                                android:text="@string/budget_expiration_notification"
                                 android:textSize="12sp"
                                 android:textColor="@color/text_secondary" />
 
@@ -259,12 +259,12 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="自动化设置"
+                        android:text="@string/automation_settings"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:layout_marginBottom="16dp" />
 
-                    <!-- 自动续期 -->
+                    <!-- Auto Renewal -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -280,13 +280,13 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="自动续期"
+                                android:text="@string/auto_renewal"
                                 android:textSize="16sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="预算到期后自动创建下个周期"
+                                android:text="@string/auto_create_next_period_budget"
                                 android:textSize="12sp"
                                 android:textColor="@color/text_secondary" />
 
@@ -320,47 +320,47 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="数据管理"
+                        android:text="@string/data_management"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:layout_marginBottom="16dp" />
 
-                    <!-- 重置所有预算 -->
+                    <!-- Reset all budgets -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnResetAllBudgets"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="重置所有预算"
+                        android:text="@string/reset_all_budgets"
                         app:icon="@drawable/ic_refresh"
                         style="@style/Widget.Material3.Button.OutlinedButton" />
 
-                    <!-- 清理过期预算 -->
+                    <!-- Clean expired budgets -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnCleanExpiredBudgets"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="清理过期预算"
+                        android:text="@string/clean_expired_budgets"
                         app:icon="@drawable/ic_delete"
                         style="@style/Widget.Material3.Button.OutlinedButton" />
 
-                    <!-- 导出预算数据 -->
+                    <!-- Export budget data -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnExportBudgets"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:text="导出预算数据"
+                        android:text="@string/export_budget_data"
                         app:icon="@drawable/ic_upload"
                         style="@style/Widget.Material3.Button.OutlinedButton" />
 
-                    <!-- 导入预算数据 -->
+                    <!-- Import budget data -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnImportBudgets"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="导入预算数据"
+                        android:text="@string/import_budget_data"
                         app:icon="@drawable/ic_download"
                         style="@style/Widget.Material3.Button.OutlinedButton" />
 

@@ -26,8 +26,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.appcompat.app.AlertDialog
 
 /**
- * 预算分析页面
- * 显示预算使用情况、趋势分析和智能建议
+ * Budget Analysis Page
+ * Displays budget usage, trend analysis and smart recommendations
  */
 class BudgetAnalysisFragment : Fragment() {
     
@@ -58,7 +58,7 @@ class BudgetAnalysisFragment : Fragment() {
     }
     
     private fun setupViews() {
-        // 设置建议列表 - 简化，不需要点击处理
+        // Setup recommendation list - simplified, no click handling needed
         recommendationAdapter = BudgetRecommendationAdapter()
         
         binding.recyclerViewRecommendations.apply {
@@ -66,47 +66,47 @@ class BudgetAnalysisFragment : Fragment() {
             adapter = recommendationAdapter
         }
         
-        // 设置图表切换
+        // Setup chart switching
         setupChartTabs()
     }
     
     private fun setupObservers() {
-        // 观察分析概览数据
+        // Observe analysis overview data
         viewModel.analysisOverview.observe(viewLifecycleOwner) { overview ->
             overview?.let { updateOverviewUI(it) }
         }
         
-        // 观察预算使用数据
+        // Observe budget usage data
         viewModel.budgetUsageData.observe(viewLifecycleOwner) { usageDataList ->
             usageDataList?.let { 
                 if (it.isNotEmpty()) {
-                    updateUsageChart(it.first()) // 使用第一个预算的数据作为示例
+                    updateUsageChart(it.first()) // Use first budget data as example
                 }
             }
         }
         
-        // 观察趋势数据
+        // Observe trend data
         viewModel.budgetTrendData.observe(viewLifecycleOwner) { trendDataList ->
             trendDataList?.let { updateTrendChart(it) }
         }
         
-        // 观察对比数据
+        // Observe comparison data
         viewModel.budgetComparisonData.observe(viewLifecycleOwner) { comparisonDataList ->
             comparisonDataList?.let { updateComparisonChart(it) }
         }
         
-        // 观察建议数据
+        // Observe recommendation data
         viewModel.recommendations.observe(viewLifecycleOwner) { recommendations ->
             recommendationAdapter.submitList(recommendations)
             updateRecommendationsUI(recommendations)
         }
         
-        // 观察加载状态
+        // Observe loading state
         viewModel.isLoadingRecommendations.observe(viewLifecycleOwner) { isLoading ->
             updateLoadingState(isLoading)
         }
         
-        // 观察错误信息
+        // Observe error messages
         viewModel.recommendationError.observe(viewLifecycleOwner) { error ->
             error?.let {
                 showError(it)
@@ -115,33 +115,33 @@ class BudgetAnalysisFragment : Fragment() {
     }
     
     private fun setupClickListeners() {
-        // 返回按钮
+        // Back button
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
         
-        // 刷新按钮
+        // Refresh button
         binding.fabRefresh.setOnClickListener {
             refreshAnalysisData()
         }
         
-        // 智能建议按钮
+        // Smart recommendations button
         binding.btnSmartRecommendations?.setOnClickListener {
             viewModel.generateSmartRecommendations()
         }
         
-        // 时间范围选择
+        // Time range selection
         binding.chipWeek.setOnClickListener { 
-            // 设置周视图
+            // Set week view
         }
         binding.chipMonth.setOnClickListener { 
-            // 设置月视图
+            // Set month view
         }
         binding.chipQuarter.setOnClickListener { 
-            // 设置季度视图
+            // Set quarter view
         }
         binding.chipYear.setOnClickListener { 
-            // 设置年视图
+            // Set year view
         }
     }
     
@@ -149,7 +149,7 @@ class BudgetAnalysisFragment : Fragment() {
         if (recommendations.isEmpty()) {
             binding.layoutEmptyRecommendations.visibility = View.VISIBLE
             binding.recyclerViewRecommendations.visibility = View.GONE
-            binding.tvNoRecommendations.text = "暂无建议，点击智能建议获取AI分析"
+            binding.tvNoRecommendations.text = getString(R.string.no_recommendations_message)
         } else {
             binding.layoutEmptyRecommendations.visibility = View.GONE
             binding.recyclerViewRecommendations.visibility = View.VISIBLE
@@ -159,7 +159,7 @@ class BudgetAnalysisFragment : Fragment() {
     private fun updateLoadingState(isLoading: Boolean) {
         binding.btnSmartRecommendations.apply {
             isEnabled = !isLoading
-            text = if (isLoading) "分析中..." else "智能建议"
+            text = if (isLoading) getString(R.string.analyzing) else getString(R.string.smart_recommendations)
         }
         
         binding.progressRecommendations.visibility = if (isLoading) View.VISIBLE else View.GONE
@@ -186,17 +186,17 @@ class BudgetAnalysisFragment : Fragment() {
     
     private fun showChart(type: ChartType) {
         binding.apply {
-            // 隐藏所有图表
+            // Hide all charts
             pieChart.visibility = View.GONE
             lineChart.visibility = View.GONE
             barChart.visibility = View.GONE
             layoutEmptyChart.visibility = View.GONE
             
-            // 显示选中的图表
+            // Show selected chart
             when (type) {
                 ChartType.PIE -> {
                     pieChart.visibility = View.VISIBLE
-                    // 如果有数据则更新饼图
+                    // Update pie chart if data is available
                     viewModel.budgetUsageData.value?.let { usageDataList ->
                         if (usageDataList.isNotEmpty()) {
                             updateUsageChart(usageDataList.first())
@@ -207,7 +207,7 @@ class BudgetAnalysisFragment : Fragment() {
                 }
                 ChartType.LINE -> {
                     lineChart.visibility = View.VISIBLE
-                    // 如果有数据则更新趋势图
+                    // Update trend chart if data is available
                     viewModel.budgetTrendData.value?.let { trendDataList ->
                         if (trendDataList.isNotEmpty()) {
                             updateTrendChart(trendDataList)
@@ -218,7 +218,7 @@ class BudgetAnalysisFragment : Fragment() {
                 }
                 ChartType.BAR -> {
                     barChart.visibility = View.VISIBLE
-                    // 如果有数据则更新对比图
+                    // Update comparison chart if data is available
                     viewModel.budgetComparisonData.value?.let { comparisonDataList ->
                         if (comparisonDataList.isNotEmpty()) {
                             updateComparisonChart(comparisonDataList)
@@ -232,7 +232,7 @@ class BudgetAnalysisFragment : Fragment() {
     }
     
     private fun refreshAnalysisData() {
-        // 重新加载所有数据
+        // Reload all data
         viewModel.loadAnalysisData()
     }
     
@@ -247,11 +247,11 @@ class BudgetAnalysisFragment : Fragment() {
     
     private fun updateOverviewUI(overview: AnalysisOverview) {
         with(binding) {
-            // 健康评分
+            // Health score
             tvHealthScore.text = overview.healthScore.toString()
             progressHealth.progress = overview.healthScore
             
-            // 设置健康评分颜色
+            // Set health score color
             val scoreColor = when {
                 overview.healthScore >= 80 -> R.color.success
                 overview.healthScore >= 60 -> R.color.warning
@@ -259,9 +259,9 @@ class BudgetAnalysisFragment : Fragment() {
             }
             tvHealthScore.setTextColor(requireContext().getColor(scoreColor))
             
-            // 统计信息
+            // Statistics information
             tvTotalBudgets.text = overview.totalBudgets.toString()
-            tvOverspentBudgets.text = "0"  // TODO: 需要从 overview 中添加此字段
+            tvOverspentBudgets.text = "0"  // TODO: Need to add this field from overview
             tvAverageUsage.text = "${String.format("%.1f", overview.averageUsage)}%"
         }
     }
@@ -273,10 +273,10 @@ class BudgetAnalysisFragment : Fragment() {
         val remainingAmount = usageData.amount - usageData.spent
         
         if (usedAmount > 0) {
-            entries.add(PieEntry(usedAmount.toFloat(), "已使用"))
+            entries.add(PieEntry(usedAmount.toFloat(), getString(R.string.used)))
         }
         if (remainingAmount > 0) {
-            entries.add(PieEntry(remainingAmount.toFloat(), "剩余"))
+            entries.add(PieEntry(remainingAmount.toFloat(), getString(R.string.remaining)))
         }
         
         if (entries.isEmpty()) {
@@ -284,7 +284,7 @@ class BudgetAnalysisFragment : Fragment() {
             return
         }
         
-        val dataSet = PieDataSet(entries, "预算使用情况")
+        val dataSet = PieDataSet(entries, getString(R.string.budget_usage_status))
         dataSet.colors = listOf(
             Color.parseColor("#FF6B6B"), // 已使用 - 红色
             Color.parseColor("#4ECDC4")  // 剩余 - 绿色
@@ -296,7 +296,7 @@ class BudgetAnalysisFragment : Fragment() {
         data.setValueFormatter(PercentFormatter(binding.pieChart))
         
         binding.pieChart.data = data
-        binding.pieChart.setCenterText("预算使用率\n${String.format("%.1f", usageData.percentage)}%")
+        binding.pieChart.setCenterText("${getString(R.string.budget_usage_rate)}\n${String.format("%.1f", usageData.percentage)}%")
         binding.pieChart.invalidate()
     }
     
@@ -309,7 +309,7 @@ class BudgetAnalysisFragment : Fragment() {
             spentEntries.add(Entry(index.toFloat(), point.totalSpent.toFloat()))
         }
         
-        val budgetDataSet = LineDataSet(budgetEntries, "预算金额")
+        val budgetDataSet = LineDataSet(budgetEntries, getString(R.string.budget_amount))
         budgetDataSet.color = Color.parseColor("#4ECDC4")
         budgetDataSet.setCircleColor(Color.parseColor("#4ECDC4"))
         budgetDataSet.lineWidth = 2f
@@ -317,7 +317,7 @@ class BudgetAnalysisFragment : Fragment() {
         budgetDataSet.setDrawCircleHole(false)
         budgetDataSet.valueTextSize = 10f
         
-        val spentDataSet = LineDataSet(spentEntries, "实际支出")
+        val spentDataSet = LineDataSet(spentEntries, getString(R.string.actual_spending))
         spentDataSet.color = Color.parseColor("#FF6B6B")
         spentDataSet.setCircleColor(Color.parseColor("#FF6B6B"))
         spentDataSet.lineWidth = 2f
@@ -338,7 +338,7 @@ class BudgetAnalysisFragment : Fragment() {
             entries.add(BarEntry(index.toFloat(), changePercentage))
         }
         
-        val dataSet = BarDataSet(entries, "支出变化率")
+        val dataSet = BarDataSet(entries, getString(R.string.spending_change_rate))
         dataSet.colors = ColorTemplate.MATERIAL_COLORS.toList()
         dataSet.valueTextSize = 12f
         

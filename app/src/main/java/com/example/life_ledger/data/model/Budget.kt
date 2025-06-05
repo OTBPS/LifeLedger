@@ -61,10 +61,10 @@ data class Budget(
     val currency: String = "CNY", // 货币类型
     
     @ColumnInfo(name = "isRecurring")
-    val isRecurring: Boolean = true, // 是否为定期预算（自动续期）
+    val isRecurring: Boolean = true, // Whether it's a recurring budget (auto-renewal)
     
     @ColumnInfo(name = "lastAlertDate")
-    val lastAlertDate: Long? = null, // 最后一次警告日期
+    val lastAlertDate: Long? = null, // Last alert date
     
     @ColumnInfo(name = "createdAt")
     val createdAt: Long = System.currentTimeMillis(),
@@ -73,42 +73,42 @@ data class Budget(
     val updatedAt: Long = System.currentTimeMillis()
 ) {
     /**
-     * 预算周期枚举
+     * Budget period enum
      */
     enum class BudgetPeriod(val displayName: String, val days: Int) {
-        DAILY("每日", 1),
-        WEEKLY("每周", 7),
-        MONTHLY("每月", 30),
-        QUARTERLY("每季度", 90),
-        YEARLY("每年", 365)
+        DAILY("Daily", 1),
+        WEEKLY("Weekly", 7),
+        MONTHLY("Monthly", 30),
+        QUARTERLY("Quarterly", 90),
+        YEARLY("Yearly", 365)
     }
     
     /**
-     * 预算状态枚举
+     * Budget status enum
      */
     enum class BudgetStatus {
-        SAFE,       // 安全
-        WARNING,    // 警告
-        EXCEEDED,   // 超支
-        EXPIRED     // 已过期
+        SAFE,       // Safe
+        WARNING,    // Warning
+        EXCEEDED,   // Exceeded
+        EXPIRED     // Expired
     }
     
     /**
-     * 计算剩余金额
+     * Calculate remaining amount
      */
     fun getRemainingAmount(): Double {
         return amount - spent
     }
     
     /**
-     * 计算花费百分比
+     * Calculate spent percentage
      */
     fun getSpentPercentage(): Double {
         return if (amount <= 0) 0.0 else (spent / amount * 100).coerceAtMost(100.0)
     }
     
     /**
-     * 获取预算状态
+     * Get budget status
      */
     fun getBudgetStatus(): BudgetStatus {
         return when {
@@ -120,14 +120,14 @@ data class Budget(
     }
     
     /**
-     * 检查是否过期
+     * Check if expired
      */
     fun isExpired(): Boolean {
         return System.currentTimeMillis() > endDate
     }
     
     /**
-     * 检查是否需要警告
+     * Check if alert is needed
      */
     fun needsAlert(): Boolean {
         if (!isAlertEnabled || !isActive) return false
@@ -135,7 +135,7 @@ data class Budget(
         val status = getBudgetStatus()
         if (status != BudgetStatus.WARNING && status != BudgetStatus.EXCEEDED) return false
         
-        // 检查是否已经在今天发送过警告
+        // Check if alert was already sent today
         lastAlertDate?.let { lastAlert ->
             val today = Calendar.getInstance().apply {
                 set(Calendar.HOUR_OF_DAY, 0)
@@ -151,7 +151,7 @@ data class Budget(
     }
     
     /**
-     * 检查是否即将到期（3天内）
+     * Check if expiring soon (within 3 days)
      */
     fun isExpiringSoon(): Boolean {
         val threeDaysInMillis = 3 * 24 * 60 * 60 * 1000L
@@ -159,7 +159,7 @@ data class Budget(
     }
     
     /**
-     * 获取剩余天数
+     * Get remaining days
      */
     fun getRemainingDays(): Long {
         val remaining = endDate - System.currentTimeMillis()
@@ -167,31 +167,31 @@ data class Budget(
     }
     
     /**
-     * 获取状态颜色（用于UI显示）
+     * Get status color (for UI display)
      */
     fun getStatusColor(): String {
         return when (getBudgetStatus()) {
-            BudgetStatus.SAFE -> "#4CAF50"      // 绿色
-            BudgetStatus.WARNING -> "#FF9800"   // 橙色
-            BudgetStatus.EXCEEDED -> "#F44336"  // 红色
-            BudgetStatus.EXPIRED -> "#9E9E9E"   // 灰色
+            BudgetStatus.SAFE -> "#4CAF50"      // Green
+            BudgetStatus.WARNING -> "#FF9800"   // Orange
+            BudgetStatus.EXCEEDED -> "#F44336"  // Red
+            BudgetStatus.EXPIRED -> "#9E9E9E"   // Gray
         }
     }
     
     /**
-     * 获取状态文本
+     * Get status text
      */
     fun getStatusText(): String {
         return when (getBudgetStatus()) {
-            BudgetStatus.SAFE -> "预算充足"
-            BudgetStatus.WARNING -> "接近限额"
-            BudgetStatus.EXCEEDED -> "预算超支"
-            BudgetStatus.EXPIRED -> "已过期"
+            BudgetStatus.SAFE -> "Budget Sufficient"
+            BudgetStatus.WARNING -> "Near Limit"
+            BudgetStatus.EXCEEDED -> "Over Budget"
+            BudgetStatus.EXPIRED -> "Expired"
         }
     }
     
     /**
-     * 更新花费金额
+     * Update spent amount
      */
     fun updateSpent(newSpent: Double): Budget {
         return this.copy(
@@ -201,21 +201,21 @@ data class Budget(
     }
     
     /**
-     * 增加花费
+     * Add spent amount
      */
     fun addSpent(additionalSpent: Double): Budget {
         return updateSpent(spent + additionalSpent)
     }
     
     /**
-     * 减少花费
+     * Subtract spent amount
      */
     fun subtractSpent(amountToSubtract: Double): Budget {
         return updateSpent(spent - amountToSubtract)
     }
     
     /**
-     * 重置预算（新周期）
+     * Reset budget for new period
      */
     fun resetForNewPeriod(): Budget {
         val newStartDate = endDate + 1
@@ -252,7 +252,7 @@ data class Budget(
     }
     
     /**
-     * 计算每日平均可花费金额
+     * Calculate daily allowance
      */
     fun getDailyAllowance(): Double {
         val remainingDays = getRemainingDays()

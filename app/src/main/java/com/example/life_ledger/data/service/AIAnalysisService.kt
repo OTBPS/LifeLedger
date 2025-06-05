@@ -7,53 +7,107 @@ import com.example.life_ledger.data.network.ChatCompletionRequest
 import com.example.life_ledger.data.network.Message
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.*
+import java.net.SocketTimeoutException
+import java.io.IOException
 
 /**
- * AI分析服务
- * 使用DeepSeek API进行智能财务分析
+ * AI Analysis Service
+ * Uses DeepSeek API for intelligent financial analysis
  */
 class AIAnalysisService {
     
     private val apiService = NetworkClient.deepSeekApiService
-    private val dateFormat = SimpleDateFormat("yyyy年MM月", Locale.CHINA)
+    private val dateFormat = SimpleDateFormat("yyyy-MM", Locale.US)
+    
+    companion object {
+        private const val TAG = "AIAnalysisService"
+        private const val MAX_RETRIES = 3
+        private const val RETRY_DELAY_MS = 2000L
+    }
     
     /**
-     * 智能支出分析
+     * Intelligent expense analysis with retry mechanism
      */
     suspend fun analyzeExpenses(
         transactions: List<Transaction>,
         categories: List<Category>
     ): Result<ExpenseAnalysis> = withContext(Dispatchers.IO) {
-        try {
-            val expenseData = prepareExpenseData(transactions, categories)
-            val prompt = buildExpenseAnalysisPrompt(expenseData)
-            
-            val response = apiService.chatCompletion(
-                ChatCompletionRequest(
-                    messages = listOf(
-                        Message("system", "你是一个专业的财务分析师，专门分析个人支出模式并提供专业建议。"),
-                        Message("user", prompt)
-                    ),
-                    max_tokens = 1500,
-                    temperature = 0.7
+        var lastException: Exception? = null
+        
+        repeat(MAX_RETRIES) { attempt ->
+            try {
+                android.util.Log.d(TAG, "Starting expense analysis, attempt ${attempt + 1}/$MAX_RETRIES")
+                
+                val expenseData = prepareExpenseData(transactions, categories)
+                val prompt = buildExpenseAnalysisPrompt(expenseData)
+                
+                android.util.Log.d(TAG, "Prepared data - Total expense: ${expenseData.totalExpense}, Categories: ${expenseData.categoryExpenses.size}")
+                android.util.Log.d(TAG, "Sending request to AI API...")
+                
+                val response = apiService.chatCompletion(
+                    ChatCompletionRequest(
+                        messages = listOf(
+                            Message("system", "You are a professional financial analyst specializing in analyzing personal spending patterns and providing professional advice."),
+                            Message("user", prompt)
+                        ),
+                        max_tokens = 1500,
+                        temperature = 0.7
+                    )
                 )
-            )
-            
-            if (response.isSuccessful && response.body()?.choices?.isNotEmpty() == true) {
-                val analysis = parseExpenseAnalysis(response.body()!!.choices[0].message.content)
-                Result.success(analysis)
-            } else {
-                Result.failure(Exception("AI分析请求失败: ${response.message()}"))
+                
+                android.util.Log.d(TAG, "Received response - Success: ${response.isSuccessful}, Code: ${response.code()}")
+                
+                if (response.isSuccessful && response.body()?.choices?.isNotEmpty() == true) {
+                    val content = response.body()!!.choices[0].message.content
+                    android.util.Log.d(TAG, "AI response received, content length: ${content.length}")
+                    
+                    val analysis = parseExpenseAnalysis(content)
+                    android.util.Log.d(TAG, "Analysis parsed successfully")
+                    return@withContext Result.success(analysis)
+                } else {
+                    val errorMsg = "AI analysis request failed: ${response.code()} - ${response.message()}"
+                    android.util.Log.e(TAG, errorMsg)
+                    lastException = Exception(errorMsg)
+                }
+            } catch (e: SocketTimeoutException) {
+                val timeoutMsg = "Request timeout on attempt ${attempt + 1}. This may be due to network issues or AI service being busy."
+                android.util.Log.w(TAG, timeoutMsg, e)
+                lastException = Exception(timeoutMsg, e)
+                
+                if (attempt < MAX_RETRIES - 1) {
+                    android.util.Log.d(TAG, "Retrying in ${RETRY_DELAY_MS}ms...")
+                    delay(RETRY_DELAY_MS)
+                }
+            } catch (e: IOException) {
+                val networkMsg = "Network error on attempt ${attempt + 1}: ${e.message}"
+                android.util.Log.w(TAG, networkMsg, e)
+                lastException = Exception(networkMsg, e)
+                
+                if (attempt < MAX_RETRIES - 1) {
+                    android.util.Log.d(TAG, "Retrying in ${RETRY_DELAY_MS}ms...")
+                    delay(RETRY_DELAY_MS)
+                }
+            } catch (e: Exception) {
+                val errorMsg = "Unexpected error on attempt ${attempt + 1}: ${e.message}"
+                android.util.Log.e(TAG, errorMsg, e)
+                lastException = e
+                
+                if (attempt < MAX_RETRIES - 1) {
+                    android.util.Log.d(TAG, "Retrying in ${RETRY_DELAY_MS}ms...")
+                    delay(RETRY_DELAY_MS)
+                }
             }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
+        
+        android.util.Log.e(TAG, "All retry attempts failed")
+        Result.failure(lastException ?: Exception("Analysis failed after $MAX_RETRIES attempts"))
     }
     
     /**
-     * 生成月度财务报告
+     * Generate monthly financial report with retry mechanism
      */
     suspend fun generateMonthlyReport(
         transactions: List<Transaction>,
@@ -61,101 +115,236 @@ class AIAnalysisService {
         year: Int,
         month: Int
     ): Result<MonthlyReport> = withContext(Dispatchers.IO) {
-        try {
-            val reportData = prepareMonthlyReportData(transactions, categories, year, month)
-            val prompt = buildMonthlyReportPrompt(reportData, year, month)
-            
-            val response = apiService.chatCompletion(
-                ChatCompletionRequest(
-                    messages = listOf(
-                        Message("system", "你是一个财务顾问，专门为用户生成详细的月度财务报告。报告应该专业、准确、易懂。"),
-                        Message("user", prompt)
-                    ),
-                    max_tokens = 2000,
-                    temperature = 0.6
+        var lastException: Exception? = null
+        
+        repeat(MAX_RETRIES) { attempt ->
+            try {
+                android.util.Log.d(TAG, "Starting monthly report generation, attempt ${attempt + 1}/$MAX_RETRIES")
+                
+                val reportData = prepareMonthlyReportData(transactions, categories, year, month)
+                val prompt = buildMonthlyReportPrompt(reportData, year, month)
+                
+                android.util.Log.d(TAG, "Prepared monthly data for $year-$month - Income: ${reportData.totalIncome}, Expense: ${reportData.totalExpense}")
+                android.util.Log.d(TAG, "Sending monthly report request to AI API...")
+                
+                val response = apiService.chatCompletion(
+                    ChatCompletionRequest(
+                        messages = listOf(
+                            Message("system", "You are a financial advisor specializing in generating detailed monthly financial reports for users. Reports should be professional, accurate, and easy to understand."),
+                            Message("user", prompt)
+                        ),
+                        max_tokens = 2000,
+                        temperature = 0.6
+                    )
                 )
-            )
-            
-            if (response.isSuccessful && response.body()?.choices?.isNotEmpty() == true) {
-                val report = parseMonthlyReport(response.body()!!.choices[0].message.content, year, month)
-                Result.success(report)
-            } else {
-                Result.failure(Exception("月度报告生成失败: ${response.message()}"))
+                
+                android.util.Log.d(TAG, "Received monthly report response - Success: ${response.isSuccessful}, Code: ${response.code()}")
+                
+                if (response.isSuccessful && response.body()?.choices?.isNotEmpty() == true) {
+                    val content = response.body()!!.choices[0].message.content
+                    android.util.Log.d(TAG, "Monthly report AI response received, content length: ${content.length}")
+                    
+                    val report = parseMonthlyReport(content, year, month)
+                    android.util.Log.d(TAG, "Monthly report parsed successfully")
+                    return@withContext Result.success(report)
+                } else {
+                    val errorMsg = "Monthly report generation failed: ${response.code()} - ${response.message()}"
+                    android.util.Log.e(TAG, errorMsg)
+                    lastException = Exception(errorMsg)
+                }
+            } catch (e: SocketTimeoutException) {
+                val timeoutMsg = "Monthly report request timeout on attempt ${attempt + 1}. The AI service might be processing your request."
+                android.util.Log.w(TAG, timeoutMsg, e)
+                lastException = Exception(timeoutMsg, e)
+                
+                if (attempt < MAX_RETRIES - 1) {
+                    android.util.Log.d(TAG, "Retrying monthly report in ${RETRY_DELAY_MS}ms...")
+                    delay(RETRY_DELAY_MS)
+                }
+            } catch (e: IOException) {
+                val networkMsg = "Network error during monthly report on attempt ${attempt + 1}: ${e.message}"
+                android.util.Log.w(TAG, networkMsg, e)
+                lastException = Exception(networkMsg, e)
+                
+                if (attempt < MAX_RETRIES - 1) {
+                    android.util.Log.d(TAG, "Retrying monthly report in ${RETRY_DELAY_MS}ms...")
+                    delay(RETRY_DELAY_MS)
+                }
+            } catch (e: Exception) {
+                val errorMsg = "Unexpected error during monthly report on attempt ${attempt + 1}: ${e.message}"
+                android.util.Log.e(TAG, errorMsg, e)
+                lastException = e
+                
+                if (attempt < MAX_RETRIES - 1) {
+                    android.util.Log.d(TAG, "Retrying monthly report in ${RETRY_DELAY_MS}ms...")
+                    delay(RETRY_DELAY_MS)
+                }
             }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
+        
+        android.util.Log.e(TAG, "Monthly report generation failed after all retry attempts")
+        Result.failure(lastException ?: Exception("Monthly report generation failed after $MAX_RETRIES attempts"))
     }
     
     /**
-     * 获取个性化消费建议
+     * Get personalized consumption advice with retry mechanism
      */
     suspend fun getPersonalizedAdvice(
         transactions: List<Transaction>,
         categories: List<Category>,
         userProfile: UserProfile
     ): Result<List<ConsumptionAdvice>> = withContext(Dispatchers.IO) {
-        try {
-            val adviceData = prepareAdviceData(transactions, categories, userProfile)
-            val prompt = buildAdvicePrompt(adviceData, userProfile)
-            
-            val response = apiService.chatCompletion(
-                ChatCompletionRequest(
-                    messages = listOf(
-                        Message("system", "你是一个理财专家，根据用户的消费习惯和财务状况提供个性化的理财建议。"),
-                        Message("user", prompt)
-                    ),
-                    max_tokens = 1500,
-                    temperature = 0.8
+        var lastException: Exception? = null
+        
+        repeat(MAX_RETRIES) { attempt ->
+            try {
+                android.util.Log.d(TAG, "Starting personalized advice generation, attempt ${attempt + 1}/$MAX_RETRIES")
+                
+                val adviceData = prepareAdviceData(transactions, categories, userProfile)
+                val prompt = buildAdvicePrompt(adviceData, userProfile)
+                
+                android.util.Log.d(TAG, "Prepared advice data - Avg expense: ${adviceData.monthlyAvgExpense}, Patterns: ${adviceData.spendingPatterns.size}")
+                android.util.Log.d(TAG, "Sending personalized advice request to AI API...")
+                
+                val response = apiService.chatCompletion(
+                    ChatCompletionRequest(
+                        messages = listOf(
+                            Message("system", "You are a financial expert who provides personalized financial advice based on users' spending habits and financial situation."),
+                            Message("user", prompt)
+                        ),
+                        max_tokens = 1500,
+                        temperature = 0.8
+                    )
                 )
-            )
-            
-            if (response.isSuccessful && response.body()?.choices?.isNotEmpty() == true) {
-                val advice = parseConsumptionAdvice(response.body()!!.choices[0].message.content)
-                Result.success(advice)
-            } else {
-                Result.failure(Exception("个性化建议生成失败: ${response.message()}"))
+                
+                android.util.Log.d(TAG, "Received advice response - Success: ${response.isSuccessful}, Code: ${response.code()}")
+                
+                if (response.isSuccessful && response.body()?.choices?.isNotEmpty() == true) {
+                    val content = response.body()!!.choices[0].message.content
+                    android.util.Log.d(TAG, "Personalized advice AI response received, content length: ${content.length}")
+                    
+                    val advice = parseConsumptionAdvice(content)
+                    android.util.Log.d(TAG, "Personalized advice parsed successfully, count: ${advice.size}")
+                    return@withContext Result.success(advice)
+                } else {
+                    val errorMsg = "Personalized advice generation failed: ${response.code()} - ${response.message()}"
+                    android.util.Log.e(TAG, errorMsg)
+                    lastException = Exception(errorMsg)
+                }
+            } catch (e: SocketTimeoutException) {
+                val timeoutMsg = "Personalized advice request timeout on attempt ${attempt + 1}. Please wait while we process your data."
+                android.util.Log.w(TAG, timeoutMsg, e)
+                lastException = Exception(timeoutMsg, e)
+                
+                if (attempt < MAX_RETRIES - 1) {
+                    android.util.Log.d(TAG, "Retrying personalized advice in ${RETRY_DELAY_MS}ms...")
+                    delay(RETRY_DELAY_MS)
+                }
+            } catch (e: IOException) {
+                val networkMsg = "Network error during personalized advice on attempt ${attempt + 1}: ${e.message}"
+                android.util.Log.w(TAG, networkMsg, e)
+                lastException = Exception(networkMsg, e)
+                
+                if (attempt < MAX_RETRIES - 1) {
+                    android.util.Log.d(TAG, "Retrying personalized advice in ${RETRY_DELAY_MS}ms...")
+                    delay(RETRY_DELAY_MS)
+                }
+            } catch (e: Exception) {
+                val errorMsg = "Unexpected error during personalized advice on attempt ${attempt + 1}: ${e.message}"
+                android.util.Log.e(TAG, errorMsg, e)
+                lastException = e
+                
+                if (attempt < MAX_RETRIES - 1) {
+                    android.util.Log.d(TAG, "Retrying personalized advice in ${RETRY_DELAY_MS}ms...")
+                    delay(RETRY_DELAY_MS)
+                }
             }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
+        
+        android.util.Log.e(TAG, "Personalized advice generation failed after all retry attempts")
+        Result.failure(lastException ?: Exception("Personalized advice generation failed after $MAX_RETRIES attempts"))
     }
     
     /**
-     * 获取预算智能建议
+     * Get intelligent budget recommendations with retry mechanism
      */
     suspend fun getBudgetRecommendations(
         budgets: List<com.example.life_ledger.data.model.Budget>,
         transactions: List<Transaction>,
         categories: List<Category>
     ): Result<List<com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation>> = withContext(Dispatchers.IO) {
-        try {
-            val budgetData = prepareBudgetAnalysisData(budgets, transactions, categories)
-            val prompt = buildBudgetRecommendationPrompt(budgetData)
-            
-            val response = apiService.chatCompletion(
-                ChatCompletionRequest(
-                    messages = listOf(
-                        Message("system", "你是一个专业的预算管理顾问，专门分析用户的预算执行情况并提供实用的优化建议。"),
-                        Message("user", prompt)
-                    ),
-                    max_tokens = 1500,
-                    temperature = 0.7
+        var lastException: Exception? = null
+        
+        repeat(MAX_RETRIES) { attempt ->
+            try {
+                android.util.Log.d(TAG, "Starting budget recommendations generation, attempt ${attempt + 1}/$MAX_RETRIES")
+                
+                val budgetData = prepareBudgetAnalysisData(budgets, transactions, categories)
+                val prompt = buildBudgetRecommendationPrompt(budgetData)
+                
+                android.util.Log.d(TAG, "Prepared budget data - Total budgets: ${budgetData.totalBudgets}, Over budget: ${budgetData.overBudgetCount}")
+                android.util.Log.d(TAG, "Sending budget recommendations request to AI API...")
+                
+                val response = apiService.chatCompletion(
+                    ChatCompletionRequest(
+                        messages = listOf(
+                            Message("system", "You are a professional budget management consultant specializing in analyzing users' budget execution and providing practical optimization recommendations."),
+                            Message("user", prompt)
+                        ),
+                        max_tokens = 1500,
+                        temperature = 0.7
+                    )
                 )
-            )
-            
-            if (response.isSuccessful && response.body()?.choices?.isNotEmpty() == true) {
-                val recommendations = parseBudgetRecommendations(response.body()!!.choices[0].message.content)
-                Result.success(recommendations)
-            } else {
-                Result.failure(Exception("预算建议生成失败: ${response.message()}"))
+                
+                android.util.Log.d(TAG, "Received budget recommendations response - Success: ${response.isSuccessful}, Code: ${response.code()}")
+                
+                if (response.isSuccessful && response.body()?.choices?.isNotEmpty() == true) {
+                    val content = response.body()!!.choices[0].message.content
+                    android.util.Log.d(TAG, "Budget recommendations AI response received, content length: ${content.length}")
+                    
+                    val recommendations = parseBudgetRecommendations(content)
+                    android.util.Log.d(TAG, "Budget recommendations parsed successfully, count: ${recommendations.size}")
+                    return@withContext Result.success(recommendations)
+                } else {
+                    val errorMsg = "Budget recommendation generation failed: ${response.code()} - ${response.message()}"
+                    android.util.Log.e(TAG, errorMsg)
+                    lastException = Exception(errorMsg)
+                }
+            } catch (e: SocketTimeoutException) {
+                val timeoutMsg = "Budget recommendations request timeout on attempt ${attempt + 1}. Please wait while we analyze your budget data."
+                android.util.Log.w(TAG, timeoutMsg, e)
+                lastException = Exception(timeoutMsg, e)
+                
+                if (attempt < MAX_RETRIES - 1) {
+                    android.util.Log.d(TAG, "Retrying budget recommendations in ${RETRY_DELAY_MS}ms...")
+                    delay(RETRY_DELAY_MS)
+                }
+            } catch (e: IOException) {
+                val networkMsg = "Network error during budget recommendations on attempt ${attempt + 1}: ${e.message}"
+                android.util.Log.w(TAG, networkMsg, e)
+                lastException = Exception(networkMsg, e)
+                
+                if (attempt < MAX_RETRIES - 1) {
+                    android.util.Log.d(TAG, "Retrying budget recommendations in ${RETRY_DELAY_MS}ms...")
+                    delay(RETRY_DELAY_MS)
+                }
+            } catch (e: Exception) {
+                val errorMsg = "Unexpected error during budget recommendations on attempt ${attempt + 1}: ${e.message}"
+                android.util.Log.e(TAG, errorMsg, e)
+                lastException = e
+                
+                if (attempt < MAX_RETRIES - 1) {
+                    android.util.Log.d(TAG, "Retrying budget recommendations in ${RETRY_DELAY_MS}ms...")
+                    delay(RETRY_DELAY_MS)
+                }
             }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
+        
+        android.util.Log.e(TAG, "Budget recommendations generation failed after all retry attempts")
+        Result.failure(lastException ?: Exception("Budget recommendation generation failed after $MAX_RETRIES attempts"))
     }
     
-    // 数据准备方法
+    // Data preparation methods
     
     private fun prepareExpenseData(transactions: List<Transaction>, categories: List<Category>): ExpenseData {
         val expenseTransactions = transactions.filter { it.type == Transaction.TransactionType.EXPENSE }
@@ -164,11 +353,11 @@ class AIAnalysisService {
         val categoryExpenses = expenseTransactions
             .groupBy { it.categoryId }
             .mapValues { (_, transactions) -> transactions.sumOf { it.amount } }
-            .mapKeys { (categoryId, _) -> categoryMap[categoryId]?.name ?: "其他" }
+            .mapKeys { (categoryId, _) -> categoryMap[categoryId]?.name ?: "Other" }
         
         val totalExpense = expenseTransactions.sumOf { it.amount }
         val avgDailyExpense = if (expenseTransactions.isNotEmpty()) {
-            totalExpense / 30 // 假设30天
+            totalExpense / 30 // Assume 30 days
         } else 0.0
         
         val topCategories = categoryExpenses.toList().sortedByDescending { it.second }.take(5)
@@ -216,7 +405,7 @@ class AIAnalysisService {
                     amount = transactions.sumOf { it.amount }
                 )
             }
-            .mapKeys { (categoryId, _) -> categoryMap[categoryId]?.name ?: "其他" }
+            .mapKeys { (categoryId, _) -> categoryMap[categoryId]?.name ?: "Other" }
         
         return MonthlyReportData(
             year = year,
@@ -243,7 +432,7 @@ class AIAnalysisService {
         val spendingPatterns = expenseTransactions
             .groupBy { it.categoryId }
             .mapValues { (_, transactions) -> transactions.sumOf { it.amount } }
-            .mapKeys { (categoryId, _) -> categoryMap[categoryId]?.name ?: "其他" }
+            .mapKeys { (categoryId, _) -> categoryMap[categoryId]?.name ?: "Other" }
         
         return AdviceData(
             monthlyAvgExpense = monthlyAvgExpense,
@@ -262,7 +451,7 @@ class AIAnalysisService {
         val currentTime = System.currentTimeMillis()
         
         val budgetPerformance = budgets.map { budget ->
-            val categoryName = budget.categoryId?.let { categoryMap[it]?.name } ?: "总预算"
+            val categoryName = budget.categoryId?.let { categoryMap[it]?.name } ?: "Total Budget"
             val usageRate = if (budget.amount > 0) (budget.spent / budget.amount * 100) else 0.0
             val remainingDays = maxOf(0, ((budget.endDate - currentTime) / (24 * 60 * 60 * 1000)).toInt())
             val isOverBudget = budget.spent > budget.amount
@@ -289,7 +478,7 @@ class AIAnalysisService {
         val categorySpending = recentTransactions
             .groupBy { it.categoryId }
             .mapValues { (_, txs) -> txs.sumOf { it.amount } }
-            .mapKeys { (categoryId, _) -> categoryMap[categoryId]?.name ?: "其他" }
+            .mapKeys { (categoryId, _) -> categoryMap[categoryId]?.name ?: "Other" }
         
         return BudgetAnalysisData(
             budgetPerformance = budgetPerformance,
@@ -300,123 +489,123 @@ class AIAnalysisService {
         )
     }
     
-    // Prompt构建方法
+    // Prompt building methods
     
     private fun buildExpenseAnalysisPrompt(data: ExpenseData): String {
         return """
-        请分析以下支出数据并提供专业的财务分析：
+        Please analyze the following expense data and provide professional financial analysis:
         
-        总支出：¥${String.format("%.2f", data.totalExpense)}
-        日均支出：¥${String.format("%.2f", data.avgDailyExpense)}
-        交易笔数：${data.transactionCount}
+        Total expenses: ¥${String.format("%.2f", data.totalExpense)}
+        Daily expenses: ¥${String.format("%.2f", data.avgDailyExpense)}
+        Transaction count: ${data.transactionCount}
         
-        支出分类明细：
+        Expense breakdown:
         ${data.categoryExpenses.map { "${it.key}: ¥${String.format("%.2f", it.value)}" }.joinToString("\n")}
         
-        请从以下角度进行分析：
-        1. 支出结构分析（各类别占比是否合理）
-        2. 消费习惯评估（频率、金额特点）
-        3. 潜在问题识别（过度消费的类别）
-        4. 优化建议（具体的改进措施）
+        Please analyze from the following perspectives:
+        1. Expense structure analysis (whether the proportion of each category is reasonable)
+        2. Consumption habit assessment (frequency and amount characteristics)
+        3. Potential problem identification (categories of excessive consumption)
+        4. Optimization suggestions (specific improvement measures)
         
-        请用中文回答，结构清晰，建议具体可执行。
+        Please answer in Chinese, with clear structure and specific, executable suggestions.
         """.trimIndent()
     }
     
     private fun buildMonthlyReportPrompt(data: MonthlyReportData, year: Int, month: Int): String {
         return """
-        请生成${year}年${month}月的详细财务报告：
+        Please generate a detailed financial report for ${year}-${month}:
         
-        基本数据：
-        - 总收入：¥${String.format("%.2f", data.totalIncome)}
-        - 总支出：¥${String.format("%.2f", data.totalExpense)}
-        - 净收入：¥${String.format("%.2f", data.netIncome)}
-        - 交易笔数：${data.transactionCount}
+        Basic data:
+        - Total income: ¥${String.format("%.2f", data.totalIncome)}
+        - Total expenses: ¥${String.format("%.2f", data.totalExpense)}
+        - Net income: ¥${String.format("%.2f", data.netIncome)}
+        - Transaction count: ${data.transactionCount}
         
-        分类明细：
-        ${data.categoryBreakdown.map { "${it.key}: ${it.value.count}笔, ¥${String.format("%.2f", it.value.amount)}" }.joinToString("\n")}
+        Expense breakdown:
+        ${data.categoryBreakdown.map { "${it.key}: ${it.value.count} transactions, ¥${String.format("%.2f", it.value.amount)}" }.joinToString("\n")}
         
-        请包含以下内容：
-        1. 财务状况总结
-        2. 收支分析
-        3. 消费结构分析
-        4. 与理想财务状况的对比
-        5. 下月改进建议
+        Please include the following:
+        1. Financial situation summary
+        2. Income and expense analysis
+        3. Consumption structure analysis
+        4. Comparison with ideal financial situation
+        5. Next month improvement suggestions
         
-        报告要专业、详细、易懂。
+        The report should be professional, detailed, and easy to understand.
         """.trimIndent()
     }
     
     private fun buildAdvicePrompt(data: AdviceData, userProfile: UserProfile): String {
         return """
-        基于以下用户信息和消费数据，请提供个性化的理财建议：
+        Based on the following user information and consumption data, please provide personalized financial advice:
         
-        用户信息：
-        - 年龄：${userProfile.age}岁
-        - 收入水平：${userProfile.incomeLevel}
-        - 理财目标：${userProfile.financialGoals.joinToString(", ")}
+        User information:
+        - Age: ${userProfile.age} years old
+        - Income level: ${userProfile.incomeLevel}
+        - Financial goals: ${userProfile.financialGoals.joinToString(", ")}
         
-        消费数据：
-        - 月均支出：¥${String.format("%.2f", data.monthlyAvgExpense)}
-        - 最近交易：${data.recentTransactionCount}笔
+        Consumption data:
+        - Monthly average expenses: ¥${String.format("%.2f", data.monthlyAvgExpense)}
+        - Recent transactions: ${data.recentTransactionCount} transactions
         
-        支出分布：
+        Expense distribution:
         ${data.spendingPatterns.map { "${it.key}: ¥${String.format("%.2f", it.value)}" }.joinToString("\n")}
         
-        请提供5-8条个性化建议，每条建议包括：
-        1. 建议标题
-        2. 详细说明
-        3. 预期效果
-        4. 执行难度（简单/中等/困难）
+        Please provide 5-8 personalized advice, each including:
+        1. Advice title
+        2. Detailed description
+        3. Expected effect
+        4. Execution difficulty (simple/medium/difficult)
         
-        建议要实用、具体、符合用户特点。
+        The advice should be practical, specific, and in line with user characteristics.
         """.trimIndent()
     }
     
     private fun buildBudgetRecommendationPrompt(data: BudgetAnalysisData): String {
         return buildString {
-            appendLine("作为专业的预算分析师，请分析以下预算使用情况，并提供2-4条简洁实用的建议：")
+            appendLine("As a professional budget analyst, please analyze the following budget usage situation and provide 2-4 concise and practical suggestions:")
             appendLine()
             
-            appendLine("【预算使用情况分析】")
+            appendLine("【Budget usage analysis】")
             data.budgetPerformance.forEach { budget ->
                 val remaining = budget.budgetAmount - budget.spentAmount
-                appendLine("• ${budget.name}：")
-                appendLine("  - 预算总额：¥${String.format("%.0f", budget.budgetAmount)}")
-                appendLine("  - 已使用：¥${String.format("%.0f", budget.spentAmount)}")
-                appendLine("  - 剩余金额：¥${String.format("%.0f", remaining)}")
-                appendLine("  - 使用率：${String.format("%.1f", budget.usageRate)}%")
-                appendLine("  - 剩余时间：${budget.remainingDays}天")
+                appendLine("• ${budget.name}:")
+                appendLine("  - Total budget: ¥${String.format("%.0f", budget.budgetAmount)}")
+                appendLine("  - Spent: ¥${String.format("%.0f", budget.spentAmount)}")
+                appendLine("  - Remaining amount: ¥${String.format("%.0f", remaining)}")
+                appendLine("  - Usage rate: ${String.format("%.1f", budget.usageRate)}%")
+                appendLine("  - Remaining time: ${budget.remainingDays} days")
                 appendLine()
             }
             
-            appendLine("【总体情况】")
-            appendLine("- 预算总数：${data.totalBudgets}个")
-            appendLine("- 超支预算：${data.overBudgetCount}个")
-            appendLine("- 平均使用率：${String.format("%.1f", data.averageUsageRate)}%")
+            appendLine("【Overall situation】")
+            appendLine("- Total budgets: ${data.totalBudgets} budgets")
+            appendLine("- Over budget budgets: ${data.overBudgetCount} budgets")
+            appendLine("- Average usage rate: ${String.format("%.1f", data.averageUsageRate)}%")
             appendLine()
             
-            appendLine("请基于以上数据提供建议，每条建议格式如下：")
-            appendLine("建议标题|详细分析和具体建议（包含数据分析和改进措施）|优先级（高/中/低）")
+            appendLine("Please provide suggestions based on the above data, each suggestion format as follows:")
+            appendLine("Advice title|Detailed analysis and specific suggestions (including data analysis and improvement measures)|Priority (High/Medium/Low)")
             appendLine()
-            appendLine("要求：")
-            appendLine("1. 每条建议要完整详细，无需点击查看更多")
-            appendLine("2. 结合具体数据进行分析")
-            appendLine("3. 提供可执行的改进措施")
-            appendLine("4. 优先分析使用率异常的预算")
-            appendLine("5. 建议控制在150字以内但要包含关键信息")
+            appendLine("Requirements:")
+            appendLine("1. Each suggestion must be complete and detailed without clicking to view more")
+            appendLine("2. Analysis based on specific data")
+            appendLine("3. Provide executable improvement measures")
+            appendLine("4. Prioritize analysis of budgets with abnormal usage rate")
+            appendLine("5. Suggestions should be控制在150字以内但要包含关键信息")
         }
     }
     
-    // 解析方法
+    // Parsing methods
     
     private fun parseExpenseAnalysis(content: String): ExpenseAnalysis {
         return ExpenseAnalysis(
             summary = content.substringBefore("\n\n").ifEmpty { content },
-            structureAnalysis = extractSection(content, "支出结构分析", "消费习惯评估") ?: "暂无分析",
-            habitAssessment = extractSection(content, "消费习惯评估", "潜在问题识别") ?: "暂无评估", 
-            problemIdentification = extractSection(content, "潜在问题识别", "优化建议") ?: "暂无问题",
-            optimizationSuggestions = extractSection(content, "优化建议", null) ?: "暂无建议",
+            structureAnalysis = extractSection(content, "Expense structure analysis", "Consumption habit assessment") ?: "No analysis available",
+            habitAssessment = extractSection(content, "Consumption habit assessment", "Potential problem identification") ?: "No assessment available", 
+            problemIdentification = extractSection(content, "Potential problem identification", "Optimization suggestions") ?: "No problem identified",
+            optimizationSuggestions = extractSection(content, "Optimization suggestions", null) ?: "No suggestions generated",
             generatedAt = System.currentTimeMillis()
         )
     }
@@ -438,11 +627,11 @@ class AIAnalysisService {
         var currentTitle = ""
         var currentDescription = ""
         var currentEffect = ""
-        var currentDifficulty = "中等"
+        var currentDifficulty = "Medium"
         
         for (line in lines) {
             when {
-                line.contains("建议") && line.contains("：") -> {
+                line.contains("Advice") && line.contains("：") -> {
                     if (currentTitle.isNotEmpty()) {
                         adviceList.add(ConsumptionAdvice(
                             title = currentTitle,
@@ -455,19 +644,19 @@ class AIAnalysisService {
                     currentTitle = line.substringAfter("：").trim()
                     currentDescription = ""
                     currentEffect = ""
-                    currentDifficulty = "中等"
+                    currentDifficulty = "Medium"
                 }
-                line.contains("说明") -> currentDescription = line.substringAfter("：").trim()
-                line.contains("效果") -> currentEffect = line.substringAfter("：").trim()
-                line.contains("难度") -> currentDifficulty = when {
-                    line.contains("简单") -> "简单"
-                    line.contains("困难") -> "困难"
-                    else -> "中等"
+                line.contains("Description") -> currentDescription = line.substringAfter("：").trim()
+                line.contains("Effect") -> currentEffect = line.substringAfter("：").trim()
+                line.contains("Difficulty") -> currentDifficulty = when {
+                    line.contains("Simple") -> "Simple"
+                    line.contains("Difficult") -> "Difficult"
+                    else -> "Medium"
                 }
             }
         }
         
-        // 添加最后一个建议
+        // Add the last advice
         if (currentTitle.isNotEmpty()) {
             adviceList.add(ConsumptionAdvice(
                 title = currentTitle,
@@ -480,10 +669,10 @@ class AIAnalysisService {
         
         return adviceList.ifEmpty { 
             listOf(ConsumptionAdvice(
-                title = "继续保持",
-                description = "您的消费习惯总体良好，建议继续保持当前的理财方式。",
-                expectedEffect = "维持财务稳定",
-                difficulty = "简单",
+                title = "Continue to maintain",
+                description = "Your consumption habits are generally good, it is recommended to continue maintaining the current financial management method.",
+                expectedEffect = "Maintain financial stability",
+                difficulty = "Simple",
                 priority = 1
             ))
         }
@@ -492,38 +681,38 @@ class AIAnalysisService {
     private fun parseBudgetRecommendations(content: String): List<com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation> {
         val recommendations = mutableListOf<com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation>()
         
-        // 按行分割并处理新格式：建议标题|详细描述|优先级
+        // Split by line and process new format: Advice title|Detailed description|Priority
         val lines = content.split("\n").filter { it.trim().isNotEmpty() }
         
         for (line in lines) {
             val trimmedLine = line.trim()
             
-            // 检查是否为建议格式（包含 | 分隔符）
-            if (trimmedLine.contains("|") && !trimmedLine.startsWith("建议标题")) {
+            // Check if it's an advice format (contains | separator)
+            if (trimmedLine.contains("|") && !trimmedLine.startsWith("Advice title")) {
                 val parts = trimmedLine.split("|")
                 if (parts.size >= 2) {
                     val title = parts[0].trim()
                     val description = parts[1].trim()
-                    val priorityText = if (parts.size >= 3) parts[2].trim() else "中"
+                    val priorityText = if (parts.size >= 3) parts[2].trim() else "Medium"
                     
-                    // 确定优先级
+                    // Determine priority
                     val priority = when {
-                        priorityText.contains("高") -> com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.Priority.HIGH
-                        priorityText.contains("低") -> com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.Priority.LOW
+                        priorityText.contains("High") -> com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.Priority.HIGH
+                        priorityText.contains("Low") -> com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.Priority.LOW
                         else -> com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.Priority.MEDIUM
                     }
                     
-                    // 根据建议内容确定类型
+                    // Determine type based on advice content
                     val type = when {
-                        title.contains("超支") || description.contains("超支") -> 
+                        title.contains("Over") || description.contains("Over") -> 
                             com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.RecommendationType.OVERSPENDING
-                        title.contains("调整") || description.contains("调整") -> 
+                        title.contains("Adjust") || description.contains("Adjust") -> 
                             com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.RecommendationType.BUDGET_ADJUSTMENT
-                        title.contains("节省") || description.contains("节省") -> 
+                        title.contains("Save") || description.contains("Save") -> 
                             com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.RecommendationType.SAVINGS_OPPORTUNITY
-                        title.contains("分类") || description.contains("分类") -> 
+                        title.contains("Category") || description.contains("Category") -> 
                             com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.RecommendationType.CATEGORY_OPTIMIZATION
-                        title.contains("习惯") || description.contains("习惯") -> 
+                        title.contains("Habit") || description.contains("Habit") -> 
                             com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.RecommendationType.SPENDING_PATTERN
                         else -> com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.RecommendationType.BUDGET_ADJUSTMENT
                     }
@@ -535,19 +724,19 @@ class AIAnalysisService {
                             title = title,
                             description = description,
                             priority = priority,
-                            actionText = null // 不需要操作按钮
+                            actionText = null // No need for action button
                         )
                     )
                 }
             }
         }
         
-        // 如果解析失败或没有建议，返回基于数据的默认建议
+        // If parsing fails or no suggestions, return data-based default suggestions
         if (recommendations.isEmpty()) {
             recommendations.addAll(generateDataBasedRecommendations())
         }
         
-        return recommendations.take(4) // 最多4条建议
+        return recommendations.take(4) // Maximum 4 suggestions
     }
     
     private fun generateDataBasedRecommendations(): List<com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation> {
@@ -555,15 +744,15 @@ class AIAnalysisService {
             com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation(
                 id = "data_based_1",
                 type = com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.RecommendationType.BUDGET_ADJUSTMENT,
-                title = "预算执行分析",
-                description = "根据当前预算使用情况，建议定期检查和调整预算分配，确保预算设置符合实际消费需求。可以将使用率低的预算金额转移到使用率高的分类中。",
+                title = "Budget execution analysis",
+                description = "Based on the current budget usage situation, it is recommended to regularly check and adjust the budget allocation to ensure that the budget setting is in line with actual consumption needs. The amount of low usage rate budgets can be transferred to high usage rate categories.",
                 priority = com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.Priority.MEDIUM
             ),
             com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation(
                 id = "data_based_2",
                 type = com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.RecommendationType.SPENDING_PATTERN,
-                title = "支出习惯优化",
-                description = "建议记录每笔支出的详细信息，养成记账习惯。定期分析支出模式，识别不必要的开支，逐步培养理性消费的习惯。",
+                title = "Spending habit optimization",
+                description = "It is recommended to record the detailed information of each transaction, establish a bookkeeping habit. Regularly analyze spending patterns, identify unnecessary expenses, and gradually cultivate rational consumption habits.",
                 priority = com.example.life_ledger.ui.budget.viewmodel.BudgetRecommendation.Priority.LOW
             )
         )
@@ -587,7 +776,7 @@ class AIAnalysisService {
     }
 }
 
-// 数据类定义
+// Data class definitions
 
 data class ExpenseData(
     val totalExpense: Double,
@@ -621,8 +810,8 @@ data class AdviceData(
 
 data class UserProfile(
     val age: Int = 25,
-    val incomeLevel: String = "中等",
-    val financialGoals: List<String> = listOf("储蓄", "理财")
+    val incomeLevel: String = "Medium",
+    val financialGoals: List<String> = listOf("Savings", "Financing")
 )
 
 data class ExpenseAnalysis(
@@ -646,7 +835,7 @@ data class ConsumptionAdvice(
     val title: String,
     val description: String,
     val expectedEffect: String,
-    val difficulty: String, // "简单", "中等", "困难"
+    val difficulty: String, // "Simple", "Medium", "Difficult"
     val priority: Int
 )
 

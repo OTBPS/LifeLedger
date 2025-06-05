@@ -55,7 +55,7 @@ class AIAnalysisFragment : Fragment() {
             android.util.Log.d("AIAnalysisFragment", "Fragment setup completed successfully")
         } catch (e: Exception) {
             android.util.Log.e("AIAnalysisFragment", "Error during fragment setup", e)
-            Snackbar.make(view, "初始化失败：${e.message}", Snackbar.LENGTH_LONG).show()
+            Snackbar.make(view, getString(R.string.initialization_failed, e.message), Snackbar.LENGTH_LONG).show()
         }
     }
 
@@ -88,32 +88,50 @@ class AIAnalysisFragment : Fragment() {
         binding.apply {
             // 支出分析按钮
             buttonAnalyzeExpenses.setOnClickListener {
-                viewModel.analyzeRecentExpenses()
+                android.util.Log.d("AIAnalysisFragment", "User clicked expense analysis button")
+                if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                    viewModel.analyzeRecentExpenses()
+                }
             }
             
             // 月度报告按钮
             buttonMonthlyReport.setOnClickListener {
-                viewModel.generateMonthlyReport()
+                android.util.Log.d("AIAnalysisFragment", "User clicked monthly report button")
+                if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                    viewModel.generateMonthlyReport()
+                }
             }
             
             // 个性化建议按钮
             buttonPersonalizedAdvice.setOnClickListener {
-                viewModel.getPersonalizedAdvice()
+                android.util.Log.d("AIAnalysisFragment", "User clicked personalized advice button")
+                if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                    viewModel.getPersonalizedAdvice()
+                }
             }
             
             // 一键分析按钮
             buttonFullAnalysis.setOnClickListener {
-                viewModel.performFullAnalysis()
+                android.util.Log.d("AIAnalysisFragment", "User clicked full analysis button")
+                if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                    viewModel.performFullAnalysis()
+                }
             }
             
             // 刷新按钮
             swipeRefreshLayout.setOnRefreshListener {
-                viewModel.performFullAnalysis()
+                android.util.Log.d("AIAnalysisFragment", "User triggered refresh")
+                if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                    viewModel.performFullAnalysis()
+                }
             }
             
             // 用户配置按钮
             buttonUserProfile.setOnClickListener {
-                showUserProfileDialog()
+                android.util.Log.d("AIAnalysisFragment", "User clicked profile button")
+                if (isAdded && !isDetached && activity != null && activity?.isFinishing != true) {
+                    showUserProfileDialog()
+                }
             }
         }
     }
@@ -175,9 +193,9 @@ class AIAnalysisFragment : Fragment() {
             textOptimizationSuggestions.text = analysis.optimizationSuggestions
             
             // 显示分析时间
-            val date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+            val date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH)
                 .format(Date(analysis.generatedAt))
-            textAnalysisTime.text = "分析时间：$date"
+            textAnalysisTime.text = "Analysis time: $date"
         }
     }
 
@@ -185,14 +203,14 @@ class AIAnalysisFragment : Fragment() {
         binding.apply {
             layoutMonthlyReport.visibility = View.VISIBLE
             
-            textReportTitle.text = "${report.year}年${report.month}月财务报告"
+            textReportTitle.text = "${report.month}/${report.year} Financial Report"
             textReportContent.text = report.content
             textReportSummary.text = report.summary
             
             // 显示报告生成时间
-            val date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+            val date = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH)
                 .format(Date(report.generatedAt))
-            textReportTime.text = "生成时间：$date"
+            textReportTime.text = "Generated: $date"
         }
     }
 
