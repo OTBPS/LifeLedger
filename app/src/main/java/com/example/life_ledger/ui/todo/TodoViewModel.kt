@@ -114,9 +114,9 @@ class TodoViewModel(private val repository: LifeLedgerRepository) : ViewModel() 
         viewModelScope.launch {
             try {
                 repository.insertTodo(todo)
-                _operationResult.emit(OperationResult(true, "任务添加成功"))
+                _operationResult.emit(OperationResult(true, "Task added successfully"))
             } catch (e: Exception) {
-                _operationResult.emit(OperationResult(false, "添加任务失败: ${e.message}"))
+                _operationResult.emit(OperationResult(false, "Adding task failed: ${e.message}"))
             }
         }
     }
@@ -128,9 +128,9 @@ class TodoViewModel(private val repository: LifeLedgerRepository) : ViewModel() 
         viewModelScope.launch {
             try {
                 repository.updateTodo(todo)
-                _operationResult.emit(OperationResult(true, "任务更新成功"))
+                _operationResult.emit(OperationResult(true, "Task update successful"))
             } catch (e: Exception) {
-                _operationResult.emit(OperationResult(false, "更新任务失败: ${e.message}"))
+                _operationResult.emit(OperationResult(false, "Update task failed: ${e.message}"))
             }
         }
     }
@@ -142,9 +142,9 @@ class TodoViewModel(private val repository: LifeLedgerRepository) : ViewModel() 
         viewModelScope.launch {
             try {
                 repository.deleteTodo(todo)
-                _operationResult.emit(OperationResult(true, "任务删除成功"))
+                _operationResult.emit(OperationResult(true, "Task deleted successfully"))
             } catch (e: Exception) {
-                _operationResult.emit(OperationResult(false, "删除任务失败: ${e.message}"))
+                _operationResult.emit(OperationResult(false, "Task deletion failed: ${e.message}"))
             }
         }
     }
@@ -156,7 +156,7 @@ class TodoViewModel(private val repository: LifeLedgerRepository) : ViewModel() 
         return try {
             repository.getTodoById(id)
         } catch (e: Exception) {
-            _operationResult.emit(OperationResult(false, "获取任务失败: ${e.message}"))
+            _operationResult.emit(OperationResult(false, "Failed to obtain task: ${e.message}"))
             null
         }
     }
@@ -176,11 +176,11 @@ class TodoViewModel(private val repository: LifeLedgerRepository) : ViewModel() 
                 _operationResult.emit(
                     OperationResult(
                         true,
-                        if (updatedTodo.isCompleted) "任务已完成" else "任务已恢复"
+                        if (updatedTodo.isCompleted) "Task completed" else "Task has been restored"
                     )
                 )
             } catch (e: Exception) {
-                _operationResult.emit(OperationResult(false, "更新任务状态失败: ${e.message}"))
+                _operationResult.emit(OperationResult(false, "Failed to update task status: ${e.message}"))
             }
         }
     }
@@ -193,9 +193,9 @@ class TodoViewModel(private val repository: LifeLedgerRepository) : ViewModel() 
             try {
                 val updatedTodo = todo.updateProgress(progress)
                 repository.updateTodo(updatedTodo)
-                _operationResult.emit(OperationResult(true, "进度已更新"))
+                _operationResult.emit(OperationResult(true, "Progress has been updated"))
             } catch (e: Exception) {
-                _operationResult.emit(OperationResult(false, "更新进度失败: ${e.message}"))
+                _operationResult.emit(OperationResult(false, "Update progress failed: ${e.message}"))
             }
         }
     }
@@ -293,9 +293,9 @@ class TodoViewModel(private val repository: LifeLedgerRepository) : ViewModel() 
         viewModelScope.launch {
             try {
                 repository.markTodosAsCompleted(todoIds)
-                _operationResult.emit(OperationResult(true, "已标记 ${todoIds.size} 个任务为完成"))
+                _operationResult.emit(OperationResult(true, "Marked ${todoIds.size} tasks to complete"))
             } catch (e: Exception) {
-                _operationResult.emit(OperationResult(false, "批量更新失败: ${e.message}"))
+                _operationResult.emit(OperationResult(false, "Batch update failed: ${e.message}"))
             }
         }
     }
@@ -310,9 +310,9 @@ class TodoViewModel(private val repository: LifeLedgerRepository) : ViewModel() 
                 completedTodos.forEach { todo ->
                     repository.deleteTodo(todo)
                 }
-                _operationResult.emit(OperationResult(true, "已删除 ${completedTodos.size} 个已完成任务"))
+                _operationResult.emit(OperationResult(true, "Deleted ${completedTodos.size}  completed task"))
             } catch (e: Exception) {
-                _operationResult.emit(OperationResult(false, "删除任务失败: ${e.message}"))
+                _operationResult.emit(OperationResult(false, "Task deletion failed: ${e.message}"))
             }
         }
     }
@@ -321,8 +321,8 @@ class TodoViewModel(private val repository: LifeLedgerRepository) : ViewModel() 
      * 获取分类名称
      */
     fun getCategoryName(categoryId: String?): String {
-        if (categoryId == null) return "未分类"
-        return _categories.value.find { it.id == categoryId }?.name ?: "未知分类"
+        if (categoryId == null) return "Unclassified"
+        return _categories.value.find { it.id == categoryId }?.name ?: "Unknown classification"
     }
 
     /**

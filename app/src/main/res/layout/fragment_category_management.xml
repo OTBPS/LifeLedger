@@ -27,7 +27,7 @@
                 android:elevation="4dp"
                 android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
                 app:navigationIcon="@drawable/ic_arrow_back"
-                app:title="分类管理"
+                app:title="Classification management"
                 app:titleTextColor="?attr/colorOnPrimary" />
 
             <!-- 筛选区域 -->
@@ -47,7 +47,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="筛选分类"
+                        android:text="Filter classification"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
                         android:textColor="?attr/colorOnSurface" />
 
@@ -66,21 +66,21 @@
                             style="@style/Widget.MaterialComponents.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="全部" />
+                            android:text="All" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chipIncomeCategories"
                             style="@style/Widget.MaterialComponents.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="收入分类" />
+                            android:text="Income Categories" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chipExpenseCategories"
                             style="@style/Widget.MaterialComponents.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="支出分类" />
+                            android:text="expenditure category" />
 
                     </com.google.android.material.chip.ChipGroup>
 
@@ -122,7 +122,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="暂无分类"
+                    android:text="There are currently no categories available"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                     android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -130,7 +130,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="点击右下角按钮添加分类"
+                    android:text="Click the button in the bottom right corner to add a category"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                     android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -145,7 +145,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
-            android:contentDescription="添加分类"
+            android:contentDescription="Add classification"
             app:srcCompat="@drawable/ic_add"
             app:tint="?attr/colorOnPrimary" />
 
